@@ -3,7 +3,6 @@
 import CompetitionCards from "@/components/dashboard/competitionCards";
 import CompetitionHeader from "@/components/dashboard/competitionHeader";
 import SelectBank from "@/components/dashboard/selectBank";
-import TrendChart from "@/components/dashboard/trendChart";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import React from "react";
@@ -164,7 +163,6 @@ const Dashboard = () => {
                 <CardTitle className="mt-2">{item.name}</CardTitle>
                 <Button variant="outline" className="p-2">View More</Button>
               </CardHeader>
-              <TrendChart/>
             </Card>
           )
         })}
