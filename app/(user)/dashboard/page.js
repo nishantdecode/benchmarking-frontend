@@ -9,8 +9,8 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
 import Header from "@/app/components/header/header";
 import SelectBank from "@/app/components/dashboard/selectBank";
-import { VisualiseLine } from "@/app/components/visualise/VisualiseLine";
-import { VisualiseBar } from "@/app/components/visualise/VisualiseBar";
+import { VisualiseLine } from "@/app/components/visualise/visualiseLine";
+import { VisualiseBar } from "@/app/components/visualise/visualiseBar";
 import CompetitionCards from "@/app/components/dashboard/competitionCards";
 import CompetitionHeader from "@/app/components/dashboard/competitionHeader";
 

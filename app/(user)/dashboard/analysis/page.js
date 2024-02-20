@@ -6,8 +6,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-import { VisualiseBar } from "@/app/components/visualise/VisualiseBar";
-import { VisualiseLine } from "@/app/components/visualise/VisualiseLine";
+import { VisualiseBar } from "@/app/components/visualise/visualiseBar";
+import { VisualiseLine } from "@/app/components/visualise/visualiseLine";
 import Category from "@/app/components/dashboard/analysis/category";
 import HeaderAnalysis from "@/app/components/dashboard/analysis/headerAnalysis";
 import {
@@ -39,7 +39,7 @@ const TrendAndCompetitionAnalysis = ({}) => {
     router.push(
       `${pathName}?category=${category}&bank=${bank}&competitionOne=${competitionOne}&competitionTwo=${competitionTwo}`
     );
-  }, [category, bank, competitionOne, competitionTwo]);
+  }, [category, bank, competitionOne, competitionTwo, router, pathName]);
   const displayedCategory = analysisCategories.find(
     (categoryObj) => categoryObj.category === category
   );
