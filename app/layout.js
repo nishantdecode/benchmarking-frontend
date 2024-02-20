@@ -4,7 +4,7 @@ import StoreProvider from "../lib/StoreProvider";
 import { Inter as FontSans } from "next/font/google"
  
 import { cn } from "@/lib/utils"
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/app/components/theme-provider"
  
 export const fontSans = FontSans({
   subsets: ["latin"],

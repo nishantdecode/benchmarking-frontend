@@ -2,7 +2,7 @@ import React from "react";
 
 import { RiPieChart2Fill } from "react-icons/ri";
 
-import Header from "@/components/header/header";
+import Header from "@/app/components/header/header";
 
 const MarketLayout = ({ children }) => {
   return (

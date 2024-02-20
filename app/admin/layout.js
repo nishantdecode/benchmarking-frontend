@@ -1,8 +1,8 @@
 import React from 'react'
 
-const AdminLayout = () => {
+const AdminLayout = ({children}) => {
   return (
-    <div>Admin</div>
+    <div>{children}</div>
   )
 }
 

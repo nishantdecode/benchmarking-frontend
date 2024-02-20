@@ -11,7 +11,8 @@ import { PiSigmaFill } from "react-icons/pi";
 import { BiSolidBank } from "react-icons/bi";
 import { FaRankingStar } from "react-icons/fa6";
 
-import { Button } from "../ui/button";
+import { Button } from "../../../components/ui/button";
+import { Div } from "@/components/ui/div";
 
 const navItems = [
   {
@@ -57,15 +58,16 @@ const navItems = [
 ];
 
 const MenuList = ({ pathname, router }) => {
+  const parentPath = pathname.split('/')[1];
   return (
     <div className="flex flex-col items-center justify-center space-y-2">
       {navItems.map((navItem, index) => {
-        const variant = navItem.route === pathname ? "default" : "link";
+        const variant = navItem.route.startsWith('/' + parentPath) ? "default" : "link";
         return (
-          <Button key={index} variant={variant} className="w-full" onClick={()=>{router.push(navItem.route)}}>
+          <Div key={index} variant={variant} className="w-full" onClick={()=>{router.push(navItem.route)}}>
               {navItem.icon}
               <div>{navItem.title}</div>
-          </Button>
+          </Div>
         );
       })}
     </div>

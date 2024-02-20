@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { store } from "./lib/store";
 import { authApi } from "./lib/features/services/authApi";
-import { setAuthenticated, setUser } from "./lib/features/slices/authSlice";
 
 const userPrefixes = [
   "/dashboard",
@@ -48,9 +47,7 @@ export async function middleware(req) {
         );
         const { data, error } = await verify;
         if (data) {
-          store.dispatch(setAuthenticated(true));
-          store.dispatch(setUser(data.userObj));
-          const user = store.getState().auth.user;
+          const user = data.userObj;
           if (user) {
             if (user.role === "Admin" || user.role === "SuperAdmin") {
               if (req.nextUrl.pathname.startsWith("/login")) {
@@ -67,6 +64,8 @@ export async function middleware(req) {
                 )
               ) {
                 return NextResponse.next();
+              } else {
+                return NextResponse.redirect(new URL("/dashboard", req.url));
               }
             }
           } else {
@@ -86,6 +85,7 @@ export async function middleware(req) {
             const { data, error } = await refresh;
             if (data) {
               const newAccessToken = req.cookies.get("accessToken")?.value;
+              console.log(newAccessToken)
               if (newAccessToken) {
                 const reVerify = store.dispatch(
                   authApi.endpoints.verifyToken.initiate({
@@ -93,10 +93,10 @@ export async function middleware(req) {
                   })
                 );
                 const { data, error } = await reVerify;
+                console.log(data)
+                console.log(error)
                 if (data) {
-                  store.dispatch(setAuthenticated(true));
-                  store.dispatch(setUser(data.userObj));
-                  const user = store.getState().auth.user;
+                  const user = data.userObj;
                   if (user) {
                     if (user.role === "Admin" || user.role === "SuperAdmin") {
                       if (req.nextUrl.pathname.startsWith("/login")) {
@@ -117,6 +117,10 @@ export async function middleware(req) {
                         )
                       ) {
                         return NextResponse.next();
+                      } else {
+                        return NextResponse.redirect(
+                          new URL("/dashboard", req.url)
+                        );
                       }
                     }
                   } else {

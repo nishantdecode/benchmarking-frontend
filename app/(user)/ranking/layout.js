@@ -2,7 +2,7 @@ import React from "react";
 
 import { FaRankingStar } from "react-icons/fa6";
 
-import Header from "@/components/header/header";
+import Header from "@/app/components/header/header";
 
 const RankingLayout = ({ children }) => {
   return (

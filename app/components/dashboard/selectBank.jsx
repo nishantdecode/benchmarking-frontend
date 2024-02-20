@@ -7,10 +7,9 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel"
- 
+} from "@/components/ui/carousel" 
 
-const SelectBank = ({data}) => {
+const SelectBank = ({banks, bankName, setBankName}) => {
   return (
     <Carousel
       opts={{
@@ -19,13 +18,13 @@ const SelectBank = ({data}) => {
       className="w-full"
     >
       <CarouselContent>
-        {data.map((bank, index) => (
-          <CarouselItem key={index} className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5">
+        {banks.map((bank, index) => (
+          <CarouselItem key={index} className="basis-1/1 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <div className="p-1">
-              <Card>
-                <CardContent className="flex items-center justify-start p-2 pl-4 gap-4">
-                  <span className="text-sm font-semibold">{bank.icon}</span>
-                  <span className="text-sm font-semibold">{bank.name}</span>
+              <Card onClick={()=>{setBankName(bank.name)}} className={`${bankName === bank.name ? "bg-card/10" : ""} hover:bg-card/50`}>
+                <CardContent className="flex items-center justify-start p-2 px-4 gap-4">
+                  <span className="text-xs sm:text-sm font-semibold">{bank.iconUrl}</span>
+                  <span className="text-xs sm:text-sm font-semibold">{bank.name}</span>
                 </CardContent>
               </Card>
             </div>

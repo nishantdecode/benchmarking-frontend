@@ -2,7 +2,7 @@ import React from "react";
 
 import { PiMathOperationsFill } from "react-icons/pi";
 
-import Header from "@/components/header/header";
+import Header from "@/app/components/header/header";
 
 const RatioLayout = ({ children }) => {
   return (
