@@ -1,9 +1,9 @@
 import React from "react";
 
-import HeaderAuth from "@/components/headerAuth/headerAuth";
+import HeaderAuth from "@/app/components/header/headerAuth";
 
 import { Card } from "@/components/ui/card";
-import ClientOnly from "@/components/ClientOnly";
+import ClientOnly from "@/app/components/ClientOnly";
 
 const Layout = ({ children }) => {
   return (

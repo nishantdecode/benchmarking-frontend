@@ -2,6 +2,10 @@
 
 import React from "react";
 import { useTheme } from "next-themes";
+import { usePathname, useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { useLogoutMutation } from "@/lib/features/services/authApi";
+import { setAuthenticated, setUser } from "@/lib/features/slices/authSlice";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +17,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { IoIosArrowForward } from "react-icons/io";
 import { BsFillPieChartFill } from "react-icons/bs";
 import { MdDarkMode } from "react-icons/md";
@@ -21,14 +26,27 @@ import { RxAvatar } from "react-icons/rx";
 import { LuLogOut } from "react-icons/lu";
 
 import MenuList from "./menuList";
+import { LogoutDialog } from "./logoutDialog";
+import logoutAction from "@/app/actions/logoutAction";
 
-const Navbar = ({pathname, router, user}) => {
+
+const Navbar = ({ user }) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const dispatch = useDispatch();
   const { theme, setTheme } = useTheme();
+  dispatch(setUser(user));
+  dispatch(setAuthenticated(true));
+
+  const handleLogout = async () => {
+    await logoutAction()
+    router.push("./login");
+  };
   return (
     <div>
       <Drawer direction="left" className="h-full">
         <DrawerTrigger asChild>
-          <div className="fixed flex flex-col justify-center w-2 h-screen bg-card dark:bg-card">
+          <div className="fixed top-0 flex flex-col justify-center w-2 h-screen bg-card dark:bg-card">
             <div className="flex flex-col justify-center align-middle w-5 h-16 rounded-r-full bg-card dark:bg-card">
               <IoIosArrowForward className="text-primary font-bold size-6" />
             </div>
@@ -45,13 +63,13 @@ const Navbar = ({pathname, router, user}) => {
           </DrawerHeader>
           <div className="p-4 pb-0 flex-grow">
             <DrawerClose>
-              <MenuList pathname={pathname} router={router}/>
+              <MenuList pathname={pathname} router={router} />
             </DrawerClose>
           </div>
           <DrawerFooter className="border-t-[2px] border-border pt-2 flex-shrink-0">
             <Button
               variant="link"
-              className="w-full"
+              className="w-full gap-3"
               onClick={() => {
                 theme === "dark" ? setTheme("light") : setTheme("dark");
               }}
@@ -63,15 +81,28 @@ const Navbar = ({pathname, router, user}) => {
               )}
               <div>{theme} Mode</div>
             </Button>
-            <Button variant="link" className="w-full">
+            <Button variant="link" className="w-full gap-3">
               <RxAvatar size={20} />
-              {user && <div>{user.name.first} {user.name.last}</div>}
-              {!user && <div>User name</div>}
+              {user && (
+                <div>
+                  {user.name.first} {user.name.last}
+                </div>
+              )}
+              {!user && (
+                <div>
+                  username
+                </div>
+              )}
             </Button>
-            <Button variant="destructive" className="w-full font-bold">
-              <LuLogOut size={20} />
-              <div>Logout</div>
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" className="w-full font-bold gap-3">
+                  <LuLogOut size={20} />
+                  <div>Logout</div>
+                </Button>
+              </AlertDialogTrigger>
+              <LogoutDialog handleLogout={handleLogout}/>
+            </AlertDialog>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>

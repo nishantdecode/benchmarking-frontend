@@ -2,7 +2,7 @@ import React from "react";
 
 import { IoBarChart } from "react-icons/io5";
 
-import Header from "@/components/header/header";
+import Header from "@/app/components/header/header";
 
 const SizeLayout = ({ children }) => {
   return (

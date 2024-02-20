@@ -2,7 +2,7 @@ import React from "react";
 
 import { IoIosListBox } from "react-icons/io";
 
-import Header from "@/components/header/header";
+import Header from "@/app/components/header/header";
 
 const AnalysisLayout = ({ children }) => {
   return (

@@ -28,7 +28,6 @@ const formSchema = z.object({
 
 const Login = () => {
   const [login, { isLoading, error }] = useLoginMutation();
-  const dispatch = useDispatch();
   const router = useRouter();
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -47,8 +46,6 @@ const Login = () => {
     try {
       const response = await login(credentials);
       if (response.data) {
-        dispatch(setAuthenticated(true));
-        dispatch(setUser(response.data.user));
         router.push("./dashboard");
       } else {
         console.log("Login failed:", response.data.error);
