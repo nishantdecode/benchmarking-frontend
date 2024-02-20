@@ -17,30 +17,25 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
 import { useLoginMutation } from "@/lib/features/services/authApi";
-import { setAuthenticated, setUser } from "@/lib/features/slices/authSlice";
 
 const formSchema = z.object({
-  loginID: z.string().min(36),
-  password: z.string().min(3),
+  EmailID: z.string().email(),
 });
 
-const Login = () => {
+const ForgetPassword = () => {
   const [login, { isLoading, error }] = useLoginMutation();
   const router = useRouter();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      loginID: "",
-      password: "",
+      EmailID: "",
     },
   });
 
   const handleSubmit = async (values) => {
     const credentials = {
-      loginID: values.loginID,
-      password: values.password,
+      EmailID: values.EmailID,
     };
 
     try {
@@ -56,7 +51,9 @@ const Login = () => {
   };
   return (
     <>
-      <div className="w-full font-bold text-left text-xl md:text-2xl pb-6 md:mb-8">Log in</div>
+      <div className="w-full font-bold text-left text-xl md:text-2xl pb-6 md:mb-8">
+        Forget Password
+      </div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
@@ -64,18 +61,20 @@ const Login = () => {
         >
           <FormField
             control={form.control}
-            name="loginID"
+            name="EmailID"
             render={({ field }) => {
               return (
                 <FormItem>
                   <div className="flex flex-col md:flex-row justify-between gap-4">
-                    <FormLabel className="text-xs md:text-sm">Login ID* :</FormLabel>
+                    <FormLabel className="text-xs md:text-sm">
+                      Enter your registered Email ID* :
+                    </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="loginID"
-                        type="loginID"
+                        placeholder="Enter your Email ID"
+                        type="EmailID"
                         {...field}
-                        className="md:max-w-[300px]"
+                        className="w-full md:max-w-[250px]"
                       />
                     </FormControl>
                   </div>
@@ -84,29 +83,10 @@ const Login = () => {
               );
             }}
           />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => {
-              return (
-                <FormItem>
-                  <div className="flex flex-col md:flex-row justify-between gap-4">
-                    <FormLabel className="mt-3 text-xs md:text-sm">Password* :</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="password"
-                        type="password"
-                        {...field}
-                        className="md:max-w-[300px]"
-                      />
-                    </FormControl>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              );
-            }}
-          />
-          <div className="flex flex-row w-full justify-center md:justify-end mt-2 md:mt-5">
+          <div className="w-full text-center md:text-end text-[10px]">
+            We will send an OTP at this Email ID
+          </div>
+          <div className="flex flex-col-reverse md:flex-row w-full justify-center md:justify-end mt-2 md:mt-5">
             <Button
               size="sm"
               variant="default"
@@ -119,16 +99,17 @@ const Login = () => {
         </form>
       </Form>
       <div className="flex flex-row w-full justify-center md:justify-start">
-      <Button
-        variant="link"
-        className="p-0 text-xs md:mt-[-40px]"
-        onClick={() => router.push("/forgetPassword")}
-      >
-        Forget Password?
-      </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="px-3 text-xs md:mt-[-35px] rounded-xl"
+          onClick={() => router.push("/login")}
+        >
+          Back to Login ?
+        </Button>
       </div>
     </>
   );
 };
 
-export default Login;
+export default ForgetPassword;

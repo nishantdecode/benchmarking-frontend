@@ -37,7 +37,7 @@ const navItems = [
   },
   {
     title: "Common Size",
-    route: "/size",
+    route: "/size/singleBank",
     icon: <IoBarChart size={20} />,
   },
   {
