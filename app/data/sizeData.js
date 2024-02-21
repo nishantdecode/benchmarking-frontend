@@ -333,13 +333,13 @@ const equityCategories = [
     name: "Treasury Shares",
   },
   {
-    name: "Employees’ Related",
+    name: "Employees\' Related",
   },
   {
     name: "Foreign Currency  Transition",
   },
   {
-    name: "Total Shareholder’s Equity",
+    name: "Total Shareholder\'s Equity",
   },
 ];
 
@@ -353,9 +353,9 @@ const equityData = [
     "Retained Earnings": "17.4",
     "Proposed Dividends": "18.7",
     "Treasury Shares": "12.5",
-    "Employees’ Related": "18.2",
+    "Employees\' Related": "18.2",
     "Foreign Currency  Transition": "14.1",
-    "Total Shareholder’s Equity": "12.9",
+    "Total Shareholder\'s Equity": "12.9",
   },
   {
     id: 2,
@@ -366,9 +366,9 @@ const equityData = [
     "Retained Earnings": "19.8",
     "Proposed Dividends": "34.5",
     "Treasury Shares": "28.1",
-    "Employees’ Related": "46.9",
+    "Employees\' Related": "46.9",
     "Foreign Currency  Transition": "33.4",
-    "Total Shareholder’s Equity": "47.2",
+    "Total Shareholder\'s Equity": "47.2",
   },
   {
     id: 3,
@@ -379,9 +379,9 @@ const equityData = [
     "Retained Earnings": "39.7",
     "Proposed Dividends": "22.3",
     "Treasury Shares": "78.1",
-    "Employees’ Related": "57.2",
+    "Employees\' Related": "57.2",
     "Foreign Currency  Transition": "64.8",
-    "Total Shareholder’s Equity": "58.9",
+    "Total Shareholder\'s Equity": "58.9",
   },
   {
     id: 4,
@@ -392,9 +392,9 @@ const equityData = [
     "Retained Earnings": "61.8",
     "Proposed Dividends": "43.6",
     "Treasury Shares": "55.1",
-    "Employees’ Related": "73.4",
+    "Employees\' Related": "73.4",
     "Foreign Currency  Transition": "81.7",
-    "Total Shareholder’s Equity": "69.2",
+    "Total Shareholder\'s Equity": "69.2",
   },
   {
     id: 5,
@@ -405,9 +405,9 @@ const equityData = [
     "Retained Earnings": "74.6",
     "Proposed Dividends": "59.8",
     "Treasury Shares": "71.5",
-    "Employees’ Related": "48.3",
+    "Employees\' Related": "48.3",
     "Foreign Currency  Transition": "93.2",
-    "Total Shareholder’s Equity": "83.7",
+    "Total Shareholder\'s Equity": "83.7",
   },
   {
     id: 6,
@@ -418,9 +418,9 @@ const equityData = [
     "Retained Earnings": "68.4",
     "Proposed Dividends": "53.7",
     "Treasury Shares": "79.4",
-    "Employees’ Related": "87.5",
+    "Employees\' Related": "87.5",
     "Foreign Currency  Transition": "91.8",
-    "Total Shareholder’s Equity": "72.9",
+    "Total Shareholder\'s Equity": "72.9",
   },
   {
     id: 7,
@@ -431,9 +431,9 @@ const equityData = [
     "Retained Earnings": "71.9",
     "Proposed Dividends": "67.3",
     "Treasury Shares": "92.5",
-    "Employees’ Related": "88.1",
+    "Employees\' Related": "88.1",
     "Foreign Currency  Transition": "84.7",
-    "Total Shareholder’s Equity": "89.3",
+    "Total Shareholder\'s Equity": "89.3",
   },
   {
     id: 8,
@@ -444,9 +444,9 @@ const equityData = [
     "Retained Earnings": "65.4",
     "Proposed Dividends": "59.3",
     "Treasury Shares": "88.2",
-    "Employees’ Related": "72.1",
+    "Employees\' Related": "72.1",
     "Foreign Currency  Transition": "77.3",
-    "Total Shareholder’s Equity": "78.5",
+    "Total Shareholder\'s Equity": "78.5",
   },
   {
     id: 9,
@@ -457,9 +457,9 @@ const equityData = [
     "Retained Earnings": "72.1",
     "Proposed Dividends": "61.4",
     "Treasury Shares": "67.2",
-    "Employees’ Related": "75.3",
+    "Employees\' Related": "75.3",
     "Foreign Currency  Transition": "73.6",
-    "Total Shareholder’s Equity": "67.8",
+    "Total Shareholder\'s Equity": "67.8",
   },
   {
     id: 10,
@@ -470,9 +470,9 @@ const equityData = [
     "Retained Earnings": "63.7",
     "Proposed Dividends": "57.1",
     "Treasury Shares": "48.2",
-    "Employees’ Related": "54.9",
+    "Employees\' Related": "54.9",
     "Foreign Currency  Transition": "46.5",
-    "Total Shareholder’s Equity": "59.4",
+    "Total Shareholder\'s Equity": "59.4",
   }
 ];
 

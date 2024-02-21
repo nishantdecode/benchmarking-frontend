@@ -82,7 +82,7 @@ const SingleBankPage = () => {
               </div>
               <div className="flex flex-col w-full gap-3">
                 <div className="text-xl font-semibold">
-                  Shareholder's Equity : {bank}
+                  Shareholder&apos;s Equity : {bank}
                 </div>
                 <VisualiseTable data={equityData} columns={equityColumns} />
               </div>

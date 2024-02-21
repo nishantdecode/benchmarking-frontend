@@ -103,7 +103,7 @@ const MultiBankPage = () => {
               <div className="flex flex-row gap-5">
                 <div className="flex flex-col w-full lg:w-1/5 h-auto gap-3">
                   <div className="text-lg font-semibold">
-                    Shareholder's Equity :
+                    Shareholder&apos;s Equity :
                   </div>
                   <SelectCategory
                     categories={equityCategories}

@@ -38,7 +38,7 @@ const Navbar = ({ user }) => {
   useEffect(()=>{
     dispatch(setUser(user));
     dispatch(setAuthenticated(true));
-  },[dispatch, setAuthenticated, setUser])
+  },[dispatch,user])
   const handleLogout = async () => {
     await logoutAction()
     router.push("./login");
