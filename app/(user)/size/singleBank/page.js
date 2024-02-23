@@ -1,13 +1,18 @@
 "use client";
 
-import { columns } from "@/app/components/ratio/columns";
+import {
+  assetsColumns,
+  equityColumns,
+  expenseColumns,
+  incomeColumns,
+  liabilityColumns,
+} from "@/app/components/size/singleBank/columns";
 import { ToggleBank } from "@/app/components/market/toggleBank";
 import { VisualiseTable } from "@/app/components/visualise/analysis/visualiseTable";
 import { banks } from "@/app/data/marketShareData";
 import { Card } from "@/components/ui/card";
 import React, { useState } from "react";
 import OptionButtons from "@/app/components/size/OptionsButtons";
-import { figuresData } from "@/app/data/ratioData";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +23,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { IoIosArrowDown } from "react-icons/io";
+import {
+  assetData,
+  equityData,
+  expenseData,
+  incomeData,
+  liabilityData,
+} from "@/app/data/sizeData";
 
 const SingleBankPage = () => {
   const [size, setSize] = useState("BS-CS");
@@ -53,12 +65,44 @@ const SingleBankPage = () => {
           <div className="lg:sticky lg:top-14 w-full lg:w-1/6 h-full">
             <ToggleBank data={banks} bank={bank} setBank={setBank} />
           </div>
-          <div className="flex flex-col w-full lg:w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
-            <div className="flex flex-col w-full gap-3">
-              <div className="text-xl font-semibold">Assets : {bank}</div>
-              <VisualiseTable data={figuresData} columns={columns} />
+          {size === "BS-CS" ? (
+            <div className="flex flex-col w-full lg:w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-20">
+              <div className="flex flex-col w-full gap-3">
+                <div className="text-xl font-semibold">Assets : {bank}</div>
+                <VisualiseTable data={assetData} columns={assetsColumns} />
+              </div>
+              <div className="flex flex-col w-full gap-3">
+                <div className="text-xl font-semibold">
+                  Liabilities : {bank}
+                </div>
+                <VisualiseTable
+                  data={liabilityData}
+                  columns={liabilityColumns}
+                />
+              </div>
+              <div className="flex flex-col w-full gap-3">
+                <div className="text-xl font-semibold">
+                  Shareholder's Equity : {bank}
+                </div>
+                <VisualiseTable data={equityData} columns={equityColumns} />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex flex-col w-full lg:w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-20">
+              <div className="flex flex-col w-full gap-3">
+                <div className="text-xl font-semibold">
+                  Operating Income : {bank}
+                </div>
+                <VisualiseTable data={incomeData} columns={incomeColumns} />
+              </div>
+              <div className="flex flex-col w-full gap-3">
+                <div className="text-xl font-semibold">
+                  Operating Expense : {bank}
+                </div>
+                <VisualiseTable data={expenseData} columns={expenseColumns} />
+              </div>
+            </div>
+          )}
         </div>
       </Card>
     </div>

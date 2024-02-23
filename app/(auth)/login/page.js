@@ -17,9 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
 import { useLoginMutation } from "@/lib/features/services/authApi";
-import { setAuthenticated, setUser } from "@/lib/features/slices/authSlice";
 
 const formSchema = z.object({
   loginID: z.string().min(36),
@@ -44,9 +42,13 @@ const Login = () => {
     };
 
     try {
-      const response = await login(credentials);
-      if (response.data) {
-        router.push("./dashboard");
+      if (typeof window !== "undefined" && window.localStorage) {
+        const response = await login(credentials);
+        if (response.data) {
+          localStorage.setItem("accessToken", response.data.accessToken);
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+          router.push("./dashboard");
+        }
       } else {
         console.log("Login failed:", response.data.error);
       }
@@ -56,7 +58,9 @@ const Login = () => {
   };
   return (
     <>
-      <div className="w-full font-bold text-left text-xl md:text-2xl pb-6 md:mb-8">Log in</div>
+      <div className="w-full font-bold text-left text-xl md:text-2xl pb-6 md:mb-8">
+        Log in
+      </div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
@@ -69,7 +73,9 @@ const Login = () => {
               return (
                 <FormItem>
                   <div className="flex flex-col md:flex-row justify-between gap-4">
-                    <FormLabel className="text-xs md:text-sm">Login ID* :</FormLabel>
+                    <FormLabel className="text-xs md:text-sm">
+                      Login ID* :
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="loginID"
@@ -91,7 +97,9 @@ const Login = () => {
               return (
                 <FormItem>
                   <div className="flex flex-col md:flex-row justify-between gap-4">
-                    <FormLabel className="mt-3 text-xs md:text-sm">Password* :</FormLabel>
+                    <FormLabel className="mt-3 text-xs md:text-sm">
+                      Password* :
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="password"
@@ -119,13 +127,13 @@ const Login = () => {
         </form>
       </Form>
       <div className="flex flex-row w-full justify-center md:justify-start">
-      <Button
-        variant="link"
-        className="p-0 text-xs md:mt-[-40px]"
-        onClick={() => router.push("/forgetPassword")}
-      >
-        Forget Password?
-      </Button>
+        <Button
+          variant="link"
+          className="p-0 text-xs md:mt-[-40px]"
+          onClick={() => router.push("/forgetPassword")}
+        >
+          Forget Password?
+        </Button>
       </div>
     </>
   );

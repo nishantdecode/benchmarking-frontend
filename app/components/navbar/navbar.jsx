@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { usePathname, useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
-import { useLogoutMutation } from "@/lib/features/services/authApi";
+import { useSelector, useDispatch } from "react-redux";
 import { setAuthenticated, setUser } from "@/lib/features/slices/authSlice";
 
 import { Button } from "@/components/ui/button";
@@ -27,7 +26,6 @@ import { LuLogOut } from "react-icons/lu";
 
 import MenuList from "./menuList";
 import { LogoutDialog } from "./logoutDialog";
-import logoutAction from "@/app/actions/logoutAction";
 
 
 const Navbar = ({ user }) => {
@@ -35,11 +33,26 @@ const Navbar = ({ user }) => {
   const pathname = usePathname();
   const dispatch = useDispatch();
   const { theme, setTheme } = useTheme();
-  dispatch(setUser(user));
-  dispatch(setAuthenticated(true));
 
-  const handleLogout = async () => {
-    await logoutAction()
+  const [username, setUsername] = useState('username')
+  const [role, setRole] = useState('User')
+
+  useEffect(()=>{
+    if (typeof window !== "undefined" && window.localStorage) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const name = user?.name.first + " " + user?.name.last
+      setUsername(name)
+      setRole(user?.role)
+      dispatch(setUser(user));
+      dispatch(setAuthenticated(true));
+    }
+  },[])
+
+  const handleLogout = () => {
+    dispatch(setUser(undefined));
+    dispatch(setAuthenticated(false));
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
     router.push("./login");
   };
   return (
@@ -81,18 +94,11 @@ const Navbar = ({ user }) => {
               )}
               <div>{theme} Mode</div>
             </Button>
-            <Button variant="link" className="w-full gap-3">
+            <Button variant={`${pathname === '/admin' ? 'default' : 'link'}`} className="w-full gap-3" onClick={()=>{role === 'Admin' ? router.push('/admin') : router.push('/dashboard')}}>
               <RxAvatar size={20} />
-              {user && (
-                <div>
-                  {user.name.first} {user.name.last}
-                </div>
-              )}
-              {!user && (
-                <div>
-                  username
-                </div>
-              )}
+              <div>
+                {username}
+              </div>
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
