@@ -46,7 +46,7 @@ const Navbar = ({ user }) => {
       dispatch(setUser(user));
       dispatch(setAuthenticated(true));
     }
-  },[])
+  },[dispatch])
 
   const handleLogout = () => {
     dispatch(setUser(undefined));

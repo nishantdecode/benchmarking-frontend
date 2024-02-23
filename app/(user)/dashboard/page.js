@@ -38,7 +38,7 @@ const Dashboard = () => {
     if (localStorage.getItem('user') === null) {
       router.push("/login");
     }
-  }, [user]);
+  }, [user, router]);
 
   useEffect(() => {
     //query: api/v1/dashboard/year/:year

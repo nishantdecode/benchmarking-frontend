@@ -6,11 +6,11 @@ import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { IoIosArrowForward } from "react-icons/io";
 
-const page = () => {
+const Home = () => {
   const router = useRouter();
   useEffect(() => {
     router.push("/dashboard");
-  }, []);
+  }, [router]);
   return (
     <>
       <div className="fixed top-0 flex flex-col justify-center w-full h-12 bg-card dark:bg-card border-background drop-shadow-lg z-50">
@@ -27,4 +27,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Home;

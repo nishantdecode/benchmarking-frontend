@@ -39,7 +39,7 @@ const Admin = () => {
         dispatch(setAuthenticated(true));
       }
     }
-  },[])
+  },[userObj, dispatch])
 
   const date = new Date(userObj?.createdAt)
   const day = date.getDate();
