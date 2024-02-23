@@ -1,9 +1,14 @@
-import React from 'react'
+import React from "react";
 
-const AdminLayout = ({children}) => {
+import Navbar from "@/app/components/navbar/navbar";
+
+const AdminLayout = async ({children}) => {
   return (
-    <div>{children}</div>
-  )
-}
+    <div>
+      <Navbar/>
+      {children}
+    </div>
+  );
+};
 
-export default AdminLayout
+export default AdminLayout;

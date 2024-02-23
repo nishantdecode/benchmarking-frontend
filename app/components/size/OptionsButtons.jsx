@@ -25,7 +25,7 @@ const OptionButtons = () => {
             : router.push("/size/singleBank")
         }
       >
-        Compare Banks
+        {page === "singleBank" ? "Compare Banks" : "Individual Banks"}
       </Button>
     </div>
   );

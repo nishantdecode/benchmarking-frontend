@@ -52,6 +52,12 @@ export async function middleware(req) {
             if (user.role === "Admin" || user.role === "SuperAdmin") {
               if (req.nextUrl.pathname.startsWith("/login")) {
                 return NextResponse.redirect(new URL("/admin", req.url));
+              } else if (
+                userPrefixes.some((prefix) =>
+                  req.nextUrl.pathname.startsWith(prefix)
+                )
+              ) {
+                return NextResponse.next();
               } else if (req.nextUrl.pathname.startsWith("/admin")) {
                 return NextResponse.next();
               }
@@ -103,6 +109,12 @@ export async function middleware(req) {
                         return NextResponse.redirect(
                           new URL("/admin", req.url)
                         );
+                      } else if (
+                        userPrefixes.some((prefix) =>
+                          req.nextUrl.pathname.startsWith(prefix)
+                        )
+                      ) {
+                        return NextResponse.next();
                       } else if (req.nextUrl.pathname.startsWith("/admin")) {
                         return NextResponse.next();
                       }

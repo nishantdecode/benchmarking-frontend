@@ -1,13 +1,11 @@
 import React from "react";
 
-import getUserAction from '@/app/actions/getUserAction'
 import Navbar from "@/app/components/navbar/navbar";
 
-const UserLayout = async ({children}) => {
-  const user = await getUserAction();
+const UserLayout = async ({ children }) => {
   return (
     <div>
-      <Navbar user={user}/>
+      <Navbar/>
       {children}
     </div>
   );
