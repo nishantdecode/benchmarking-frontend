@@ -38,7 +38,7 @@ const darkTooltip = {
   bodyColor: "#fff",
 };
 
-const VisualiseLineChart = forwardRef(({ data, colors, xAxis, dataFormatter }, ref) => {
+const VisualiseLineChart = forwardRef(function VisualiseLineChart({ data, colors, xAxis, dataFormatter }, ref) {
   const { theme } = useTheme();
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
   ChartJS.defaults.color = theme === 'dark' ? "#fff" : "#000";

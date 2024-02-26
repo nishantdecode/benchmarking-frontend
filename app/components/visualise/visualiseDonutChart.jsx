@@ -19,7 +19,7 @@ const darkTooltip = {
   bodyColor: "#fff",
 };
 
-const VisualiseDonutChart = forwardRef(({ marketData }, ref) => {
+const VisualiseDonutChart = forwardRef(function VisualiseDonutChart({ marketData }, ref) {
   const { theme } = useTheme();
   ChartJS.defaults.color = theme === "dark" ? "#fff" : "#000";
   ChartJS.defaults.borderColor = "rgba(0,0,0,0)";

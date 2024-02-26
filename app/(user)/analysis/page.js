@@ -62,7 +62,7 @@ const AnalysisPage = () => {
       )}`,
       { scroll: false }
     );
-  }, [analysis, ratioCategory, checkedBanks]);
+  }, [router, analysis, ratioCategory, checkedBanks]);
 
   const { data, bankColors, dataFormatterPercentage } = visualisationUtils(
     ratioCategory,

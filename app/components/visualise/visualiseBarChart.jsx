@@ -40,7 +40,7 @@ const darkTooltip = {
   bodyColor: "#fff",
 };
 
-const VisualiseBarChart = forwardRef(({ data, colors, xAxis, dataFormatter }, ref) => {
+const VisualiseBarChart = forwardRef(function VisualiseBarChart({ data, colors, xAxis, dataFormatter }, ref) {
   const { theme } = useTheme();
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
   ChartJS.defaults.color = theme === "dark" ? "#fff" : "#000";
