@@ -1,58 +1,41 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import React, { useRef, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-
-import { VisualiseBar } from "@/app/components/visualise/visualiseBar";
-import { VisualiseLine } from "@/app/components/visualise/visualiseLine";
-import Category from "@/app/components/dashboard/analysis/category";
-import HeaderAnalysis from "@/app/components/dashboard/analysis/headerAnalysis";
 import {
   analysisCategories,
-  banks,
-  bankMultipleData,
-  bankBarMultipleData,
-  tableColData,
 } from "@/app/data/dashboardData";
-
+import { banks } from "@/app/data/data";
 import { IoTrendingUpSharp } from "react-icons/io5";
-import { columns } from "@/app/components/dashboard/analysis/columns";
-import TableComponent from "@/app/components/visualise/analysis/tableComponent";
+import { visualisationUtils } from "@/util/visualisationUtils";
+import { downloadImage, downloadPDF, downloadSheet } from "@/util/exportUtils";
+
+import { Card } from "@/components/ui/card";
+
 import HeaderChild from "@/app/components/header/headerChild";
+import Header from "@/app/components/dashboard/analysis/header";
+import SelectCategory from "@/app/components/dashboard/analysis/selectCategory";
+import { generateColumns } from "@/app/components/visualise/columns";
+import VisualiseBarChart from "@/app/components/visualise/visualiseBarChart";
+import VisualiseLineChart from "@/app/components/visualise/visualiseLineChart";
+import TableComponent from "@/app/components/dashboard/analysis/tableComponent";
 
 const TrendAndCompetitionAnalysis = ({}) => {
+  let ref = useRef()
   const router = useRouter();
-  const pathName = usePathname();
   const searchParams = useSearchParams();
-  const [category, setCategory] = useState(searchParams.get("category"));
-  const [bank, setBank] = useState(searchParams.get("bank"));
-  const [competitionOne, setCompetitionOne] = useState(
-    searchParams.get("competitionOne")
-  );
-  const [competitionTwo, setCompetitionTwo] = useState(
-    searchParams.get("competitionTwo")
-  );
+  const category = searchParams.get("category") || analysisCategories[0].category;
+  const selectedBanks = JSON.parse(searchParams.get("banks")) || banks.slice(0, 3).map(bank => bank.name);
+
   useEffect(() => {
     router.push(
-      `${pathName}?category=${category}&bank=${bank}&competitionOne=${competitionOne}&competitionTwo=${competitionTwo}`
+      `?category=${category}&banks=${JSON.stringify(selectedBanks)}`
     );
-  }, [category, bank, competitionOne, competitionTwo, router, pathName]);
-  const displayedCategory = analysisCategories.find(
-    (categoryObj) => categoryObj.category === category
-  );
-  const data =
-    displayedCategory.visualise === "line"
-      ? bankMultipleData
-      : displayedCategory.visualise === "bar"
-      ? bankBarMultipleData
-      : tableColData;
-  const fields = Object.keys(data[0]);
-  const index = fields[0];
-  const categories = fields.slice(1, fields.length);
-  const dataFormatter = (number) => number + 'C';
+  }, [category, selectedBanks]);
+
+  const { displayedCategory, data, bankColors, dataFormatterCurrency } = visualisationUtils(category);
+  const columns = generateColumns({data:data});
   return (
     <>
       <HeaderChild
@@ -60,51 +43,54 @@ const TrendAndCompetitionAnalysis = ({}) => {
         icon={<IoTrendingUpSharp size={32} />}
         link="/dashboard"
       />
-      <div className="flex justify-center items-center w-full h-full mt-14 p-5 pl-7 sm:pl-10">
-        <Card className="flex flex-col lg:flex-row w-full h-full p-3 md:p-5 gap-3 md:5 lg:gap-5">
-          <div className="lg:sticky lg:top-20 w-full lg:w-1/5 h-full">
-            <Category
+      <div className="flex justify-center items-center h-auto w-full mt-14 p-5 pl-7 sm:pl-10">
+        <Card className="flex flex-col lg:flex-row h-auto w-full p-3 md:p-5 gap-3 lg:gap-5">
+          <div className="lg:sticky lg:top-20 h-full w-full lg:w-1/5">
+            <SelectCategory
               categories={analysisCategories}
-              category={category}
-              setCategory={setCategory}
+              downloadPDF={() => downloadPDF(ref)}
+              downloadImage={() => downloadImage(ref)}
+              downloadSheet={() => downloadSheet(data,"Sheet Name","File Name")}
             />
           </div>
-          <div className="flex flex-col-reverse sm:flex-col w-full h-full lg:w-4/5 pb-10 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
-            <HeaderAnalysis
+          <div className="flex flex-col-reverse sm:flex-col h-full w-full lg:w-4/5 pb-10 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
+            <Header
               banks={banks}
-              bank={bank}
-              setBank={setBank}
-              competitionOne={competitionOne}
-              setCompetitionOne={setCompetitionOne}
-              competitionTwo={competitionTwo}
-              setCompetitionTwo={setCompetitionTwo}
+              downloadPDF={() => downloadPDF(ref)}
+              downloadImage={() => downloadImage(ref)}
+              downloadSheet={() => downloadSheet(data,"Sheet Name","File Name")}
             />
-            <div className="hidden sm:flex text-lg sm:text-xl font-bold">
+            <div className="hidden sm:flex text-md sm:text-xl font-medium sm:font-bold">
               {category}:
             </div>
             {displayedCategory.visualise === "line" ? (
-              <VisualiseLine
-                height={"h-[600px]"}
-                data={data}
-                categories={categories}
-                index={index}
-                dataFormatter={dataFormatter}
-              />
+              <div className="h-[400px] sm:h-[60vh] md:h-[80vh] my-10">
+                <VisualiseLineChart
+                  ref={ref}
+                  data={data}
+                  colors={bankColors}
+                  xAxis={true}
+                  dataFormatter={dataFormatterCurrency}
+                />
+              </div>
             ) : displayedCategory.visualise === "bar" ? (
-              <VisualiseBar
-                data={data}
-                categories={categories}
-                index={index}
-                dataFormatter={dataFormatter}
-              />
+              <div className="h-[400px] sm:h-[60vh] md:h-[80vh] my-10">
+                <VisualiseBarChart
+                  ref={ref}
+                  data={data}
+                  colors={bankColors}
+                  xAxis={true}
+                  dataFormatter={dataFormatterCurrency}
+                />
+              </div>
             ) : (
               <TableComponent
                 category={category}
                 columns={columns}
-                tableColData={tableColData}
+                tableColData={data}
               />
             )}
-            <div className="flex sm:hidden text-lg sm:text-xl font-bold py-4">
+            <div className="flex sm:hidden text-md sm:text-xl font-medium sm:font-bold py-4">
               {category}:
             </div>
           </div>

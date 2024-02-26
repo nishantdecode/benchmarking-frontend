@@ -1,12 +1,13 @@
-import { useRouter } from "next/navigation"; 
 import React from "react";
+import { useRouter } from "next/navigation"; 
+
 import { FaArrowCircleLeft } from "react-icons/fa";
 
 const HeaderChild = ({ title, icon, link }) => {
   const router = useRouter();
   return (
-    <div className="fixed top-0 flex flex-col justify-center w-full h-12 bg-card dark:bg-card border-background drop-shadow-lg z-50">
-      <div className="flex flex-row pl-5 font-medium text-foreground gap-2">
+    <div className="fixed top-0 flex flex-col justify-center w-full h-12 z-50 drop-shadow-lg bg-card dark:bg-card border-background">
+      <div className="flex flex-row pl-5 gap-2 font-medium text-foreground">
         <FaArrowCircleLeft
           size={25}
           onClick={() => {

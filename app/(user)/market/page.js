@@ -1,59 +1,113 @@
-'use client'
+"use client";
 
-import { columns } from "@/app/components/market/columns";
-import { DonutPagination } from "@/app/components/market/donutPagination";
-import OptionButton from "@/app/components/market/optionButton";
-import { SelectBanks } from "@/app/components/market/selectBanks";
-import { SelectCategory } from "@/app/components/market/selectCategory";
-import { ToggleBank } from "@/app/components/market/toggleBank";
-import { VisualiseTable } from "@/app/components/visualise/analysis/visualiseTable";
-import { VisualiseDonut } from "@/app/components/visualise/visualiseDonut";
-import { categories, individualBankMarketData, marketShareByCategory, banks } from "@/app/data/marketShareData";
+import React, { useRef, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { banks } from "@/app/data/data";
+import {
+  categories,
+  individualBankMarketData,
+  marketShareByCategory,
+} from "@/app/data/marketShareData";
+
 import { Card } from "@/components/ui/card";
-import React, { useState } from "react";
+
+import generateMarketData from "@/util/marketDataUtils";
+import { ToggleBank } from "@/app/components/toggleBank";
+import { SelectBanks } from "@/app/components/selectBanks";
+import { generateColumns } from "@/app/components/visualise/columns";
+import OptionButtons from "@/app/components/visualise/optionButtons";
+import { SelectCategory } from "@/app/components/selectCategory";
+import { DonutPagination } from "@/app/components/market/donutPagination";
+import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
+import { downloadImage, downloadPDF, downloadSheet } from "@/util/exportUtils";
+import VisualiseDonutChart from "@/app/components/visualise/visualiseDonutChart";
 
 const Market = () => {
-  const [bank, setBank] = useState(banks[0].name)
-  const [category, setCategory] = useState(categories[0].name)
-  const [checkedBanks, setCheckedBanks] = useState(banks.map((bank)=> bank.name))
-  const dataFormatter = (number) => number + "%";
+  let ref = useRef();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentYear = new Date().getFullYear();
+  const year = searchParams.get('year') || currentYear;
+  const bank = searchParams.get("bank") || banks[0].name;
+  const category = searchParams.get("category") || categories[0].name;
+  const checkedBanks =
+    JSON.parse(searchParams.get("checkedBanks")) ||
+    banks.map((bank) => bank.name);
+
+  useEffect(() => {
+    router.push(
+      `?bank=${bank}&category=${category}&year=${year}&checkedBanks=${JSON.stringify(
+        checkedBanks
+      )}`,
+      { scroll: false }
+    );
+  }, [year, bank, category, checkedBanks]);
+
+  const color = banks.find((item) => item.name === bank).color;
+
+  const columns = generateColumns({
+    data: individualBankMarketData,
+    type: "progress",
+    color: color,
+  });
+
+  const marketData = generateMarketData(
+    banks,
+    marketShareByCategory,
+    checkedBanks
+  );
+
   return (
-    <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10 gap-10">
-      <Card className="flex flex-col w-full h-auto p-3 md:p-5 gap-3 md:5 lg:gap-5">
+    <div className="flex flex-col justify-center items-start h-auto w-screen overflow-clip mt-14 p-5 pl-7 sm:pl-10 gap-10">
+      <Card className="flex flex-col h-auto w-full p-3 md:p-5 md:pb-10 gap-5 lg:gap-10">
         <div className="flex justify-between min-w-full">
           <div className="flex flex-row gap-16">
-            <div className="text-2xl font-bold">Individual Bank</div>
-            <div className="text-xs sm:text-sm font-medium mt-2">{bank}</div>
+            <div className="text-lg lg:text-2xl font-bold">Individual Bank</div>
+            <div className="hidden lg:block mt-2 text-xs sm:text-sm font-medium">
+              {bank}
+            </div>
           </div>
-          <OptionButton />
+          <OptionButtons
+            type="table"
+            downloadSheet={() =>
+              downloadSheet(individualBankMarketData, "Sheet Name", "File Name")
+            }
+          />
         </div>
-        <div className="flex flex-row w-full gap-5">
-          <div className="lg:sticky lg:top-14 w-full lg:w-1/6 h-full">
-            <ToggleBank data={banks} bank={bank} setBank={setBank}/>
+        <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
+          <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+            <ToggleBank data={banks} />
           </div>
-          <div className="flex flex-col w-full lg:w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
+          <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
             <VisualiseTable data={individualBankMarketData} columns={columns} />
           </div>
         </div>
       </Card>
-      <Card className="flex flex-col w-full h-auto p-3 md:p-5 gap-3 md:5 lg:gap-5">
+      <Card className="flex flex-col h-auto w-full p-3 md:p-5 md:pb-10 gap-5 lg:gap-10">
         <div className="flex justify-between min-w-full">
-          <div className="flex flex-row gap-16">
-            <div className="text-2xl font-bold">Comparision</div>
-            <div className="text-xs sm:text-sm font-medium mt-2">{category}</div>
+          <div className="flex flex-row gap-24">
+            <div className="text-lg lg:text-2xl font-bold">Comparision</div>
+            <div className="hidden lg:block mt-2 text-xs sm:text-sm font-medium">
+              {category}
+            </div>
           </div>
-          <OptionButton />
+          <OptionButtons
+            downloadPDF={() => downloadPDF(ref)}
+            downloadImage={() => downloadImage(ref)}
+            type="chart"
+          />
         </div>
-        <div className="flex flex-row w-full h-auto gap-5">
-          <div className="lg:sticky lg:top-14 w-full lg:w-1/6 h-full">
-            <SelectCategory categories={categories} category={category} setCategory={setCategory} />
+        <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-14 lg:gap-0">
+          <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+            <SelectCategory search={true} categories={categories} />
           </div>
-          <div className="flex flex-col justify-center items-center w-full lg:w-4/6 h-auto px-20 sm:gap-3 md:gap-8 lg:gap-16">
-            <VisualiseDonut data={marketShareByCategory} dataFormatter={dataFormatter}/>
-            <DonutPagination/>
+          <div className="flex flex-col justify-center items-center h-[300px] xs:h-[400] md:h-[500px] w-full lg:w-4/6 md:mt-10 gap-5 md:gap-8 lg:gap-10">
+            <VisualiseDonutChart ref={ref} marketData={marketData} />
+            <DonutPagination />
           </div>
-          <div className="lg:sticky lg:top-14 w-full lg:w-1/6 h-full">
-            <SelectBanks banks={banks} checkedBanks={checkedBanks} setCheckedBanks={setCheckedBanks}/>
+          <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+            <SelectBanks banks={banks} />
           </div>
         </div>
       </Card>

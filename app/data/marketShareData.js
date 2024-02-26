@@ -257,7 +257,7 @@ const categories = [
     name: "Retail Loans (Gross)",
   },
   {
-    name: "Corporate & other Loans",
+    name: "Corporate and other Loans",
   },
   {
     name: "Investments (Net)",
@@ -298,10 +298,6 @@ const marketShareByCategory = [
     value: 5.63,
   },
   {
-    name: "Saudi Awwal Bank",
-    value: 18.32,
-  },
-  {
     name: "Al-Rajhi Bank",
     value: 6.59,
   },
@@ -310,12 +306,12 @@ const marketShareByCategory = [
     value: 9.71,
   },
   {
-    name: "SAB",
-    value: 21.5,
-  },
-  {
     name: "Bank Aljazira",
     value: 14.69,
+  },
+  {
+    name: "Saudi Awwal Bank",
+    value: 18.32,
   },
   {
     name: "Saudi National Bank",
@@ -328,6 +324,10 @@ const marketShareByCategory = [
   {
     name: "Bank Saudi Fransi",
     value: 3.92,
+  },
+  {
+    name: "Alinma Bank",
+    value: 21.5,
   },
 ];
 

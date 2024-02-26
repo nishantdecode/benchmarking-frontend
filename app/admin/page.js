@@ -6,7 +6,7 @@ import { RxAvatar } from "react-icons/rx";
 import { Card } from "@/components/ui/card";
 import { BiEdit } from "react-icons/bi";
 import { Button } from "@/components/ui/button";
-import { SelectCategory } from "../components/market/selectCategory";
+import { SelectCategory } from "../components/selectCategory";
 import { setAuthenticated, setUser } from "@/lib/features/slices/authSlice";
 
 import {

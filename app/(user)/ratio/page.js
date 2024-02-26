@@ -1,99 +1,138 @@
 "use client";
 
-import OptionButtons from "@/app/components/dashboard/analysis/optionButtons";
-import { columns } from "@/app/components/ratio/columns";
-import OptionButton from "@/app/components/market/optionButton";
-import { SelectBanks } from "@/app/components/market/selectBanks";
-import { SelectCategory } from "@/app/components/market/selectCategory";
-import { ToggleBank } from "@/app/components/market/toggleBank";
-import VisualiseOptions from "@/app/components/ratio/visualiseOptions";
-import { VisualiseTable } from "@/app/components/visualise/analysis/visualiseTable";
-import { VisualiseLine } from "@/app/components/visualise/visualiseLine";
-import { bankMultipleRatioData, figuresData } from "@/app/data/ratioData";
-import {
-  banks,
-} from "@/app/data/marketShareData";
+import React, { useRef, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { banks } from "@/app/data/data";
 import { categories } from "@/app/data/ratioData";
+import { bankMultipleRatioData, figuresData } from "@/app/data/ratioData";
+
 import { Card } from "@/components/ui/card";
-import React, { useState } from "react";
+
+import { ToggleBank } from "@/app/components/toggleBank";
+import { SelectBanks } from "@/app/components/selectBanks";
+import { visualisationUtils } from "@/util/visualisationUtils";
+import { downloadImage, downloadPDF } from "@/util/exportUtils";
+import { SelectCategory } from "@/app/components/selectCategory";
+import { generateColumns } from "@/app/components/visualise/columns";
+import OptionButtons from "@/app/components/visualise/optionButtons";
+import DataIntervalOptions from "@/app/components/dataIntervalOptions";
+import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
+import VisualiseLineChart from "@/app/components/visualise/visualiseLineChart";
 
 const Ratio = () => {
+  let ref = useRef();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const currentYear = new Date().getFullYear();
-  const [bank, setBank] = useState(banks[0].name);
-  const [category, setCategory] = useState(categories[0].name);
-  const [interval, setInterval] = useState("YoY & YTD");
-  const [startYear, setStartYear] = useState(currentYear);
-  const [endYear, setEndYear] = useState(startYear - 1);
-  const [checkedBanks, setCheckedBanks] = useState(
-    banks.map((bank) => bank.name)
+  const bank = searchParams.get("bank") || banks[0].name;
+  const checkedBanks =
+    JSON.parse(searchParams.get("checkedBanks")) ||
+    banks.map((bank) => bank.name);
+  const category = searchParams.get("category") || categories[0].name;
+  const intervalTypeParam = searchParams.get("intervalType");
+  const intervalType = intervalTypeParam
+    ? decodeURIComponent(intervalTypeParam)
+    : "YoY & YTD";
+  const start = JSON.parse(searchParams.get("start")) || {
+    first:
+      intervalType === "Half-Yearly"
+        ? "H1"
+        : intervalType === "Quarterly"
+        ? "Q1"
+        : "",
+    second: currentYear,
+  };
+  const end = JSON.parse(searchParams.get("end")) || {
+    first:
+      intervalType === "Half-Yearly"
+        ? "H1"
+        : intervalType === "Quarterly"
+        ? "Q1"
+        : "",
+    second: currentYear - 1,
+  };
+
+  useEffect(() => {
+    router.push(
+      `?bank=${bank}&category=${category}&checkedBanks=${JSON.stringify(
+        checkedBanks
+      )}&intervalType=${encodeURIComponent(
+        intervalType
+      )}&start=${JSON.stringify({
+        first: start.first,
+        second: start.second,
+      })}&end=${JSON.stringify({
+        first: end.first,
+        second: end.second,
+      })}`,
+      { scroll: false }
+    );
+  }, [bank, category, checkedBanks, intervalType, start, end]);
+
+  const { data, bankColors, dataFormatterPercentage } = visualisationUtils(
+    category,
+    bankMultipleRatioData
   );
-  const displayedCategory = categories.find(
-    (categoryObj) => categoryObj.name === category
-  );
-  const data = bankMultipleRatioData;
-  const fields = Object.keys(data[0]);
-  const index = fields[0];
-  const dataCategories = fields.slice(1, fields.length);
-  const dataFormatter = (number) => number+'%';
+
+  const columns = generateColumns({
+    data: figuresData,
+  });
+
   return (
     <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10 gap-10">
-      <Card className="flex flex-col w-full h-auto p-3 md:p-5 gap-3 md:5 lg:gap-5">
-        <div className="flex justify-between min-w-full">
-          <div className="flex flex-row gap-24">
-            <div className="text-2xl font-bold mt-2">Key Ratios</div>
-            <div className="text-xs sm:text-sm font-medium mt-2">
-              <VisualiseOptions
-                category={category}
-                interval={interval}
-                setInterval={setInterval}
-                startYear={startYear}
-                setStartYear={setStartYear}
-                endYear={endYear}
-                setEndYear={setEndYear}
-              />
-            </div>
+      <Card className="flex flex-col items-center w-full h-auto p-3 md:p-5 gap-3 md:gap-5">
+        <div className="flex flex-col lg:flex-row justify-between items-center min-w-full gap-3">
+          <div className="w-full lg:w-[180px] text-2xl font-bold mt-2">
+            Key Ratios
           </div>
-          <OptionButtons />
+          <div className="w-full text-xs sm:text-sm font-medium">
+            <DataIntervalOptions />
+          </div>
+          <OptionButtons
+            downloadImage={() => downloadImage(ref)}
+            downloadPDF={() => downloadPDF(ref)}
+            type="chart"
+          />
         </div>
-        <div className="flex flex-row w-full gap-5">
-          <div className="lg:sticky lg:top-20 w-full lg:w-1/6 h-auto">
-            <SelectCategory
-              categories={categories}
-              category={category}
-              setCategory={setCategory}
-            />
+        <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-14 lg:gap-2">
+          <div className="lg:sticky lg:top-20 w-full sm:w-auto lg:w-1/6 h-auto">
+            <SelectCategory categories={categories} />
           </div>
-          <div className="flex flex-col w-full lg:w-4/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
-            <VisualiseLine
-              height={"h-full"}
+          <div className="flex flex-col h-[300px] md:h-[600px] w-full lg:w-4/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
+            <VisualiseLineChart
+              ref={ref}
               data={data}
-              categories={dataCategories}
-              index={index}
-              dataFormatter={dataFormatter}
+              colors={bankColors}
+              xAxis={true}
+              dataFormatter={dataFormatterPercentage}
             />
           </div>
-          <div className="lg:sticky lg:top-14 w-full lg:w-1/6 h-full">
-            <SelectBanks
-              banks={banks}
-              checkedBanks={checkedBanks}
-              setCheckedBanks={setCheckedBanks}
-            />
+          <div className="lg:sticky lg:top-14 w-full sm:w-auto lg:w-1/6 h-full">
+            <SelectBanks banks={banks} />
           </div>
         </div>
       </Card>
-      <Card className="flex flex-col w-full h-auto p-3 md:p-5 gap-3 md:5 lg:gap-5">
+      <Card className="flex flex-col h-auto w-full p-3 md:p-5 md:pb-10 gap-5 lg:gap-10">
         <div className="flex justify-between min-w-full">
-          <div className="flex flex-row">
-            <div className="text-2xl font-bold">Figures</div>
+          <div className="flex flex-row gap-16">
+            <div className="text-lg lg:text-2xl font-bold">Individual Bank</div>
+            <div className="hidden lg:block mt-2 text-xs sm:text-sm font-medium">
+              {bank}
+            </div>
           </div>
-          <OptionButton />
         </div>
-        <div className="flex flex-row w-full gap-5">
-          <div className="lg:sticky lg:top-20 w-full lg:w-1/6 h-full">
-            <ToggleBank data={banks} bank={bank} setBank={setBank}/>
+        <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
+          <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+            <ToggleBank data={banks} />
           </div>
-          <div className="flex flex-col w-full lg:w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
-            <VisualiseTable data={figuresData} columns={columns} input="true"/>
+          <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+            <VisualiseTable
+              data={figuresData}
+              columns={columns}
+              search="true"
+              exportXls="true"
+            />
           </div>
         </div>
       </Card>

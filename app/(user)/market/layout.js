@@ -7,7 +7,7 @@ import Header from "@/app/components/header/header";
 const MarketLayout = ({ children }) => {
   return (
     <>
-      <div className="w-screen h-screen">
+      <div className="h-auto w-full">
         <Header title="Market Share" icon={<RiPieChart2Fill size={32} />} />
         {children}
       </div>
