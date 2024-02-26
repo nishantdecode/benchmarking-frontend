@@ -98,7 +98,7 @@ const ForgetPassword = () => {
           </div>
         </form>
       </Form>
-      <div className="flex flex-row w-full justify-center md:justify-start">
+      <div className="flex flex-row w-full justify-center md:justify-start mt-2 lg:mt-0">
         <Button
           size="sm"
           variant="outline"
