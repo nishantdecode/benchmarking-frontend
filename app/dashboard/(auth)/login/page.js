@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 import { useLoginMutation } from "@/lib/features/services/authApi";
 
 const formSchema = z.object({
-  loginID: z.string().min(36),
+  email: z.string().email(),
   password: z.string().min(3),
 });
 
@@ -30,24 +30,25 @@ const Login = () => {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      loginID: "",
+      email: "",
       password: "",
     },
   });
 
   const handleSubmit = async (values) => {
     const credentials = {
-      loginID: values.loginID,
+      email: values.email,
       password: values.password,
     };
 
     try {
       if (typeof window !== "undefined" && window.localStorage) {
         const response = await login(credentials);
-        if (response.data) {
-          localStorage.setItem("accessToken", response.data.accessToken);
-          localStorage.setItem("user", JSON.stringify(response.data.user));
-          router.push("./dashboard");
+        console.log(response)
+        if (!response.data.error) {
+          localStorage.setItem("accessToken", response.data.result.userObj.accessToken);
+          localStorage.setItem("user", JSON.stringify(response.data.result.userObj));
+          router.push("/dashboard/dashboard");
         }
       } else {
         console.log("Login failed:", response.data.error);
@@ -68,18 +69,18 @@ const Login = () => {
         >
           <FormField
             control={form.control}
-            name="loginID"
+            name="email"
             render={({ field }) => {
               return (
                 <FormItem>
                   <div className="flex flex-col md:flex-row justify-between gap-4">
                     <FormLabel className="text-xs md:text-sm">
-                      Login ID* :
+                      Email* :
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="loginID"
-                        type="loginID"
+                        placeholder="email"
+                        type="email"
                         {...field}
                         className="md:max-w-[300px]"
                       />

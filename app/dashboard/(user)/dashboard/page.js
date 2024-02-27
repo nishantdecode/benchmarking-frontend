@@ -12,14 +12,12 @@ import {
   tableData,
 } from "@/app/data/dashboardData";
 import { banks } from "@/app/data/data";
-import { MdSpaceDashboard } from "react-icons/md";
 import { IoIosArrowForward } from "react-icons/io";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
-import Header from "@/app/components/header/header";
 import SelectBank from "@/app/components/dashboard/selectBank";
 import CompetitionCards from "@/app/components/dashboard/competitionCards";
 import CompetitionHeader from "@/app/components/dashboard/competitionHeader";
@@ -81,8 +79,6 @@ const Dashboard = () => {
 
   return (
     <>
-      <Header title="Dashboard" icon={<MdSpaceDashboard size={32} />} />
-
       <div className="flex flex-col h-full w-full mt-14 p-5 pl-7 sm:pl-10 gap-10">
         <div className="flex flex-col justify-start items-start h-auto w-full gap-3">
           <CompetitionHeader />
@@ -103,9 +99,9 @@ const Dashboard = () => {
                 ? bankBarData
                 : tableData;
 
-            const names = Object.keys(data[0]).map(key => key.replace(/ Income$/, '')).filter(
-              (key) => key !== "year"
-            );
+            const names = Object.keys(data[0])
+              .map((key) => key.replace(/ Income$/, ""))
+              .filter((key) => key !== "year");
             const bankColors = names.map((name) => {
               const bankInfo = banks.find((bank) => bank.name === name);
               return bankInfo ? bankInfo.color : null;

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { IoIosArrowForward } from "react-icons/io";
 
-const Home = () => {
+const Dashboard = () => {
   const router = useRouter();
   useEffect(() => {
     router.push("/dashboard/dashboard");
@@ -27,4 +27,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Dashboard;

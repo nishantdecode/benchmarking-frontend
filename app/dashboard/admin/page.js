@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Header from "../components/header/header";
+import Header from "../../components/header/header";
 import { RxAvatar } from "react-icons/rx";
 import { Card } from "@/components/ui/card";
 import { BiEdit } from "react-icons/bi";
 import { Button } from "@/components/ui/button";
-import { SelectCategory } from "../components/selectCategory";
+import { SelectCategory } from "../../components/selectCategory";
 import { setAuthenticated, setUser } from "@/lib/features/slices/authSlice";
 
 import {
@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { bankData, userData } from "../data/adminData";
+import { bankData, userData } from "../../data/adminData";
 import { MdFindInPage } from "react-icons/md";
 import { useRouter } from "next/navigation";
 
@@ -48,7 +48,6 @@ const Admin = () => {
   const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
   return (
     <>
-      <Header title="Admin Profile" icon={<RxAvatar size={32} />} />
       <div className="flex flex-col w-full h-full mt-14 p-5 pl-7 sm:pl-10 gap-10">
         <div className="flex flex-row justify-center items-center gap-5">
           <div className="h-[300px] w-4/6">

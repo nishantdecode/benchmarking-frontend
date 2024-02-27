@@ -7,13 +7,11 @@ import {
   analysisCategories,
 } from "@/app/data/dashboardData";
 import { banks } from "@/app/data/data";
-import { IoTrendingUpSharp } from "react-icons/io5";
 import { visualisationUtils } from "@/util/visualisationUtils";
 import { downloadImage, downloadPDF, downloadSheet } from "@/util/exportUtils";
 
 import { Card } from "@/components/ui/card";
 
-import HeaderChild from "@/app/components/header/headerChild";
 import Header from "@/app/components/dashboard/analysis/header";
 import SelectCategory from "@/app/components/dashboard/analysis/selectCategory";
 import { generateColumns } from "@/app/components/visualise/columns";
@@ -38,11 +36,6 @@ const TrendAndCompetitionAnalysis = ({}) => {
   const columns = generateColumns({data:data});
   return (
     <>
-      <HeaderChild
-        title="Trend & Competitive Analysis"
-        icon={<IoTrendingUpSharp size={32} />}
-        link="/dashboard"
-      />
       <div className="flex justify-center items-center h-auto w-full mt-14 p-5 pl-7 sm:pl-10">
         <Card className="flex flex-col lg:flex-row h-auto w-full p-3 md:p-5 gap-3 lg:gap-5">
           <div className="lg:sticky lg:top-20 h-full w-full lg:w-1/5">

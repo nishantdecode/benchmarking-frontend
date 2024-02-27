@@ -53,8 +53,9 @@ const Navbar = ({ user }) => {
     dispatch(setAuthenticated(false));
     localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
-    router.push("./login");
+    router.push("/dashboard/login");
   };
+
   return (
     <div>
       <Drawer direction="left" className="h-full">
@@ -94,7 +95,7 @@ const Navbar = ({ user }) => {
               )}
               <div>{theme} Mode</div>
             </Button>
-            <Button variant={`${pathname === '/admin' ? 'default' : 'link'}`} className="w-full gap-3" onClick={()=>{role === 'Admin' ? router.push('/admin') : router.push('/dashboard')}}>
+            <Button variant={`${pathname === '/dashboard/admin' ? 'default' : 'link'}`} className="w-full gap-3" onClick={()=>{role === 'Admin' ? router.push('/dashboard/admin') : router.push('/dashboard/dashboard')}}>
               <RxAvatar size={20} />
               <div>
                 {username}

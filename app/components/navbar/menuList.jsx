@@ -17,52 +17,52 @@ import { Div } from "@/components/ui/div";
 const navItems = [
   {
     title: "Dashboard",
-    route: "/dashboard",
+    route: "/dashboard/dashboard",
     icon: <MdSpaceDashboard size={20} />,
   },
   {
     title: "Market Share",
-    route: "/market",
+    route: "/dashboard/market",
     icon: <RiPieChart2Fill size={20} />,
   },
   {
     title: "Key Ratio",
-    route: "/ratio",
+    route: "/dashboard/ratio",
     icon: <PiMathOperationsFill size={20} />,
   },
   {
     title: "Item Analysis",
-    route: "/analysis",
+    route: "/dashboard/analysis",
     icon: <IoIosListBox size={20} />,
   },
   {
     title: "Common Size",
-    route: "/size/singleBank",
+    route: "/dashboard/size/singleBank",
     icon: <IoBarChart size={20} />,
   },
   {
     title: "Executive Summary",
-    route: "/summary",
+    route: "/dashboard/summary",
     icon: <PiSigmaFill size={20} />,
   },
   {
     title: "Individual Banks",
-    route: "/bank",
+    route: "/dashboard/bank",
     icon: <BiSolidBank size={20} />,
   },
   {
     title: "Rankings",
-    route: "/ranking",
+    route: "/dashboard/ranking",
     icon: <FaRankingStar size={20} />,
   },
 ];
 
 const MenuList = ({ pathname, router }) => {
-  const parentPath = pathname.split('/')[1];
+  const parentPath = pathname.split('/')[2];
   return (
     <div className="flex flex-col items-center justify-center space-y-2">
       {navItems.map((navItem, index) => {
-        const variant = navItem.route.startsWith('/' + parentPath) ? "default" : "link";
+        const variant = navItem.route.startsWith('/dashboard/' + parentPath) ? "default" : "link";
         return (
           <Div key={index} variant={variant} className="w-full" onClick={()=>{router.push(navItem.route)}}>
               {navItem.icon}
