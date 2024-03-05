@@ -37,7 +37,6 @@ import showToast from "@/util/showToast";
 import UploadButton from "@/app/components/upload";
 import {
   useDeleteUserMutation,
-  useGetAdminMutation,
   useGetUserMutation,
   useRegisterMutation,
   useUpdateUserMutation,

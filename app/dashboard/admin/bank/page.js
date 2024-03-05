@@ -110,7 +110,8 @@ const BankPage = () => {
             `Successfully Updated Bank ${response.data.result.name} !`,
             undefined
           );
-          window.location.href = "http://localhost:3000/dashboard/admin";
+          window.location.href = "https://benchmarking.brihatinfotech.com/dashboard/admin";
+          // window.location.href = "http://localhost:3000/dashboard/admin";
           // router.push("/dashboard/admin");
         } else showToast("Error", response.error.data.message);
       } catch (err) {
