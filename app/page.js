@@ -9,7 +9,7 @@ import { IoIosArrowForward } from "react-icons/io";
 const Home = () => {
   const router = useRouter();
   useEffect(() => {
-    router.push("/dashboard/dashboard");
+    router.push("/dashboard/overview");
   }, [router]);
   return (
     <>

@@ -11,18 +11,17 @@ import {
 
 import { Card } from "@/components/ui/card";
 
+import { SelectCategory } from "@/app/components/selectCategory";
 import { generateColumns } from "@/app/components/visualise/columns";
 import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
-import { SelectCategoryBalance } from "@/app/components/ranking/selectCategoryBalance";
-import { SelectCategoryIncome } from "@/app/components/ranking/selectCategoryIncome";
 
 const Ranking = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const balanceCategory =
-    searchParams.get("balanceCategory") || balanceSheetCategories[0].name;
-  const incomeStatmentCategory =
-    searchParams.get("incomeStatmentCategory") ||
+  const balanceCategory = searchParams.get("balanceCategory") ?
+    decodeURIComponent(searchParams.get("balanceCategory")) : balanceSheetCategories[0].name;
+  const incomeStatmentCategory = searchParams.get("incomeStatmentCategory") ?
+    decodeURIComponent(searchParams.get("incomeStatmentCategory")) :
     incomeStatmentCategories[0].name;
 
   useEffect(() => {
@@ -48,9 +47,10 @@ const Ranking = () => {
         </div>
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
           <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
-            <SelectCategoryBalance
+            <SelectCategory
               search={true}
               categories={balanceSheetCategories}
+              categoryName="balanceCategory"
             />
           </div>
           <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
@@ -70,9 +70,10 @@ const Ranking = () => {
         </div>
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
           <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
-            <SelectCategoryIncome
+            <SelectCategory
               search={true}
               categories={incomeStatmentCategories}
+              categoryName="incomeStatmentCategory"
             />
           </div>
           <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import {
@@ -34,31 +34,46 @@ const MultiBankPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const size = searchParams.get("size") || "BS-CS";
-  const assetCategory = searchParams.get("category") || assetCategories[0].name;
-  const [liabilityCategory, setLiabilityCategory] = useState(
-    liabilityCategories[0].name
-  );
-  const [equityCategory, setEquityCategory] = useState(
-    equityCategories[0].name
-  );
-  const [incomeCategory, setIncomeCategory] = useState(
-    incomeCategories[0].name
-  );
-  const [expenseCategory, setExpenseCategory] = useState(
-    expenseCategories[0].name
-  );
+  const assetCategory = searchParams.get("assetCategory") ?
+    decodeURIComponent(searchParams.get("assetCategory")) :
+    assetCategories[0].name;
+  const liabilityCategory = searchParams.get("liabilityCategory") ?
+    decodeURIComponent(searchParams.get("liabilityCategory")) : 
+    liabilityCategories[0].name;
+  const equityCategory = searchParams.get("equityCategory") ?
+    decodeURIComponent(searchParams.get("equityCategory")) :
+    equityCategories[0].name;
+  const incomeCategory = searchParams.get("incomeCategory") ?
+    decodeURIComponent(searchParams.get("incomeCategory")) : 
+    incomeCategories[0].name;
+  const expenseCategory = searchParams.get("expenseCategory") ?
+    decodeURIComponent(searchParams.get("expenseCategory")) : 
+    expenseCategories[0].name;
   const checkedBanks =
     JSON.parse(searchParams.get("checkedBanks")) ||
     banks.map((bank) => bank.name);
 
   useEffect(() => {
     router.push(
-      `?size=${size}&category=${assetCategory}&checkedBanks=${JSON.stringify(
+      `?size=${
+        size
+      }&checkedBanks=${
+        JSON.stringify(
         checkedBanks
-      )}`,
+      )}&assetCategory=${
+        encodeURIComponent(assetCategory)
+      }&liabilityCategory=${
+        encodeURIComponent(liabilityCategory)
+      }&equityCategory=${
+        encodeURIComponent(equityCategory)
+      }&incomeCategory=${
+        encodeURIComponent(incomeCategory)
+      }&expenseCategory=${
+        encodeURIComponent(expenseCategory)
+      }`,
       { scroll: false }
     );
-  }, [size, assetCategory, checkedBanks]);
+  }, []);
 
   function navigate({ paramNameToUpdate, newValue }) {
     const updatedParams = new URLSearchParams(searchParams);
@@ -73,7 +88,7 @@ const MultiBankPage = () => {
   });
 
   return (
-    <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10 gap-10">
+    <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10">
       <Card className="flex flex-col w-full h-auto p-3 md:p-5 md:pt-10 gap-8 md:8 lg:gap-5">
         <div className="flex flex-col lg:flex-row items-center lg:justify-between w-full gap-4">
           <DropdownMenu>
@@ -108,11 +123,11 @@ const MultiBankPage = () => {
         </div>
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
           {size === "BS-CS" ? (
-            <div className="flex flex-col w-full lg:w-5/6 h-auto gap-10">
+            <div className="flex flex-col w-full lg:w-5/6 h-auto gap-5">
               <div className="flex flex-col lg:flex-row w-full gap-5">
                 <div className="flex flex-col items-center w-full lg:w-1/5 h-auto gap-3">
                   <div className="text-lg font-semibold">Assets :</div>
-                  <SelectCategory categories={assetCategories} />
+                  <SelectCategory categories={assetCategories} categoryName="assetCategory"/>
                 </div>
                 <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
                   <VisualiseTable data={assetData} columns={assetsColumns} />
@@ -121,7 +136,7 @@ const MultiBankPage = () => {
               <div className="flex flex-col lg:flex-row gap-5">
                 <div className="flex flex-col items-center w-full lg:w-1/5 h-auto gap-3">
                   <div className="text-lg font-semibold">Liabilities :</div>
-                  <SelectCategory categories={liabilityCategories} />
+                  <SelectCategory categories={liabilityCategories} categoryName="liabilityCategory"/>
                 </div>
                 <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
                   <VisualiseTable data={assetData} columns={assetsColumns} />
@@ -132,7 +147,7 @@ const MultiBankPage = () => {
                   <div className="text-lg font-semibold">
                     Shareholder&apos;s Equity :
                   </div>
-                  <SelectCategory categories={equityCategories} />
+                  <SelectCategory categories={equityCategories}  categoryName="equityCategory"/>
                 </div>
                 <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
                   <VisualiseTable data={assetData} columns={assetsColumns} />
@@ -146,7 +161,7 @@ const MultiBankPage = () => {
                   <div className="text-lg font-semibold">
                     Operating Income :
                   </div>
-                  <SelectCategory categories={incomeCategories} />
+                  <SelectCategory categories={incomeCategories} categoryName="incomeCategory"/>
                 </div>
                 <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
                   <VisualiseTable data={assetData} columns={assetsColumns} />
@@ -157,7 +172,7 @@ const MultiBankPage = () => {
                   <div className="text-lg font-semibold">
                     Operating Expense :
                   </div>
-                  <SelectCategory categories={expenseCategories} />
+                  <SelectCategory categories={expenseCategories} categoryName="expenseCategory"/>
                 </div>
                 <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
                   <VisualiseTable data={assetData} columns={assetsColumns} />

@@ -24,33 +24,20 @@ const Ratio = () => {
   let ref = useRef();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentYear = new Date().getFullYear();
+  const years = [2019, 2020, 2021, 2022];
   const bank = searchParams.get("bank") || banks[0].name;
   const checkedBanks =
     JSON.parse(searchParams.get("checkedBanks")) ||
     banks.map((bank) => bank.name);
   const category = searchParams.get("category") || categories[0].name;
-  const intervalTypeParam = searchParams.get("intervalType");
-  const intervalType = intervalTypeParam
-    ? decodeURIComponent(intervalTypeParam)
-    : "YoY & YTD";
+  const intervalType = searchParams.get("intervalType") || "YoY & YTD";
   const start = JSON.parse(searchParams.get("start")) || {
-    first:
-      intervalType === "Half-Yearly"
-        ? "H1"
-        : intervalType === "Quarterly"
-        ? "Q1"
-        : "",
-    second: currentYear,
+    first: "Q1",
+    second: years[0],
   };
   const end = JSON.parse(searchParams.get("end")) || {
-    first:
-      intervalType === "Half-Yearly"
-        ? "H1"
-        : intervalType === "Quarterly"
-        ? "Q1"
-        : "",
-    second: currentYear - 1,
+    first: "Q1",
+    second: years[years.length - 1],
   };
 
   useEffect(() => {
@@ -68,7 +55,7 @@ const Ratio = () => {
       })}`,
       { scroll: false }
     );
-  }, [bank, category, checkedBanks, intervalType, start, end]);
+  }, []);
 
   const { data, bankColors, dataFormatterPercentage } = visualisationUtils(
     category,
@@ -83,17 +70,17 @@ const Ratio = () => {
     <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10 gap-10">
       <Card className="flex flex-col items-center w-full h-auto p-3 md:p-5 gap-3 md:gap-5">
         <div className="flex flex-col lg:flex-row justify-between items-center min-w-full gap-3">
-          <div className="w-full lg:w-[180px] text-2xl font-bold mt-2">
-            Key Ratios
+          <span className="w-auto lg:w-1/6 text-2xl font-bold mt-2 truncate text-ellipsis">Key Ratios</span>
+          <div className="w-full lg:w-4/6 text-xs sm:text-sm font-medium">
+            <DataIntervalOptions years={[2019, 2020, 2021, 2022]}/>
           </div>
-          <div className="w-full text-xs sm:text-sm font-medium">
-            <DataIntervalOptions />
+          <div className="flex justify-center lg:justify-end w-full lg:w-1/6">
+            <OptionButtons
+              downloadImage={() => downloadImage(ref)}
+              downloadPDF={() => downloadPDF(ref)}
+              type="chart"
+            />
           </div>
-          <OptionButtons
-            downloadImage={() => downloadImage(ref)}
-            downloadPDF={() => downloadPDF(ref)}
-            type="chart"
-          />
         </div>
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-14 lg:gap-2">
           <div className="lg:sticky lg:top-20 w-full sm:w-auto lg:w-1/6 h-auto">
@@ -113,21 +100,15 @@ const Ratio = () => {
           </div>
         </div>
       </Card>
-      <Card className="flex flex-col h-auto w-full p-3 md:p-5 md:pb-10 gap-5 lg:gap-10">
-        <div className="flex justify-between min-w-full">
-          <div className="flex flex-row gap-16">
-            <div className="text-lg lg:text-2xl font-bold">Individual Bank</div>
-            <div className="hidden lg:block mt-2 text-xs sm:text-sm font-medium">
-              {bank}
-            </div>
-          </div>
-        </div>
+      <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-          <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+          <div className="flex flex-col justify-center items-center lg:items-start h-full w-full sm:w-auto lg:w-1/6 gap-7">
+            <span className="text-lg lg:text-2xl font-bold truncate text-ellipsis">Individual Bank</span>
             <ToggleBank data={banks} />
           </div>
           <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
             <VisualiseTable
+              title={bank}
               data={figuresData}
               columns={columns}
               search="true"

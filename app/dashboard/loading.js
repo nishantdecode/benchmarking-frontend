@@ -1,16 +1,11 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { IoIosArrowForward } from "react-icons/io";
 
-const Dashboard = () => {
-  const router = useRouter();
-  useEffect(() => {
-    router.push("/dashboard/overview");
-  }, [router]);
+const Loading = () => {
   return (
     <>
       <div className="fixed top-0 flex flex-col justify-center w-full h-12 bg-card dark:bg-card border-background drop-shadow-lg z-50">
@@ -27,4 +22,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Loading;

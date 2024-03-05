@@ -64,7 +64,7 @@ export function VisualiseTable({
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col lg:flex-row w-full justify-between items-center gap-4">
-        {title && <div className="flex justify-center lg:justify-start w-full">{title}</div>}
+        {title && <span className="hidden lg:flex justify-center lg:justify-start w-full text-sm">{title}</span>}
         <div className="flex flex-col lg:flex-row w-full justify-between items-center lg:justify-end gap-4">
           {search && (
             <div className="flex flex-col sm:flex-row items-center justify-end w-full sm:w-auto gap-2">
@@ -84,6 +84,7 @@ export function VisualiseTable({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
+                    size="sm"
                     variant="secondary"
                     className="flex justify-between w-auto gap-2 text-xs"
                   >
@@ -116,12 +117,13 @@ export function VisualiseTable({
               </DropdownMenu>
               {navigate && (
                 <Button
+                  size="sm"
                   variant="default"
                   className="flex py-0 text-xs justify-center w-auto"
                   onClick={() =>
                     page === "singleBank"
-                      ? router.push("/size/multiBank")
-                      : router.push("/size/singleBank")
+                      ? router.push("/dashboard/size/multiBank")
+                      : router.push("/dashboard/size/singleBank")
                   }
                 >
                   {page === "singleBank" ? "Compare Banks" : "Individual Banks"}

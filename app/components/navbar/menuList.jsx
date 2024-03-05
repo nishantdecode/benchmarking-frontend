@@ -17,7 +17,7 @@ import { Div } from "@/components/ui/div";
 const navItems = [
   {
     title: "Dashboard",
-    route: "/dashboard/dashboard",
+    route: "/dashboard/overview",
     icon: <MdSpaceDashboard size={20} />,
   },
   {
@@ -47,7 +47,7 @@ const navItems = [
   },
   {
     title: "Individual Banks",
-    route: "/dashboard/bank",
+    route: "/dashboard/banks",
     icon: <BiSolidBank size={20} />,
   },
   {

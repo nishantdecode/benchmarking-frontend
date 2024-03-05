@@ -18,8 +18,9 @@ const buttonVariants = cva(
         secondary: "bg-secondary hover:bg-secondary/50 shadow-md hover:shadow-lg",
         toggle: "flex flex-row w-full gap-2 text-xs bg-transparent",
         toggleActive: "flex flex-row w-full gap-2 text-xs bg-toggle text-toggle-foreground",
-        ghost: "hover:bg-card hover:text-slate-900",
+        ghost: "bg-card/50 hover:text-slate-900",
         link: "text-foreground hover:text-primary",
+        input: "border border-primary bg-background"
       },
       size: {
         default: "h-10 px-4 py-2",

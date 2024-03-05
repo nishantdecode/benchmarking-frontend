@@ -1,20 +1,22 @@
-'use client'
+"use client";
 
 import React from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { Card } from "@/components/ui/card";
 
 import ClientOnly from "@/app/components/ClientOnly";
 import Header from "@/app/components/header/header";
 
-const Layout = ({ children }) => {
+const LoginLayout = ({ children }) => {
+  const router = useRouter();
   const pathname = usePathname();
+
   return (
     <div className="flex flex-col justify-start align-middle h-screen w-full bg-gradient-to-r from-gray-400/10 dark:from-secondary to-gray-100/10 dark:to-card p-3">
       <div className="flex flex-row justify-between w-full flex-shrink-0 z-50">
         <ClientOnly>
-          <Header pathname={pathname}/>
+          <Header pathname={pathname} />
         </ClientOnly>
       </div>
       <div className="flex flex-col justify-center items-center w-full h-full">
@@ -29,4 +31,4 @@ const Layout = ({ children }) => {
   );
 };
 
-export default Layout;
+export default LoginLayout;

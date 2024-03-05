@@ -14,7 +14,6 @@ import { useSearchParams } from "next/navigation";
 const SelectBank = ({ banks }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const year = searchParams.get("year");
 
   function navigate({ paramNameToUpdate, newValue }) {
     const updatedParams = new URLSearchParams(searchParams);

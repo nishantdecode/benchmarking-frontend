@@ -32,6 +32,7 @@ const OptionButtons = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
+              size="sm"
               variant="secondary"
               className="flex justify-between w-full sm:w-auto gap-2 text-xs"
             >
@@ -64,6 +65,7 @@ const OptionButtons = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
+              size="sm"
               variant="secondary"
               className="flex justify-between w-full sm:w-auto gap-2 text-xs"
             >
@@ -89,6 +91,7 @@ const OptionButtons = ({
       )}
       {view && (
         <Button
+          size="sm"
           variant="default"
           className="flex justify-center w-full sm:w-auto py-0 md:px-6 text-xs"
         >
@@ -97,12 +100,13 @@ const OptionButtons = ({
       )}
       {navigate && (
         <Button
+          size="sm"
           variant="default"
           className="flex py-0 text-xs justify-center w-full sm:w-auto"
           onClick={() =>
             page === "singleBank"
-              ? router.push("/size/multiBank")
-              : router.push("/size/singleBank")
+              ? router.push("/dashboard/size/multiBank")
+              : router.push("/dashboard/size/singleBank")
           }
         >
           {page === "singleBank" ? "Compare Banks" : "Individual Banks"}

@@ -23,16 +23,16 @@ import { Card } from "@/components/ui/card";
 
 const Header = ({ pathname }) => {
   const router = useRouter();
-  const page = pathname.split("/");
+  const page = pathname?.split("/");
   const { theme, setTheme } = useTheme();
   let title = null;
   let icon = null;
   switch (page[page.length - 1]) {
-    case "dashboard":
+    case "overview":
       title = "Dashboard";
       icon = <MdSpaceDashboard size={32} />;
       break;
-    case "analysis":
+    case "trendAnalysis":
       title = "Trend & Competitive Analysis";
       icon = <IoTrendingUpSharp size={32} />;
       break;
@@ -60,7 +60,7 @@ const Header = ({ pathname }) => {
       title = "Executive Summary";
       icon = <PiSigmaFill size={32} />;
       break;
-    case "bank":
+    case "banks":
       title = "Individual Banks";
       icon = <BiSolidBank size={32} />;
       break;
@@ -76,7 +76,19 @@ const Header = ({ pathname }) => {
       title = "Benchmarking";
       icon = <BsFillPieChartFill className="mt-1" size={28} />;
       break;
+    case "resetPassword":
+      title = "Benchmarking";
+      icon = <BsFillPieChartFill className="mt-1" size={28} />;
+      break;
     case "admin":
+      title = "Admin Profile";
+      icon = <RxAvatar size={32} />;
+      break;
+    case "user":
+      title = "Admin Profile";
+      icon = <RxAvatar size={32} />;
+      break;
+    case "bank":
       title = "Admin Profile";
       icon = <RxAvatar size={32} />;
       break;

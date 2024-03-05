@@ -17,7 +17,6 @@ import { BiCalendar } from "react-icons/bi";
 const CompetitionHeader = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const bank = searchParams.get("bank");
   const currentYear = new Date().getFullYear();
 
   function navigate({ paramNameToUpdate, newValue }) {

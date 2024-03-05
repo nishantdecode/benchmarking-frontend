@@ -1,12 +1,10 @@
 "use client";
 
-import * as z from "zod";
 import React from "react";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useLoginMutation } from "@/lib/features/services/authApi";
 
+import * as z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -18,51 +16,48 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+import { useRouter, useSearchParams } from "next/navigation";
+import { useResetPasswordMutation } from "@/lib/features/services/authApi";
 import showToast from "@/util/showToast";
 
 const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(3),
+  newPassword: z.string().min(3),
+  confirmNewPassword: z.string().min(3),
 });
 
-const Login = () => {
-  const [login, { isLoading, error }] = useLoginMutation();
+const ResetPassword = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [resetPassword, { isLoading, error }] = useResetPasswordMutation();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      newPassword: "",
+      confirmNewPassword: "",
     },
   });
 
   const handleSubmit = async (values) => {
     const credentials = {
-      email: values.email,
-      password: values.password,
+      email: searchParams.get('email'),
+      newPassword: values.newPassword,
     };
-
     try {
-      if (typeof window !== "undefined" && window.localStorage) {
-        const response = await login(credentials);
-        if (response.data) {
-          localStorage.setItem("accessToken", response.data.result.token);
-          router.push("/");
-        } else {
-          if(Number(response.error.status) >= 500)
-            showToast("Server Error",response.error.data.message)
-          else 
-            showToast("Login Error",response.error.data.message)
-        }
+      const response = await resetPassword(credentials);
+      if (!response.error) {
+        showToast("Successfully password Reset!","Please Login.")
+        router.push(`/dashboard/login`);
+      } else {
+        showToast("Error!",response.error.data.message)
       }
     } catch (err) {
-      showToast("Error Logging In!","Please try again later.")
+      showToast("Error!",undefined);
     }
   };
   return (
     <>
       <div className="w-full font-bold text-left text-xl md:text-2xl pb-6 md:mb-8">
-        Log in
+        Reset Password
       </div>
       <Form {...form}>
         <form
@@ -71,18 +66,18 @@ const Login = () => {
         >
           <FormField
             control={form.control}
-            name="email"
+            name="newPassword"
             render={({ field }) => {
               return (
                 <FormItem>
                   <div className="flex flex-col md:flex-row justify-between gap-4">
-                    <FormLabel className="text-xs md:text-sm">
-                      Email* :
+                    <FormLabel className="min-w-[170px] mt-3 text-xs md:text-sm">
+                      Enter new Password* :
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="email"
-                        type="email"
+                        placeholder="New Password"
+                        type="password"
                         {...field}
                         className="md:max-w-[300px]"
                       />
@@ -95,17 +90,17 @@ const Login = () => {
           />
           <FormField
             control={form.control}
-            name="password"
+            name="confirmNewPassword"
             render={({ field }) => {
               return (
                 <FormItem>
                   <div className="flex flex-col md:flex-row justify-between gap-4">
-                    <FormLabel className="mt-3 text-xs md:text-sm">
-                      Password* :
+                    <FormLabel className="min-w-[170px] mt-3 text-xs md:text-sm">
+                      Confirm new Password* :
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="password"
+                        placeholder="Confirm Password"
                         type="password"
                         {...field}
                         className="md:max-w-[300px]"
@@ -120,7 +115,7 @@ const Login = () => {
           <div className="flex flex-row w-full justify-center md:justify-end mt-2 md:mt-5">
             <Button
               size="sm"
-              variant={isLoading ? "ghost" : "default"}
+              variant="default"
               type="submit"
               className="w-auto text-xs justify-center px-8 py-0 rounded-xl"
             >
@@ -129,17 +124,8 @@ const Login = () => {
           </div>
         </form>
       </Form>
-      <div className="flex flex-row w-full justify-center md:justify-start">
-        <Button
-          variant="link"
-          className="p-0 text-xs md:mt-[-40px]"
-          onClick={() => router.push("/dashboard/forgetPassword")}
-        >
-          Forget Password?
-        </Button>
-      </div>
     </>
   );
 };
 
-export default Login;
+export default ResetPassword;

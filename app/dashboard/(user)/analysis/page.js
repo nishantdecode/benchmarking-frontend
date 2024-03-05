@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import {
@@ -42,27 +42,32 @@ const AnalysisPage = () => {
 
   const analysis = searchParams.get("item") || "Balance Sheet/BN";
 
-  const [balanceSheetCategory] = useState(balanceSheetCategories[0].name);
-  const [msBalanceSheetCategory] = useState(msBalanceSheetCategories[0].name);
-  const [incomeStatementCategory] = useState(incomeStatementCategories[0].name);
-  const [msIncomeStatementCategory] = useState(
-    msIncomeStatementCategories[0].name
-  );
-
-  const ratioCategory = searchParams.get("category") || ratioCategories[0].name;
-
   const checkedBanks =
     JSON.parse(searchParams.get("checkedBanks")) ||
     banks.map((bank) => bank.name);
 
+  const ratioCategory =
+    searchParams.get("ratioCategory") || ratioCategories[0].name;
+  const balanceSheetCategory =
+    searchParams.get("balanceSheetCategory") || balanceSheetCategories[0].name;
+  const msBalanceSheetCategory =
+    searchParams.get("msBalanceSheetCategory") ||
+    msBalanceSheetCategories[0].name;
+  const incomeStatementCategory =
+    searchParams.get("incomeStatementCategory") ||
+    incomeStatementCategories[0].name;
+  const msIncomeStatementCategory =
+    searchParams.get("msIncomeStatementCategory") ||
+    msIncomeStatementCategories[0].name;
+
   useEffect(() => {
     router.push(
-      `?item=${analysis}&category=${ratioCategory}&checkedBanks=${JSON.stringify(
+      `?item=${analysis}&checkedBanks=${JSON.stringify(
         checkedBanks
-      )}`,
+      )}&ratioCategory=${ratioCategory}&balanceSheetCategory=${balanceSheetCategory}&msBalanceSheetCategory=${msBalanceSheetCategory}&incomeStatementCategory=${incomeStatementCategory}&msIncomeStatementCategory=${msIncomeStatementCategory}`,
       { scroll: false }
     );
-  }, [router, analysis, ratioCategory, checkedBanks]);
+  }, []);
 
   const { data, bankColors, dataFormatterPercentage } = visualisationUtils(
     ratioCategory,
@@ -88,7 +93,7 @@ const AnalysisPage = () => {
   }
   return (
     <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10 gap-10">
-      <Card className="flex flex-col h-auto w-full p-3 md:p-5 md:pb-10 gap-5 lg:gap-10">
+      <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
         <div className="flex justify-center lg:justify-start min-w-full">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -132,8 +137,10 @@ const AnalysisPage = () => {
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
             <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
               <SelectCategory
+                height="h-[700px]"
                 search={true}
                 categories={balanceSheetCategories}
+                categoryName="balanceSheetCategory"
               />
             </div>
             <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
@@ -149,8 +156,10 @@ const AnalysisPage = () => {
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
             <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
               <SelectCategory
+                height="h-[700px]"
                 search={true}
                 categories={incomeStatementCategories}
+                categoryName="incomeStatementCategory"
               />
             </div>
             <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
@@ -168,6 +177,7 @@ const AnalysisPage = () => {
               <SelectCategory
                 search={true}
                 categories={ratioCategories}
+                categoryName="ratioCategory"
                 height="h-[650px]"
               />
             </div>
@@ -200,12 +210,14 @@ const AnalysisPage = () => {
         )}
       </Card>
       {analysis === "Balance Sheet/BN" ? (
-        <Card className="flex flex-col h-auto w-full p-3 md:p-5 md:pb-10 gap-5 lg:gap-10">
+        <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
             <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
               <SelectCategory
+                height="h-[700px]"
                 search={true}
                 categories={msBalanceSheetCategories}
+                categoryName="msBalanceSheetCategory"
               />
             </div>
             <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
@@ -219,12 +231,14 @@ const AnalysisPage = () => {
           </div>
         </Card>
       ) : analysis === "Income Statement/BN" ? (
-        <Card className="flex flex-col h-auto w-full p-3 md:p-5 md:pb-10 gap-5 lg:gap-10">
+        <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
             <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
               <SelectCategory
+                height="h-[700px]"
                 search={true}
                 categories={msIncomeStatementCategories}
+                categoryName="msIncomeStatementCategory"
               />
             </div>
             <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
@@ -238,10 +252,15 @@ const AnalysisPage = () => {
           </div>
         </Card>
       ) : (
-        <Card className="flex flex-col h-auto w-full p-3 md:p-5 md:pb-10 gap-5 lg:gap-10">
+        <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
             <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
-              <SelectCategory search={true} categories={ratioCategories} />
+              <SelectCategory
+                height="h-[700px]"
+                search={true}
+                categories={ratioCategories}
+                categoryName="ratioCategory"
+              />
             </div>
             <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
               <VisualiseTable

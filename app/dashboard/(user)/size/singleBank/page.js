@@ -36,7 +36,7 @@ const SingleBankPage = () => {
 
   useEffect(() => {
     router.push(`?bank=${bank}&size=${size}`, { scroll: false });
-  }, [bank, size]);
+  }, []);
 
   function navigate({ paramNameToUpdate, newValue }) {
     const updatedParams = new URLSearchParams(searchParams);
@@ -76,7 +76,7 @@ const SingleBankPage = () => {
 
   return (
     <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10">
-      <Card className="flex flex-col lg:flex-row h-auto w-full p-3 md:p-5 md:pb-10 gap-3 lg:gap-2">
+      <Card className="flex flex-col lg:flex-row h-auto w-full p-3 md:p-5 gap-3 lg:gap-2">
         <div className="lg:sticky lg:top-14 flex flex-col justify-start items-center h-full w-full lg:w-1/6 pr-2 gap-5">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

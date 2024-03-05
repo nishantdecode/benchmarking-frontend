@@ -12,12 +12,12 @@ import { downloadImage, downloadPDF, downloadSheet } from "@/util/exportUtils";
 
 import { Card } from "@/components/ui/card";
 
-import Header from "@/app/components/dashboard/analysis/header";
-import SelectCategory from "@/app/components/dashboard/analysis/selectCategory";
+import Header from "@/app/components/dashboard/trendAnalysis/header";
+import SelectCategory from "@/app/components/dashboard/trendAnalysis/selectCategory";
 import { generateColumns } from "@/app/components/visualise/columns";
 import VisualiseBarChart from "@/app/components/visualise/visualiseBarChart";
 import VisualiseLineChart from "@/app/components/visualise/visualiseLineChart";
-import TableComponent from "@/app/components/dashboard/analysis/tableComponent";
+import TableComponent from "@/app/components/dashboard/trendAnalysis/tableComponent";
 
 const TrendAndCompetitionAnalysis = ({}) => {
   let ref = useRef()

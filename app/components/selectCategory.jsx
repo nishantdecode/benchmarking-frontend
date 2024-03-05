@@ -16,19 +16,17 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export function SelectCategory({ search, categories, height }) {
+export function SelectCategory({ category, setCategory, search, categories, height, categoryName = "category" }) {
   const [open, setOpen] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const category = searchParams.get("category");
 
-  function navigate({ paramNameToUpdate, newValue }) {
-    const updatedParams = new URLSearchParams(searchParams);
-    updatedParams.set(paramNameToUpdate, newValue);
-    router.push(`?${updatedParams.toString()}`, { scroll: false });
+  if(!category) {
+    return (
+      <Skeleton className="hidden lg:flex h-full lg:h-[600px] w-full bg-secondary"></Skeleton>
+    );
   }
+
   return (
     <>
       <Command className={`${height ? height : "h-[600px]"} lg:sticky lg:top-14 hidden lg:flex flex-col w-full bg-transparent gap-5`}>
@@ -54,11 +52,7 @@ export function SelectCategory({ search, categories, height }) {
                   <button
                     className="h-12 w-full py-2.5 px-6 truncate text-ellipsis text-left text-xs"
                     onClick={() => {
-                      setOpen(false);
-                      navigate({
-                        paramNameToUpdate: "category",
-                        newValue: item.name,
-                      });
+                      setCategory(item.name)
                     }}
                   >
                     <span>{item.name}</span>
@@ -81,7 +75,7 @@ export function SelectCategory({ search, categories, height }) {
             <FaSort className="shrink-0 h-4 w-4 ml-2 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="h-[500px] w-[300px] p-2 bg-secondary dark:bg-[#2E2B54]">
+        <PopoverContent className={`${height ? height : "h-[500px]"} w-[300px] p-2 bg-secondary dark:bg-[#2E2B54]`}>
           <Command className="bg-transparent h-full w-full">
             {search && (
               <CommandInput
@@ -106,10 +100,7 @@ export function SelectCategory({ search, categories, height }) {
                         className="h-12 w-full py-2.5 px-6 truncate text-ellipsis text-left text-xs"
                         onClick={() => {
                           setOpen(false);
-                          navigate({
-                            paramNameToUpdate: "category",
-                            newValue: item.name,
-                          });
+                          setCategory(item.name)
                         }}
                       >
                         <span>{item.name}</span>

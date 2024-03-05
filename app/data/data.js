@@ -1,7 +1,7 @@
 const banks = [
   {
     name: "SAIB",
-    iconUrl: "https://res.cloudinary.com/dohnlambm/image/upload/v1708694648/saib_ehydzo.png",
+    iconUrl: "https://res.cloudinary.com/dohnlambm/image/upload/v1709458801/pgmlgwkyezejc9ryqzd4.png",
     color: "#FECC0D",
   },
   {
@@ -11,7 +11,7 @@ const banks = [
   },
   {
     name: "Al-Rajhi Bank",
-    iconUrl: "https://res.cloudinary.com/dohnlambm/image/upload/v1708693026/rajhi_pf9tah.png",
+    iconUrl: "https://res.cloudinary.com/dohnlambm/image/upload/v1709456698/hugemuhl11ak15qglwnd.png",
     color: "#221AFB",
   },
   {
@@ -26,12 +26,12 @@ const banks = [
   },
   {
     name: "Saudi Awwal Bank",
-    iconUrl: "https://res.cloudinary.com/dohnlambm/image/upload/v1708692818/awwal_nnvabx.png",
+    iconUrl: "https://res.cloudinary.com/dohnlambm/image/upload/v1709458519/wqyhydzzcrhslnasrgwe.png",
     color: "#E00614",
   },
   {
     name: "Saudi National Bank",
-    iconUrl: "https://res.cloudinary.com/dohnlambm/image/upload/v1708693278/saudi_inq1xw.png",
+    iconUrl: "https://res.cloudinary.com/dohnlambm/image/upload/v1709457799/hw8efomdfl1utrrxrqjc.png",
     color: "#7EC042",
   },
   {

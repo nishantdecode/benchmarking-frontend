@@ -1,5 +1,6 @@
 import React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Cloudinary } from "@cloudinary/url-gen";
+import { AdvancedImage, responsive, placeholder } from "@cloudinary/react";
 
 import {
   DropdownMenu,
@@ -9,18 +10,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export function SelectBanks({ banks }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  let checkedBanks =
-    JSON.parse(searchParams.get("checkedBanks")) ||
-    banks.map((bank) => bank.name);
+export function SelectBanks({ banks, checkedBanks, setCheckedBanks, checkedBankNames = "checkedBanks" }) {
+  const cld = new Cloudinary({
+    cloud: {
+      cloudName: "dohnlambm",
+    },
+  });
 
-  function navigate({ paramNameToUpdate, newValue }) {
-    const updatedParams = new URLSearchParams(searchParams);
-    updatedParams.set(paramNameToUpdate, newValue);
-    router.push(`?${updatedParams.toString()}`, { scroll: false });
+  if (!banks || banks.length === 0) {
+    return (
+      <Skeleton className="hidden lg:flex h-full lg:h-[600px] w-full bg-secondary"></Skeleton>
+    );
   }
   return (
     <>
@@ -34,10 +36,7 @@ export function SelectBanks({ banks }) {
                 checkedBanks.length === banks.length
                   ? []
                   : banks.map((bank) => bank.name);
-              navigate({
-                paramNameToUpdate: "checkedBanks",
-                newValue: JSON.stringify(updatedBanks),
-              });
+              setCheckedBanks(updatedBanks)
             }}
           />
           <label
@@ -47,38 +46,42 @@ export function SelectBanks({ banks }) {
             Select All
           </label>
         </div>
-        {banks.map((bank) => (
-          <div
-            key={bank.name}
-            className={`${
-              checkedBanks.includes(bank.name)
-                ? "bg-toggle text-toggle-foreground"
-                : " "
-            } flex flex-row justify-start items-center h-12 w-full py-3 px-3 gap-2 rounded-md`}
-          >
-            <Checkbox
-              id={bank.name}
-              checked={checkedBanks.includes(bank.name)}
-              onCheckedChange={() => {
-                const updatedBanks = checkedBanks.includes(bank.name)
-                  ? checkedBanks.filter((item) => item !== bank.name)
-                  : [...checkedBanks, bank.name];
-                navigate({
-                  paramNameToUpdate: "checkedBanks",
-                  newValue: JSON.stringify(updatedBanks),
-                });
-              }}
-            />
+        {banks.map((bank) => {
+          const myImage = cld.image(bank.iconUrl);
+          return (
             <div
-              className="min-h-4 min-w-4"
-              style={{ backgroundColor: bank.color }}
-            ></div>
-            <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
-              <img src={bank.iconUrl} className="h-4 w-4"></img>
+              key={bank.name}
+              className={`${
+                checkedBanks.includes(bank.name)
+                  ? "bg-toggle text-toggle-foreground"
+                  : " "
+              } flex flex-row justify-start items-center h-12 w-full py-3 px-3 gap-2 rounded-md`}
+            >
+              <Checkbox
+                id={bank.name}
+                checked={checkedBanks.includes(bank.name)}
+                onCheckedChange={() => {
+                  const updatedBanks = checkedBanks.includes(bank.name)
+                    ? checkedBanks.filter((item) => item !== bank.name)
+                    : [...checkedBanks, bank.name];
+                  setCheckedBanks(updatedBanks)
+                }}
+              />
+              <div
+                className="min-h-4 min-w-4"
+                style={{ backgroundColor: bank.color }}
+              ></div>
+              <AdvancedImage
+                className="w-6 h-6 object-cover rounded-full bg-white"
+                cldImg={myImage}
+                plugins={[responsive(), placeholder()]}
+              />
+              <span className="text-xs truncate text-ellipsis">
+                {bank.name}
+              </span>
             </div>
-            <span className="text-xs truncate text-ellipsis">{bank.name}</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <div className="lg:hidden flex flex-col sm:flex-row justify-between w-full gap-2">
         <DropdownMenu>
@@ -100,10 +103,7 @@ export function SelectBanks({ banks }) {
                   checkedBanks.length === banks.length
                     ? []
                     : banks.map((bank) => bank.name);
-                navigate({
-                  paramNameToUpdate: "checkedBanks",
-                  newValue: JSON.stringify(updatedBanks),
-                });
+                setCheckedBanks(updatedBanks)
               }}
             >
               <label
@@ -114,6 +114,7 @@ export function SelectBanks({ banks }) {
               </label>
             </DropdownMenuCheckboxItem>
             {banks.map((item, index) => {
+              const myImage = cld.image(item.iconUrl);
               return (
                 <DropdownMenuCheckboxItem
                   id={item.name}
@@ -124,19 +125,18 @@ export function SelectBanks({ banks }) {
                     const updatedBanks = checkedBanks.includes(item.name)
                       ? checkedBanks.filter((bank) => bank !== item.name)
                       : [...checkedBanks, item.name];
-                    navigate({
-                      paramNameToUpdate: "checkedBanks",
-                      newValue: JSON.stringify(updatedBanks),
-                    });
+                    setCheckedBanks(updatedBanks)
                   }}
                 >
                   <div
                     className="min-h-4 min-w-4"
                     style={{ backgroundColor: item.color }}
                   ></div>
-                  <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
-                    <img src={item.iconUrl} className="h-4 w-4"></img>
-                  </div>
+                  <AdvancedImage
+                    className="w-6 h-6 object-cover rounded-full bg-white"
+                    cldImg={myImage}
+                    plugins={[responsive(), placeholder()]}
+                  />
                   <span className="text-xs">{item.name}</span>
                 </DropdownMenuCheckboxItem>
               );

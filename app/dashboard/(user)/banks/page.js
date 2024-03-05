@@ -38,7 +38,7 @@ const Bank = () => {
 
   useEffect(() => {
     router.push(`?bank=${bank}&category=${category}`, { scroll: false });
-  }, [bank, category]);
+  }, []);
 
   function navigate({ paramNameToUpdate, newValue }) {
     const updatedParams = new URLSearchParams(searchParams);
