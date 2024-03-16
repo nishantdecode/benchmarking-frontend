@@ -1,119 +1,225 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSelector } from "react-redux";
+import React, { useRef, useState, useEffect } from "react";
 
-import { banks } from "@/app/data/data";
-import { categories } from "@/app/data/ratioData";
-import { bankMultipleRatioData, figuresData } from "@/app/data/ratioData";
+import { keyRatioCategories } from "@/app/data/categoryData";
 
 import { Card } from "@/components/ui/card";
 
+import {
+  useGetAllYearsMutation,
+  useGetFiguresMutation,
+  useGetRatioMutation,
+} from "@/lib/features/services/keyRatioApi";
+import showToast from "@/util/showToast";
 import { ToggleBank } from "@/app/components/toggleBank";
 import { SelectBanks } from "@/app/components/selectBanks";
-import { visualisationUtils } from "@/util/visualisationUtils";
 import { downloadImage, downloadPDF } from "@/util/exportUtils";
 import { SelectCategory } from "@/app/components/selectCategory";
 import { generateColumns } from "@/app/components/visualise/columns";
 import OptionButtons from "@/app/components/visualise/optionButtons";
 import DataIntervalOptions from "@/app/components/dataIntervalOptions";
+import { visualisationLabelUtils } from "@/util/visualizationLabelUtils";
 import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
 import VisualiseLineChart from "@/app/components/visualise/visualiseLineChart";
 
 const Ratio = () => {
   let ref = useRef();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const years = [2019, 2020, 2021, 2022];
-  const bank = searchParams.get("bank") || banks[0].name;
-  const checkedBanks =
-    JSON.parse(searchParams.get("checkedBanks")) ||
-    banks.map((bank) => bank.name);
-  const category = searchParams.get("category") || categories[0].name;
-  const intervalType = searchParams.get("intervalType") || "YoY & YTD";
-  const start = JSON.parse(searchParams.get("start")) || {
-    first: "Q1",
-    second: years[0],
+
+  const [getRatio] = useGetRatioMutation();
+  const [getFigures] = useGetFiguresMutation();
+  const [getAllYears] = useGetAllYearsMutation();
+
+  const [ratio, setRatio] = useState([]);
+  const [figures, setFigures] = useState([]);
+  const [years, setYears] = useState([]);
+
+  const banks = useSelector((state) => state.bank.banks);
+
+  const [bank, setBank] = useState(null);
+
+  const [date, setDate] = useState({});
+  const [checkedBanks, setCheckedBanks] = useState([]);
+  const [category, setCategory] = useState(keyRatioCategories[0].name);
+
+  const ratioBankLabel =
+    ratio.length !== 0 && banks.length !== 0
+      ? visualisationLabelUtils(banks, ratio)
+      : [];
+
+  let columns = null;
+  if (figures.length !== 0) {
+    columns = generateColumns({
+      data: figures,
+    });
+  }
+
+  const replaceCategoryNames = (data) => {
+    return data.map((item) => {
+      const categoryInfo = keyRatioCategories.find(
+        (category) => category.value === item.category
+      );
+      if (categoryInfo) {
+        return {
+          ...item,
+          category: categoryInfo.name,
+        };
+      } else {
+        return item;
+      }
+    });
   };
-  const end = JSON.parse(searchParams.get("end")) || {
-    first: "Q1",
-    second: years[years.length - 1],
+
+  const getFiguresData = async () => {
+    const bankId = banks?.find((item) => item.name === bank)?.id;
+    try {
+      const response = await getFigures({ bankId });
+      if (response.data) {
+        const transformedData = replaceCategoryNames(response.data.result);
+        setFigures(transformedData);
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
+
+  const getRatioData = async () => {
+    const bankIds = checkedBanks.map(
+      (item) => banks?.find((bank) => bank.name === item).id
+    );
+    const ratioCategory = keyRatioCategories
+      .find((item) => (item.name === category ? item.value : ""))
+      .value.toString();
+    const credentials = {
+      category: ratioCategory,
+      bankIds: bankIds,
+      interval: date.interval,
+      startDate: date.startDate,
+      endDate: date.endDate,
+    };
+    try {
+      if (Object.keys(date).length !== 0) {
+        const response = await getRatio(credentials);
+        if (response.data) {
+          setRatio(response.data.result);
+        } else {
+          showToast("Error!", response.error.result);
+        }
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
+
+  const getYears = async () => {
+    try {
+      const response = await getAllYears();
+      if (response.data) {
+        setYears(response.data.result);
+        setDate({
+          interval: "YEARLY",
+          startDate: new Date(`01/01/${response.data.result[0]}`),
+          endDate: new Date(
+            `01/01/${response.data.result[response.data.result.length - 2]}`
+          ),
+        });
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
   };
 
   useEffect(() => {
-    router.push(
-      `?bank=${bank}&category=${category}&checkedBanks=${JSON.stringify(
-        checkedBanks
-      )}&intervalType=${encodeURIComponent(
-        intervalType
-      )}&start=${JSON.stringify({
-        first: start.first,
-        second: start.second,
-      })}&end=${JSON.stringify({
-        first: end.first,
-        second: end.second,
-      })}`,
-      { scroll: false }
-    );
+    getYears();
   }, []);
 
-  const { data, bankColors, dataFormatterPercentage } = visualisationUtils(
-    category,
-    bankMultipleRatioData
-  );
+  useEffect(() => {
+    if (bank) {
+      getFiguresData();
+    }
+  }, [bank, banks]);
 
-  const columns = generateColumns({
-    data: figuresData,
-  });
+  useEffect(() => {
+    if (banks && banks.length > 0) {
+      setBank(banks[0].name);
+      setCheckedBanks(banks.map((bank) => bank.name));
+    }
+  }, [banks]);
+
+  useEffect(() => {
+    getRatioData();
+  }, [date, category, checkedBanks]);
 
   return (
     <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10 gap-10">
       <Card className="flex flex-col items-center w-full h-auto p-3 md:p-5 gap-3 md:gap-5">
         <div className="flex flex-col lg:flex-row justify-between items-center min-w-full gap-3">
-          <span className="w-auto lg:w-1/6 text-2xl font-bold mt-2 truncate text-ellipsis">Key Ratios</span>
+          <span className="w-auto lg:w-1/6 text-2xl font-bold mt-2 truncate text-ellipsis">
+            Key Ratios
+          </span>
           <div className="w-full lg:w-4/6 text-xs sm:text-sm font-medium">
-            <DataIntervalOptions years={[2019, 2020, 2021, 2022]}/>
+            <DataIntervalOptions
+              years={years}
+              date={date}
+              setDate={setDate}
+              category={category}
+            />
           </div>
           <div className="flex justify-center lg:justify-end w-full lg:w-1/6">
             <OptionButtons
-              downloadImage={() => downloadImage(ref)}
-              downloadPDF={() => downloadPDF(ref)}
               type="chart"
+              downloadPDF={() => downloadPDF(ref)}
+              downloadImage={() => downloadImage(ref)}
             />
           </div>
         </div>
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-14 lg:gap-2">
-          <div className="lg:sticky lg:top-20 w-full sm:w-auto lg:w-1/6 h-auto">
-            <SelectCategory categories={categories} />
-          </div>
-          <div className="flex flex-col h-[300px] md:h-[600px] w-full lg:w-4/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
-            <VisualiseLineChart
-              ref={ref}
-              data={data}
-              colors={bankColors}
-              xAxis={true}
-              dataFormatter={dataFormatterPercentage}
+          <div className="lg:sticky lg:top-20 h-auto w-full sm:w-auto lg:w-1/6">
+            <SelectCategory
+              category={category}
+              setCategory={setCategory}
+              categories={keyRatioCategories}
             />
           </div>
-          <div className="lg:sticky lg:top-14 w-full sm:w-auto lg:w-1/6 h-full">
-            <SelectBanks banks={banks} />
+          <div className="flex flex-col h-[300px] md:h-[600px] w-full lg:w-4/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
+            {ratio.length !== 0 && (
+              <VisualiseLineChart
+                ref={ref}
+                data={ratio}
+                xAxis={true}
+                colors={ratioBankLabel.bankColorsLabel}
+                dataFormatter={ratioBankLabel.dataFormatterPercentage}
+              />
+            )}
+          </div>
+          <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+            <SelectBanks
+              banks={banks}
+              checkedBanks={checkedBanks}
+              setCheckedBanks={setCheckedBanks}
+            />
           </div>
         </div>
       </Card>
       <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
           <div className="flex flex-col justify-center items-center lg:items-start h-full w-full sm:w-auto lg:w-1/6 gap-7">
-            <span className="text-lg lg:text-2xl font-bold truncate text-ellipsis">Individual Bank</span>
-            <ToggleBank data={banks} />
+            <span className="text-lg lg:text-2xl font-bold truncate text-ellipsis">
+              Individual Bank
+            </span>
+            <ToggleBank data={banks} bank={bank} setBank={setBank} />
           </div>
-          <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
-            <VisualiseTable
-              title={bank}
-              data={figuresData}
-              columns={columns}
-              search="true"
-              exportXls="true"
-            />
+          <div className="flex flex-col h-auto w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+            {figures.length !== 0 && (
+              <VisualiseTable
+                title={bank}
+                data={figures}
+                columns={columns}
+                search="true"
+                exportXls="true"
+              />
+            )}
           </div>
         </div>
       </Card>

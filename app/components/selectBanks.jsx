@@ -26,8 +26,8 @@ export function SelectBanks({ banks, checkedBanks, setCheckedBanks, checkedBankN
   }
   return (
     <>
-      <div className="hidden lg:flex flex-col items-start gap-2">
-        <div className="flex flex-row w-full py-2 px-3 gap-2">
+      <div className="hidden lg:flex flex-col items-start gap-3">
+        <div className="flex flex-row h-10 w-full py-2 px-3 gap-2">
           <Checkbox
             id="Select All"
             checked={checkedBanks.length === banks.length}
@@ -55,7 +55,7 @@ export function SelectBanks({ banks, checkedBanks, setCheckedBanks, checkedBankN
                 checkedBanks.includes(bank.name)
                   ? "bg-toggle text-toggle-foreground"
                   : " "
-              } flex flex-row justify-start items-center h-12 w-full py-3 px-3 gap-2 rounded-md`}
+              } flex flex-row justify-start items-center h-10 w-full py-3 px-3 gap-2 rounded-md`}
             >
               <Checkbox
                 id={bank.name}

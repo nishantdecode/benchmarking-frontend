@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 
 import {
   DropdownMenu,
@@ -13,17 +12,9 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { BiCalendar } from "react-icons/bi";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const CompetitionHeader = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const currentYear = new Date().getFullYear();
-
-  function navigate({ paramNameToUpdate, newValue }) {
-    const updatedParams = new URLSearchParams(searchParams);
-    updatedParams.set(paramNameToUpdate, newValue);
-    router.push(`?${updatedParams.toString()}`, { scroll: false });
-  }
+const CompetitionHeader = ({ years, year, setYear }) => {
   return (
     <div className="flex flex-row justify-between h-auto w-full">
       <div className="flex flex-col sm:flex-row justify-start gap-2 sm:gap-5">
@@ -42,46 +33,45 @@ const CompetitionHeader = () => {
         </div>
       </div>
       <div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              size="sm"
-              variant="dropdown"
-              className="px-5 sm:px-8 gap-2 dark:border-2 rounded-lg"
-            >
-              <BiCalendar size={20} /> {searchParams.get("year") || currentYear}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-40">
-            <DropdownMenuLabel className="flex flex-row justify-center w-full">
-              Select Year
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuRadioGroup
-              value={searchParams.get("year") || currentYear}
-              onValueChange={(year) => {
-                navigate({
-                  paramNameToUpdate: "year",
-                  newValue: year,
-                });
-              }}
-            >
-              {Array.from({ length: 5 }).map((_, index) => {
-                const currentYear = new Date().getFullYear();
-                const year = currentYear - index;
-                return (
-                  <DropdownMenuRadioItem
-                    key={index}
-                    value={`${year}`}
-                    className="flex flex-row justify-center w-full"
-                  >
-                    {year}
-                  </DropdownMenuRadioItem>
-                );
-              })}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {(years && years.length !== 0) ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="sm"
+                variant="dropdown"
+                className="px-5 sm:px-8 gap-2 dark:border-2 rounded-lg"
+              >
+                <BiCalendar size={20} /> {year}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-40">
+              <DropdownMenuLabel className="flex flex-row justify-center w-full">
+                Select Year
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={year}
+                onValueChange={(item) => {
+                  setYear(item);
+                }}
+              >
+                {years.map((item, index) => {
+                  return (
+                    <DropdownMenuRadioItem
+                      key={index}
+                      value={`${item}`}
+                      className="flex flex-row justify-center w-full"
+                    >
+                      {item}
+                    </DropdownMenuRadioItem>
+                  );
+                })}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Skeleton className="h-[38px] w-[130px]"/>
+        )}
       </div>
     </div>
   );

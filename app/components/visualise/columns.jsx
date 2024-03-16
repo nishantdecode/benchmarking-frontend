@@ -1,17 +1,21 @@
 "use client";
 
+import { Cloudinary } from "@cloudinary/url-gen";
+import { AdvancedImage, responsive, placeholder } from "@cloudinary/react";
+
+import { PiBankBold } from "react-icons/pi";
+
 import { Progress } from "@/components/ui/progress";
-import { banks } from "@/app/data/data";
 
 const initialCol = ({ key }) => {
   return {
     accessorKey: key,
     header: () => {
-      return <div className="w-[120px] text-center font-bold"> </div>;
+      return <div className="w-[180px] text-center font-bold"> </div>;
     },
     cell: ({ row }) => {
       return (
-        <div className="w-[120px] text-left font-medium truncate text-ellipsis">
+        <div className="w-[180px] text-left font-medium truncate text-ellipsis">
           {row.getValue(key)}
         </div>
       );
@@ -19,21 +23,37 @@ const initialCol = ({ key }) => {
   };
 };
 
-const initialBankCol = ({ key }) => {
+const initialBankCol = ({ key, banks }) => {
   return {
     accessorKey: key,
     header: () => {
-      return <div className="w-[120px] text-center font-bold"> </div>;
+      return <div className="w-[180px] text-center font-bold"> </div>;
     },
     cell: ({ row }) => {
-      const icon = banks.find((item) => item.name === row.getValue(key))?.iconUrl;
+      const bank = banks?.find((item) => item.id === row.getValue(key));
+      const cld = new Cloudinary({
+        cloud: {
+          cloudName: "dohnlambm",
+        },
+      });
+      const myImage = cld.image(bank?.iconUrl);
       return (
-        <div className="flex flex-row w-[120px] gap-2 text-left font-medium">
+        <div className="flex flex-row w-[180px] gap-2 text-left font-medium">
           <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
-            <img src={icon} className="h-4 w-4"></img>
+            {myImage ? (
+              <AdvancedImage
+                className="w-6 h-6 object-cover rounded-full bg-white"
+                cldImg={myImage}
+                plugins={[responsive(), placeholder()]}
+              />
+            ) : (
+              <div className="flex justify-center items-center h-8 w-8 bg-foreground rounded-full">
+                <PiBankBold size={10} className="text-secondary" />
+              </div>
+            )}
           </div>
           <span className="mt-1 text-xs truncate text-ellipsis">
-            {row.getValue(key)}
+            {bank?.name}
           </span>
         </div>
       );
@@ -43,10 +63,24 @@ const initialBankCol = ({ key }) => {
 
 const initialRankCol = ({ key }) => {
   return {
-    accessorKey: "rank",
-    header: <div key={key} className="text-center font-bold min-w-[150px]"> </div>,
+    accessorKey: key,
+    header: (
+      <div key={key} className="w-[180px] text-center font-bold">
+        {" "}
+      </div>
+    ),
     cell: ({ row }) => {
-      return <div key={key} className="text-left font-medium">{row.getValue(key) === '1' ? "1st Rank" : row.getValue(key) === '2' ? "2nd Rank" : row.getValue(key) === '3' ? "3rd Rank" : `${row.getValue(key)}th Rank`}</div>;
+      return (
+        <div key={key} className="w-[180px] text-left font-medium">
+          {row.getValue(key).toString() === "1"
+            ? "1st Rank"
+            : row.getValue(key).toString() === "2"
+            ? "2nd Rank"
+            : row.getValue(key).toString() === "3"
+            ? "3rd Rank"
+            : `${row.getValue(key)}th Rank`}
+        </div>
+      );
     },
   };
 };
@@ -89,7 +123,30 @@ const progressCol = ({ key, color }) => {
   };
 };
 
-const itemRankCol = ({ key, colors }) => {
+const progressBankCol = ({ key, banks }) => {
+  return {
+    accessorKey: key,
+    header: ({ column }) => {
+      return (
+        <div className="flex flex-row justify-start w-[150px] gap-2 truncate text-ellipsis font-semibold">
+          {key}
+        </div>
+      );
+    },
+    cell: ({ row }) => {
+      const color = banks?.find(item => item.name.toString() === key.toString()).color
+      return (
+        <div className="flex flex-row w-full">
+          <Progress value={row.getValue(key)} bg={color}>
+            {row.getValue(key)}
+          </Progress>
+        </div>
+      );
+    },
+  };
+};
+
+const itemRankCol = ({ key, banks }) => {
   return {
     accessorKey: key,
     header: ({ column }) => {
@@ -101,17 +158,17 @@ const itemRankCol = ({ key, colors }) => {
     },
     cell: ({ row }) => {
       return (
-        <div className="flex flex-row gap-5 justify-center">
+        <div className="flex flex-row justify-between px-8">
           <div className="text-center font-medium">
             {row.getValue(key).value}
           </div>
           <div
-            className="flex flex-row justify-center items-center h-6 w-6 rounded-full"
+            className="flex flex-row justify-center items-center h-6 w-6 rounded-full font-bold"
             style={{
-              backgroundColor: banks.find(
+              backgroundColor: banks?.find(
                 (item) =>
-                  row.getAllCells(key)[0].row.original.bank.toString() ===
-                  item.name.toString()
+                  row.getAllCells(key)[0].row.original.bankId?.toString() ===
+                  item.id.toString()
               )?.color,
             }}
           >
@@ -123,7 +180,7 @@ const itemRankCol = ({ key, colors }) => {
   };
 };
 
-const rankCol = ({ key }) => {
+const rankCol = ({ key, banks }) => {
   return {
     accessorKey: key,
     header: () => {
@@ -134,11 +191,27 @@ const rankCol = ({ key }) => {
       );
     },
     cell: ({ row }) => {
-      const icon = banks.find((item) => item.name === row.getValue(key))?.iconUrl;
+      const bank = banks?.find(item => item.name === row.getValue(key))
+      const cld = new Cloudinary({
+        cloud: {
+          cloudName: "dohnlambm",
+        },
+      });
+      const myImage = cld.image(bank?.iconUrl);
       return (
         <div className="flex flex-row w-[120px] pl-2 gap-2 text-left font-medium">
           <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
-            <img src={icon} className="h-4 w-4"></img>
+            {myImage ? (
+              <AdvancedImage
+                className="w-6 h-6 object-cover rounded-full bg-white"
+                cldImg={myImage}
+                plugins={[responsive(), placeholder()]}
+              />
+            ) : (
+              <div className="flex justify-center items-center h-8 w-8 bg-foreground rounded-full">
+                <PiBankBold size={10} className="text-secondary" />
+              </div>
+            )}
           </div>
           <span className="mt-1 text-xs truncate text-ellipsis">
             {row.getValue(key)}
@@ -149,7 +222,7 @@ const rankCol = ({ key }) => {
   };
 };
 
-const msCol = ({ key, colors }) => {
+const msCol = ({ key, banks }) => {
   return {
     accessorKey: key,
     header: ({ column }) => {
@@ -162,7 +235,7 @@ const msCol = ({ key, colors }) => {
     },
     cell: ({ row }) => {
       return (
-        <div className="flex flex-row gap-5 justify-center">
+        <div className="flex flex-row justify-between">
           <div className="text-center font-medium">
             {row.getValue(key).value}
           </div>
@@ -170,10 +243,10 @@ const msCol = ({ key, colors }) => {
             value={row.getValue(key).share}
             className="w-[150px]"
             bg={
-              banks.find(
+              banks?.find(
                 (item) =>
-                  row.getAllCells(key)[0].row.original.bank?.toString() ===
-                  item.name.toString()
+                  row.getAllCells(key)[0].row.original.bankId?.toString() ===
+                  item.id.toString()
               )?.color
             }
           >
@@ -185,7 +258,7 @@ const msCol = ({ key, colors }) => {
   };
 };
 
-export const generateColumns = ({ data, initialType, type, color }) => {
+export const generateColumns = ({ data, initialType, type, color, banks }) => {
   let array = Object.keys(data[0]);
 
   if (array[0] !== "id") {
@@ -196,19 +269,21 @@ export const generateColumns = ({ data, initialType, type, color }) => {
     .filter((key) => key !== "id")
     .map((accessorKey, index) => {
       if (index === 0 && initialType === "bank") {
-        return initialBankCol({ key: accessorKey });
+        return initialBankCol({ key: accessorKey, banks });
       } else if (index === 0 && initialType === "initialRank") {
         return initialRankCol({ key: accessorKey });
       } else if (index === 0) {
         return initialCol({ key: accessorKey });
       } else if (type === "progress") {
-        return progressCol({ key: accessorKey, color });
+        return progressCol({ key: accessorKey, color, banks });
+      } else if (type === "progressBank") {
+        return progressBankCol({ key: accessorKey });
       } else if (type === "itemRank") {
-        return itemRankCol({ key: accessorKey });
+        return itemRankCol({ key: accessorKey, banks });
       } else if (type === "ms") {
-        return msCol({ key: accessorKey });
+        return msCol({ key: accessorKey, banks });
       } else if (type === "rank") {
-        return rankCol({ key: accessorKey });
+        return rankCol({ key: accessorKey, banks });
       } else {
         return remainingCol({ key: accessorKey });
       }

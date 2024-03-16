@@ -1,17 +1,12 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSelector } from "react-redux";
+import { Cloudinary } from "@cloudinary/url-gen";
+import React, { useState, useEffect } from "react";
+import { AdvancedImage, responsive, placeholder } from "@cloudinary/react";
 
-import {
-  assetData,
-  equityData,
-  expenseData,
-  incomeData,
-  liabilityData,
-} from "@/app/data/sizeData";
-import { banks } from "@/app/data/data";
 import { IoIosArrowDown } from "react-icons/io";
+import { commonSizeCategories } from "@/app/data/categoryData";
 
 import {
   DropdownMenu,
@@ -20,59 +15,128 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import showToast from "@/util/showToast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ToggleBank } from "@/app/components/toggleBank";
-import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
 import { generateColumns } from "@/app/components/visualise/columns";
+import { useGetSizeByBankMutation } from "@/lib/features/services/sizeApi";
+import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
 
 const SingleBankPage = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const size = searchParams.get("size") || "BS-CS";
-  const bank = searchParams.get("bank") || banks[0].name;
-  const iconUrl = banks.find((item) => item.name === bank).iconUrl;
-  const color = banks.find((item) => item.name === bank).color;
+  const [getSizeByBank] = useGetSizeByBankMutation();
 
-  useEffect(() => {
-    router.push(`?bank=${bank}&size=${size}`, { scroll: false });
-  }, []);
+  const [individualBankSize, setIndividualBankSize] = useState(null);
 
-  function navigate({ paramNameToUpdate, newValue }) {
-    const updatedParams = new URLSearchParams(searchParams);
-    updatedParams.set(paramNameToUpdate, newValue);
-    router.push(`?${updatedParams.toString()}`, { scroll: false });
+  const banks = useSelector((state) => state.bank.banks);
+
+  const [size, setSize] = useState("BS-CS");
+  const [bank, setBank] = useState(null);
+  const [color, setColor] = useState("");
+  const [iconUrl, setIconUrl] = useState("");
+
+  const cld = new Cloudinary({
+    cloud: {
+      cloudName: "dohnlambm",
+    },
+  });
+  const myImage = cld.image(iconUrl);
+
+  let assetsColumns = null;
+  let liabilityColumns = null;
+  let equityColumns = null;
+  let incomeColumns = null;
+  let expenseColumns = null;
+  if (individualBankSize) {
+    assetsColumns = generateColumns({
+      data: individualBankSize.assets,
+      type: "progress",
+      color: color,
+      banks,
+    });
+
+    liabilityColumns = generateColumns({
+      data: individualBankSize.liabilities,
+      type: "progress",
+      color: color,
+      banks,
+    });
+
+    equityColumns = generateColumns({
+      data: individualBankSize.shareholders_equity,
+      type: "progress",
+      color: color,
+      banks,
+    });
+
+    incomeColumns = generateColumns({
+      data: individualBankSize.operating_income,
+      type: "progress",
+      color: color,
+      banks,
+    });
+
+    expenseColumns = generateColumns({
+      data: individualBankSize.operating_expenses,
+      type: "progress",
+      color: color,
+      banks,
+    });
   }
 
-  const assetsColumns = generateColumns({
-    data: assetData,
-    type: "progress",
-    color: color,
-  });
+  const replaceCategoryNames = (data, categories) => {
+    return data.map((item) => {
+      const newItem = {};
+      for (const key in item) {
+        const category = categories.find((cat) => cat.value === key);
+        if (category) {
+          newItem[category.name] = item[key];
+        } else {
+          newItem[key] = item[key];
+        }
+      }
+      return newItem;
+    });
+  };
 
-  const liabilityColumns = generateColumns({
-    data: liabilityData,
-    type: "progress",
-    color: color,
-  });
+  const getIndividualBankData = async () => {
+    const bankId = banks?.find((item) => item.name === bank)?.id;
+    try {
+      const response = await getSizeByBank({ bankId });
+      if (response.data) {
+        let data = response.data.result;
+        let transformedData = {}
+        for (const item of Object.keys(data)) {
+          transformedData[item] = replaceCategoryNames(
+            data[item],
+            commonSizeCategories[item]
+          );
+        }
+        setIndividualBankSize(transformedData);
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
 
-  const equityColumns = generateColumns({
-    data: equityData,
-    type: "progress",
-    color: color,
-  });
+  useEffect(() => {
+    if (bank) {
+      getIndividualBankData();
+    }
+  }, [bank]);
 
-  const incomeColumns = generateColumns({
-    data: incomeData,
-    type: "progress",
-    color: color,
-  });
+  useEffect(() => {
+    if (banks && banks.length > 0) {
+      setBank(banks[0].name);
+    }
+  }, [banks]);
 
-  const expenseColumns = generateColumns({
-    data: expenseData,
-    type: "progress",
-    color: color,
-  });
+  useEffect(() => {
+    if (bank) {
+      setColor(banks.find((item) => item.name === bank).color);
+      setIconUrl(banks.find((item) => item.name === bank).iconUrl);
+    }
+  }, [bank, banks]);
 
   return (
     <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10">
@@ -87,126 +151,141 @@ const SingleBankPage = () => {
                 {size} <IoIosArrowDown className="text-primary" size={25} />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-30">
+            <DropdownMenuContent className="w-50 p-2">
               <DropdownMenuRadioGroup
                 value={size}
-                onValueChange={(v) =>
-                  navigate({
-                    paramNameToUpdate: "size",
-                    newValue: v,
-                  })
-                }
+                onValueChange={(v) => setSize(v)}
               >
-                <DropdownMenuRadioItem value="BS-CS">
+                <DropdownMenuRadioItem value="BS-CS" className="px-3">
                   BS - Common Size
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="IS-CS">
+                <DropdownMenuRadioItem value="IS-CS" className="px-3">
                   IS - Common Size
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-          <ToggleBank data={banks}/>
+          <ToggleBank data={banks} bank={bank} setBank={setBank} />
         </div>
         {size === "BS-CS" ? (
           <div className="flex flex-col justify-start items-center w-full lg:w-5/6 gap-10">
-            <div className="h-[500px] sm:h-[700px] w-full overflow-scroll">
-              <VisualiseTable
-                title={
-                  <div className="flex flex-row gap-2">
-                    <div className="text-xl font-semibold">Assets : </div>
-                    <div className="flex flex-row justify-center items-center h-8 w-8 rounded-full bg-secondary dark:bg-white">
-                      <img src={iconUrl} className="h-4 w-4"></img>
+            <div className="h-auto w-full">
+              {individualBankSize && (
+                <VisualiseTable
+                  title={
+                    <div className="flex flex-row gap-2">
+                      <div className="text-xl font-semibold">Assets : </div>
+                      <AdvancedImage
+                        className="w-8 h-8 object-cover rounded-full bg-white"
+                        cldImg={myImage}
+                        plugins={[responsive(), placeholder()]}
+                      />
+                      <span className="text-xl truncate text-ellipsis">
+                        {bank}
+                      </span>
                     </div>
-                    <span className="text-xl truncate text-ellipsis">
-                      {bank}
-                    </span>
-                  </div>
-                }
-                data={assetData}
-                columns={assetsColumns}
-                exportXls={true}
-                navigate={true}
-              />
+                  }
+                  navigate={true}
+                  exportXls={true}
+                  columns={assetsColumns}
+                  data={individualBankSize.assets}
+                />
+              )}
             </div>
-            <div className="h-[500px] sm:h-[700px] w-full overflow-scroll">
-              <VisualiseTable
-                title={
-                  <div className="flex flex-row gap-2">
-                    <div className="text-xl font-semibold">Liabilities :</div>
-                    <div className="flex flex-row justify-center items-center h-8 w-8 rounded-full bg-secondary dark:bg-white">
-                      <img src={iconUrl} className="h-4 w-4"></img>
+            <div className="h-auto w-full">
+              {individualBankSize && (
+                <VisualiseTable
+                  title={
+                    <div className="flex flex-row gap-2">
+                      <div className="text-xl font-semibold">Liabilities :</div>
+                      <AdvancedImage
+                        className="w-8 h-8 object-cover rounded-full bg-white"
+                        cldImg={myImage}
+                        plugins={[responsive(), placeholder()]}
+                      />
+                      <span className="text-xl truncate text-ellipsis">
+                        {bank}
+                      </span>
                     </div>
-                    <span className="text-xl truncate text-ellipsis">
-                      {bank}
-                    </span>
-                  </div>
-                }
-                data={liabilityData}
-                columns={liabilityColumns}
-              />
+                  }
+                  columns={liabilityColumns}
+                  data={individualBankSize.liabilities}
+                />
+              )}
             </div>
-            <div className="h-[500px] sm:h-[700px] w-full overflow-scroll">
-              <VisualiseTable
-                title={
-                  <div className="flex flex-row gap-2">
-                    <div className="text-xl font-semibold">
-                      Shareholder&apos;s Equity :
+            <div className="h-auto w-full">
+              {individualBankSize && (
+                <VisualiseTable
+                  title={
+                    <div className="flex flex-row gap-2">
+                      <div className="text-xl font-semibold">
+                        Shareholder&apos;s Equity :
+                      </div>
+                      <AdvancedImage
+                        className="w-8 h-8 object-cover rounded-full bg-white"
+                        cldImg={myImage}
+                        plugins={[responsive(), placeholder()]}
+                      />
+                      <span className="text-xl truncate text-ellipsis">
+                        {bank}
+                      </span>
                     </div>
-                    <div className="flex flex-row justify-center items-center h-8 w-8 rounded-full bg-secondary dark:bg-white">
-                      <img src={iconUrl} className="h-4 w-4"></img>
-                    </div>
-                    <span className="text-xl truncate text-ellipsis">
-                      {bank}
-                    </span>
-                  </div>
-                }
-                data={equityData}
-                columns={equityColumns}
-              />
+                  }
+                  columns={equityColumns}
+                  data={individualBankSize.shareholders_equity}
+                />
+              )}
             </div>
           </div>
         ) : (
           <div className="flex flex-col justify-start items-center w-full lg:w-5/6 gap-10">
-            <div className="h-[500px] sm:h-[700px] w-full overflow-scroll">
-              <VisualiseTable
-                title={
-                  <div className="flex flex-row gap-2">
-                    <div className="text-xl font-semibold">
-                      Operating Income :{" "}
+            <div className="h-auto w-full">
+              {individualBankSize && (
+                <VisualiseTable
+                  title={
+                    <div className="flex flex-row gap-2">
+                      <div className="text-xl font-semibold">
+                        Operating Income :{" "}
+                      </div>
+                      <AdvancedImage
+                        className="w-8 h-8 object-cover rounded-full bg-white"
+                        cldImg={myImage}
+                        plugins={[responsive(), placeholder()]}
+                      />
+                      <span className="text-xl truncate text-ellipsis">
+                        {bank}
+                      </span>
                     </div>
-                    <div className="flex flex-row justify-center items-center h-8 w-8 rounded-full bg-secondary dark:bg-white">
-                      <img src={iconUrl} className="h-4 w-4"></img>
-                    </div>
-                    <span className="text-xl truncate text-ellipsis">
-                      {bank}
-                    </span>
-                  </div>
-                }
-                exportXls={true}
-                navigate={true}
-                data={incomeData}
-                columns={incomeColumns}
-              />
+                  }
+                  navigate={true}
+                  exportXls={true}
+                  columns={incomeColumns}
+                  data={individualBankSize.operating_income}
+                />
+              )}
             </div>
-            <div className="h-[500px] sm:h-[700px] w-full overflow-scroll">
-              <VisualiseTable
-                title={
-                  <div className="flex flex-row gap-2">
-                    <div className="text-xl font-semibold">
-                      Operating Expense :{" "}
+            <div className="h-auto w-full">
+              {individualBankSize && (
+                <VisualiseTable
+                  title={
+                    <div className="flex flex-row gap-2">
+                      <div className="text-xl font-semibold">
+                        Operating Expense :{" "}
+                      </div>
+                      <AdvancedImage
+                        className="w-8 h-8 object-cover rounded-full bg-white"
+                        cldImg={myImage}
+                        plugins={[responsive(), placeholder()]}
+                      />
+                      <span className="text-xl truncate text-ellipsis">
+                        {bank}
+                      </span>
                     </div>
-                    <div className="flex flex-row justify-center items-center h-8 w-8 rounded-full bg-secondary dark:bg-white">
-                      <img src={iconUrl} className="h-4 w-4"></img>
-                    </div>
-                    <span className="text-xl truncate text-ellipsis">
-                      {bank}
-                    </span>
-                  </div>
-                }
-                data={expenseData}
-                columns={expenseColumns}
-              />
+                  }
+                  columns={expenseColumns}
+                  data={individualBankSize.operating_expenses}
+                />
+              )}
             </div>
           </div>
         )}

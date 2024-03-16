@@ -1,18 +1,10 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
 
-import {
-  assetCategories,
-  equityCategories,
-  expenseCategories,
-  incomeCategories,
-  assetData,
-  liabilityCategories,
-} from "@/app/data/sizeData";
-import { banks } from "@/app/data/data";
 import { IoIosArrowDown } from "react-icons/io";
+import { commonSizeCategories } from "@/app/data/categoryData";
 
 import {
   DropdownMenu,
@@ -24,96 +16,187 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+import showToast from "@/util/showToast";
 import { SelectBanks } from "@/app/components/selectBanks";
 import { SelectCategory } from "@/app/components/selectCategory";
 import OptionButtons from "@/app/components/visualise/optionButtons";
 import { generateColumns } from "@/app/components/visualise/columns";
 import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
+import { useGetSizeOfBanksMutation } from "@/lib/features/services/sizeApi";
 
 const MultiBankPage = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const size = searchParams.get("size") || "BS-CS";
-  const assetCategory = searchParams.get("assetCategory") ?
-    decodeURIComponent(searchParams.get("assetCategory")) :
-    assetCategories[0].name;
-  const liabilityCategory = searchParams.get("liabilityCategory") ?
-    decodeURIComponent(searchParams.get("liabilityCategory")) : 
-    liabilityCategories[0].name;
-  const equityCategory = searchParams.get("equityCategory") ?
-    decodeURIComponent(searchParams.get("equityCategory")) :
-    equityCategories[0].name;
-  const incomeCategory = searchParams.get("incomeCategory") ?
-    decodeURIComponent(searchParams.get("incomeCategory")) : 
-    incomeCategories[0].name;
-  const expenseCategory = searchParams.get("expenseCategory") ?
-    decodeURIComponent(searchParams.get("expenseCategory")) : 
-    expenseCategories[0].name;
-  const checkedBanks =
-    JSON.parse(searchParams.get("checkedBanks")) ||
-    banks.map((bank) => bank.name);
+  const [getSizeOfBanks] = useGetSizeOfBanksMutation();
 
-  useEffect(() => {
-    router.push(
-      `?size=${
-        size
-      }&checkedBanks=${
-        JSON.stringify(
-        checkedBanks
-      )}&assetCategory=${
-        encodeURIComponent(assetCategory)
-      }&liabilityCategory=${
-        encodeURIComponent(liabilityCategory)
-      }&equityCategory=${
-        encodeURIComponent(equityCategory)
-      }&incomeCategory=${
-        encodeURIComponent(incomeCategory)
-      }&expenseCategory=${
-        encodeURIComponent(expenseCategory)
-      }`,
-      { scroll: false }
-    );
-  }, []);
+  const [assets, setAssets] = useState([])
+  const [liabilities, setLiabilities] = useState([])
+  const [shareholdersEquity, setShareholdersEquity] = useState([])
+  const [operatingIncome, setOperatingIncome] = useState([])
+  const [operatingExpenses, setOperatingExpenses] = useState([])
 
-  function navigate({ paramNameToUpdate, newValue }) {
-    const updatedParams = new URLSearchParams(searchParams);
-    updatedParams.set(paramNameToUpdate, newValue);
-    router.push(`?${updatedParams.toString()}`, { scroll: false });
+  const [size, setSize] = useState("BS-CS");
+  const [assetCategory, setAssetCategory] = useState(
+    commonSizeCategories.assets[0].name
+  );
+  const [liabilityCategory, setLiabilityCategory] = useState(
+    commonSizeCategories.liabilities[0].name
+  );
+  const [equityCategory, setEquityCategory] = useState(
+    commonSizeCategories.shareholders_equity[0].name
+  );
+  const [incomeCategory, setIncomeCategory] = useState(
+    commonSizeCategories.operating_income[0].name
+  );
+  const [expenseCategory, setExpenseCategory] = useState(
+    commonSizeCategories.operating_expenses[0].name
+  );
+  const [checkedBanks, setCheckedBanks] = useState([]);
+
+  const banks = useSelector((state) => state.bank.banks);
+
+  let assetsColumns = null;
+  if (assets.length !== 0) {
+    assetsColumns = generateColumns({
+      data: assets,
+      type: "progressBank",
+      banks,
+    });
   }
 
-  const assetsColumns = generateColumns({
-    data: assetData,
-    type: "progress",
-    color: "#CE0E2D",
-  });
+  let liabilityColumns = null;
+  if (liabilities.length !== 0) {
+    liabilityColumns = generateColumns({
+      data: liabilities,
+      type: "progressBank",
+      banks,
+    });
+  }
+
+  let equityColumns = null;
+  if (shareholdersEquity.length !== 0) {
+    equityColumns = generateColumns({
+      data: shareholdersEquity,
+      type: "progressBank",
+      banks,
+    });
+  }
+
+  let incomeColumns = null;
+  if (operatingIncome.length !== 0) {
+    incomeColumns = generateColumns({
+      data: operatingIncome,
+      type: "progressBank",
+      banks,
+    });
+  }
+
+  let expenseColumns = null;
+  if (operatingExpenses.length !== 0) {
+    expenseColumns = generateColumns({
+      data: operatingExpenses,
+      type: "progressBank",
+      banks,
+    });
+  }
+
+  const getMultipleBankData = async ({ table, category, setData }) => {
+    const bankIds = checkedBanks.map(
+      (name) => banks?.find((item) => item.name === name)?.id
+    );
+    try {
+      const response = await getSizeOfBanks({ bankIds, table, category });
+      if (response.data) {
+        setData(response.data.result);
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
+
+  useEffect(() => {
+    if (assetCategory && checkedBanks.length !== 0) {
+      const category = commonSizeCategories.assets.find(item => item.name === assetCategory).value
+      getMultipleBankData({
+        category,
+        table: "assets",
+        setData : setAssets
+      });
+    }
+  }, [assetCategory, checkedBanks]);
+
+  useEffect(() => {
+    if (liabilityCategory && checkedBanks.length !== 0) {
+      const category = commonSizeCategories.liabilities.find(item => item.name === liabilityCategory).value
+      getMultipleBankData({
+        category,
+        table: "liabilities",
+        setData : setLiabilities
+      });
+    }
+  }, [liabilityCategory, checkedBanks]);
+
+  useEffect(() => {
+    if (equityCategory && checkedBanks.length !== 0) {
+      const category = commonSizeCategories.shareholders_equity.find(item => item.name === equityCategory).value
+      getMultipleBankData({
+        category,
+        table: "shareholders_equity",
+        setData : setShareholdersEquity
+      });
+    }
+  }, [equityCategory, checkedBanks]);
+
+  useEffect(() => {
+    if (incomeCategory && checkedBanks.length !== 0) {
+      const category = commonSizeCategories.operating_income.find(item => item.name === incomeCategory).value
+      getMultipleBankData({
+        category,
+        table: "operating_income",
+        setData : setOperatingIncome
+      });
+    }
+  }, [incomeCategory, checkedBanks]);
+
+  useEffect(() => {
+    if (expenseCategory && checkedBanks.length !== 0) {
+      const category = commonSizeCategories.operating_expenses.find(item => item.name === expenseCategory).value
+      getMultipleBankData({
+        category,
+        table: "operating_expenses",
+        setData : setOperatingExpenses
+      });
+    }
+  }, [expenseCategory, checkedBanks]);
+
+  useEffect(() => {
+    if (banks && banks.length > 0) {
+      setCheckedBanks(banks.map((bank) => bank.name));
+    }
+  }, [banks]);
 
   return (
     <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10">
-      <Card className="flex flex-col w-full h-auto p-3 md:p-5 md:pt-10 gap-8 md:8 lg:gap-5">
-        <div className="flex flex-col lg:flex-row items-center lg:justify-between w-full gap-4">
+      <Card className="flex flex-col items-center w-full h-auto p-3 md:p-5 gap-5 md:gap-8">
+        <div className="flex flex-col lg:flex-row justify-between items-center min-w-full gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="toggleActive"
-                className="flex justify-between text-xl gap-2 py-6 rounded-xl font-bold w-full sm:w-[200px]"
+                className="flex justify-between text-xl gap-2 py-6 rounded-xl font-bold w-full sm:w-[220px] lg:w-1/6"
               >
                 {size} <IoIosArrowDown className="text-primary" size={25} />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-30">
+            <DropdownMenuContent className="w-50 p-2">
               <DropdownMenuRadioGroup
                 value={size}
                 onValueChange={(v) => {
-                  navigate({
-                    paramNameToUpdate: "size",
-                    newValue: v,
-                  });
+                  setSize(v);
                 }}
               >
-                <DropdownMenuRadioItem value="BS-CS">
+                <DropdownMenuRadioItem value="BS-CS" className="px-3">
                   BS - Common Size
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="IS-CS">
+                <DropdownMenuRadioItem value="IS-CS" className="px-3">
                   IS - Common Size
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
@@ -121,67 +204,120 @@ const MultiBankPage = () => {
           </DropdownMenu>
           <OptionButtons navigate={true} />
         </div>
-        <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
+        <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-3">
           {size === "BS-CS" ? (
-            <div className="flex flex-col w-full lg:w-5/6 h-auto gap-5">
-              <div className="flex flex-col lg:flex-row w-full gap-5">
+            <div className="flex flex-col w-full lg:w-5/6 h-auto gap-10">
+              <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-3 lg:gap-3">
                 <div className="flex flex-col items-center w-full lg:w-1/5 h-auto gap-3">
-                  <div className="text-lg font-semibold">Assets :</div>
-                  <SelectCategory categories={assetCategories} categoryName="assetCategory"/>
+                  <span className="w-full text-center lg:text-left text-lg font-semibold truncate text-ellipsis">
+                    Assets :
+                  </span>
+                  <SelectCategory
+                    category={assetCategory}
+                    setCategory={setAssetCategory}
+                    categories={commonSizeCategories.assets}
+                  />
                 </div>
-                <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
-                  <VisualiseTable data={assetData} columns={assetsColumns} />
+                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+                  {assets.length !== 0 && (
+                    <VisualiseTable
+                      data={assets}
+                      columns={assetsColumns}
+                    />
+                  )}
                 </div>
               </div>
-              <div className="flex flex-col lg:flex-row gap-5">
+              <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-3 lg:gap-3">
                 <div className="flex flex-col items-center w-full lg:w-1/5 h-auto gap-3">
-                  <div className="text-lg font-semibold">Liabilities :</div>
-                  <SelectCategory categories={liabilityCategories} categoryName="liabilityCategory"/>
+                  <span className="w-full text-center lg:text-left text-lg font-semibold truncate text-ellipsis">
+                    Liabilities :
+                  </span>
+                  <SelectCategory
+                    category={liabilityCategory}
+                    setCategory={setLiabilityCategory}
+                    categories={commonSizeCategories.liabilities}
+                  />
                 </div>
-                <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
-                  <VisualiseTable data={assetData} columns={assetsColumns} />
+                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+                  {liabilities.length !== 0 && (
+                    <VisualiseTable
+                      data={liabilities}
+                      columns={liabilityColumns}
+                    />
+                  )}
                 </div>
               </div>
-              <div className="flex flex-col lg:flex-row gap-5">
+              <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-3 lg:gap-3">
                 <div className="flex flex-col items-center w-full lg:w-1/5 h-auto gap-3">
-                  <div className="text-lg font-semibold">
+                  <span className="w-full text-center lg:text-left text-lg font-semibold truncate text-ellipsis">
                     Shareholder&apos;s Equity :
-                  </div>
-                  <SelectCategory categories={equityCategories}  categoryName="equityCategory"/>
+                  </span>
+                  <SelectCategory
+                    category={equityCategory}
+                    setCategory={setEquityCategory}
+                    categories={commonSizeCategories.shareholders_equity}
+                  />
                 </div>
-                <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
-                  <VisualiseTable data={assetData} columns={assetsColumns} />
+                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+                  {shareholdersEquity.length !== 0 && (
+                    <VisualiseTable
+                      data={shareholdersEquity}
+                      columns={equityColumns}
+                    />
+                  )}
                 </div>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col w-full lg:w-5/6 h-auto gap-16">
-              <div className="flex flex-col lg:flex-row gap-5">
+            <div className="flex flex-col w-full lg:w-5/6 h-auto gap-10">
+              <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-3 lg:gap-3">
                 <div className="flex flex-col items-center w-full lg:w-1/5 h-auto gap-3">
-                  <div className="text-lg font-semibold">
+                  <span className="w-full text-center lg:text-left text-lg font-semibold truncate text-ellipsis">
                     Operating Income :
-                  </div>
-                  <SelectCategory categories={incomeCategories} categoryName="incomeCategory"/>
+                  </span>
+                  <SelectCategory
+                    category={incomeCategory}
+                    setCategory={setIncomeCategory}
+                    categories={commonSizeCategories.operating_income}
+                  />
                 </div>
-                <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
-                  <VisualiseTable data={assetData} columns={assetsColumns} />
+                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+                  {operatingIncome.length !== 0 && (
+                    <VisualiseTable
+                      data={operatingIncome}
+                      columns={incomeColumns}
+                    />
+                  )}
                 </div>
               </div>
-              <div className="flex flex-col lg:flex-row gap-5">
+              <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-3 lg:gap-3">
                 <div className="flex flex-col items-center w-full lg:w-1/5 h-auto gap-3">
-                  <div className="text-lg font-semibold">
+                  <span className="w-full text-center lg:text-left text-lg font-semibold truncate text-ellipsis">
                     Operating Expense :
-                  </div>
-                  <SelectCategory categories={expenseCategories} categoryName="expenseCategory"/>
+                  </span>
+                  <SelectCategory
+                    category={expenseCategory}
+                    setCategory={setExpenseCategory}
+                    categories={commonSizeCategories.operating_expenses}
+                  />
                 </div>
-                <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
-                  <VisualiseTable data={assetData} columns={assetsColumns} />
+                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+                  {operatingExpenses.length !== 0 && (
+                    <VisualiseTable
+                      data={operatingExpenses}
+                      columns={expenseColumns}
+                    />
+                  )}
                 </div>
               </div>
             </div>
           )}
           <div className="lg:sticky lg:top-14 w-full sm:w-auto lg:w-1/6 h-full">
-            <SelectBanks banks={banks} />
+            <SelectBanks
+              banks={banks}
+              checkedBanks={checkedBanks}
+              setCheckedBanks={setCheckedBanks}
+            />
           </div>
         </div>
       </Card>

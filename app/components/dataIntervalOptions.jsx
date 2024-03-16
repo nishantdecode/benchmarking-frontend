@@ -70,7 +70,7 @@ const DataIntervalOptions = ({ years, category, date, setDate }) => {
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        <div className="flex gap-1">
+        <div className="flex gap-2">
           <div className="flex flex-row gap-1">
             {date.interval === "QUARTERLY" ? (
               <DropdownMenu>
@@ -90,7 +90,7 @@ const DataIntervalOptions = ({ years, category, date, setDate }) => {
                       setDate((prev) => {
                         return {
                           interval: prev.interval,
-                          startDate: new Date(`01/${v}/${prev.startDate.getFullYear()}`),
+                          startDate: new Date(`${v}/01/${prev.startDate.getFullYear()}`),
                           endDate: prev.endDate,
                         };
                       });
@@ -104,19 +104,19 @@ const DataIntervalOptions = ({ years, category, date, setDate }) => {
                       <div>Q1</div>
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem
-                      value="02"
+                      value="04"
                       className="flex flex-row justify-center w-full"
                     >
                       <div>Q2</div>
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem
-                      value="03"
+                      value="07"
                       className="flex flex-row justify-center w-full"
                     >
                       <div>Q3</div>
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem
-                      value="04"
+                      value="10"
                       className="flex flex-row justify-center w-full"
                     >
                       <div>Q4</div>
@@ -146,7 +146,7 @@ const DataIntervalOptions = ({ years, category, date, setDate }) => {
                     setDate((prev) => {
                       return {
                         interval: prev.interval,
-                        startDate: new Date(`01/${date.startDate.getMonth()+1}/${year}`),
+                        startDate: new Date(`${date.startDate.getMonth()+1}/01/${year}`),
                         endDate: prev.endDate,
                       };
                     });
@@ -192,7 +192,7 @@ const DataIntervalOptions = ({ years, category, date, setDate }) => {
                         return {
                           interval: prev.interval,
                           startDate: prev.startDate,
-                          endDate: new Date(`01/${v}/${prev.endDate.getFullYear()}`),
+                          endDate: new Date(`${v}/01/${prev.endDate.getFullYear()}`),
                         };
                       });
                     }}
@@ -205,19 +205,19 @@ const DataIntervalOptions = ({ years, category, date, setDate }) => {
                       <div>Q1</div>
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem
-                      value="02"
+                      value="04"
                       className="flex flex-row justify-center w-full"
                     >
                       <div>Q2</div>
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem
-                      value="03"
+                      value="07"
                       className="flex flex-row justify-center w-full"
                     >
                       <div>Q3</div>
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem
-                      value="04"
+                      value="10"
                       className="flex flex-row justify-center w-full"
                     >
                       <div>Q4</div>
@@ -248,7 +248,7 @@ const DataIntervalOptions = ({ years, category, date, setDate }) => {
                       return {
                         interval: prev.interval,
                         startDate: prev.startDate,
-                        endDate: new Date(`01/${date.endDate.getMonth()+1}/${year}`),
+                        endDate: new Date(`${date.endDate.getMonth()+1}/01/${year}`),
                       };
                     });
                   }}

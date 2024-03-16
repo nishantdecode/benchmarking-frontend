@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AdvancedImage, responsive, placeholder } from "@cloudinary/react";
@@ -478,7 +478,7 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
           )}
         </div>
       </div>
-      <div className="rounded-md border">
+      <div className="max-h-[500px] sm:max-h-[700px] w-full overflow-scroll rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

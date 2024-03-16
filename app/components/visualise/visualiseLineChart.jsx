@@ -39,7 +39,15 @@ const darkTooltip = {
 };
 
 const VisualiseLineChart = forwardRef(function VisualiseLineChart(
-  { data, colors, xAxis, dataFormatter },
+  {
+    data,
+    colors,
+    xAxis,
+    legend = false,
+    dataFormatter = function (value, index, ticks) {
+      return value.toFixed(2);
+    },
+  },
   ref
 ) {
   const { theme } = useTheme();
@@ -61,9 +69,12 @@ const VisualiseLineChart = forwardRef(function VisualiseLineChart(
         data: data.map((dataObj) => dataObj[category]),
         backgroundColor: [colors[ind]],
         borderColor: [colors[ind]],
+        borderWidth: 2,
         color: [colors[ind]],
-        pointStyle: false,
-        tension: 0.1,
+        pointHitRadius: 2,
+        pointStyle: "circle",
+        pointRadius: 0,
+        tension: 0,
       };
     }),
   };
@@ -71,11 +82,12 @@ const VisualiseLineChart = forwardRef(function VisualiseLineChart(
     maintainAspectRatio: false,
     plugins: {
       legend: {
+        display: legend,
         align: "center",
         labels: {
           color: theme === "dark" ? "#fff" : "#000",
           font: {
-            size: 14,
+            size: 12,
           },
         },
         position: "top",
@@ -86,14 +98,13 @@ const VisualiseLineChart = forwardRef(function VisualiseLineChart(
       y: {
         grid: {
           color: theme === "dark" ? "#fff" : "#000",
+          lineWidth: 0.5,
         },
         tick: {
           display: false,
         },
         ticks: {
-          callback: function (value, index, ticks) {
-            return value.toFixed(2);
-          },
+          callback: dataFormatter,
         },
       },
       x: {

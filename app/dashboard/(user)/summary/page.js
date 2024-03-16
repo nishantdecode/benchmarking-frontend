@@ -3,43 +3,46 @@
 import { useSelector } from "react-redux";
 import React, { useRef, useEffect, useState } from "react";
 
+import {
+  keyRatioCategories,
+  executiveSummaryCategories as summaryCategories,
+} from "@/app/data/categoryData";
+
 import { Card } from "@/components/ui/card";
 
-import { figuresData } from "@/app/data/summaryData";
-import { executiveSummaryCategories as summaryCategories } from "@/app/data/categoryData";
-import { bankMultipleRatioData } from "@/app/data/ratioData";
-import { categories as ratioCategories } from "@/app/data/ratioData";
-
-import showToast from "@/util/showToast";
-import { ToggleBank } from "@/app/components/toggleBank";
-import { SelectBanks } from "@/app/components/selectBanks";
-import { visualisationUtils } from "@/util/visualisationUtils";
-import { downloadImage, downloadPDF } from "@/util/exportUtils";
-import { SelectCategory } from "@/app/components/selectCategory";
-import OptionButtons from "@/app/components/visualise/optionButtons";
-import { generateColumns } from "@/app/components/visualise/columns";
-import DataIntervalOptions from "@/app/components/dataIntervalOptions";
-import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
-import VisualiseLineChart from "@/app/components/visualise/visualiseLineChart";
 import {
   useGetAllYearsMutation,
   useGetFiguresMutation,
   useGetItemMutation,
 } from "@/lib/features/services/summaryApi";
+import showToast from "@/util/showToast";
+import { ToggleBank } from "@/app/components/toggleBank";
+import { SelectBanks } from "@/app/components/selectBanks";
+import { downloadImage, downloadPDF } from "@/util/exportUtils";
+import { SelectCategory } from "@/app/components/selectCategory";
+import OptionButtons from "@/app/components/visualise/optionButtons";
+import { generateColumns } from "@/app/components/visualise/columns";
+import DataIntervalOptions from "@/app/components/dataIntervalOptions";
 import { visualisationLabelUtils } from "@/util/visualizationLabelUtils";
+import { useGetRatioMutation } from "@/lib/features/services/keyRatioApi";
+import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
+import VisualiseLineChart from "@/app/components/visualise/visualiseLineChart";
 
 const Summary = () => {
   let ref = useRef();
 
-  const [item, setItem] = useState([]);
-  const [figures, setFigures] = useState([]);
-  const [years, setYears] = useState([]);
-
   const [getItem] = useGetItemMutation();
+  const [getRatio] = useGetRatioMutation();
   const [getFigures] = useGetFiguresMutation();
   const [getAllYears] = useGetAllYearsMutation();
 
+  const [item, setItem] = useState([]);
+  const [ratio, setRatio] = useState([]);
+  const [figures, setFigures] = useState([]);
+  const [years, setYears] = useState([]);
+
   const banks = useSelector((state) => state.bank.banks);
+
   const [bank, setBank] = useState(null);
 
   const [itemDate, setItemDate] = useState({});
@@ -48,11 +51,16 @@ const Summary = () => {
 
   const [ratioDate, setRatioDate] = useState({});
   const [ratioCheckedBanks, setRatioCheckedBanks] = useState([]);
-  const [ratioCategory, setRatioCategory] = useState(ratioCategories[0].name);
+  const [ratioCategory, setRatioCategory] = useState(keyRatioCategories[0].name);
 
-  const { bankColorsLabel } =
+  const itemBankLabel =
     item.length !== 0 && banks.length !== 0
       ? visualisationLabelUtils(banks, item)
+      : [];
+
+  const ratioBankLabel =
+    ratio.length !== 0 && banks.length !== 0
+      ? visualisationLabelUtils(banks, ratio)
       : [];
 
   let columns = null;
@@ -61,11 +69,6 @@ const Summary = () => {
       data: figures,
     });
   }
-
-  const { data, bankColors, dataFormatterPercentage } = visualisationUtils(
-    undefined,
-    bankMultipleRatioData
-  );
 
   const replaceCategoryNames = (data) => {
     return data.map((item) => {
@@ -124,6 +127,34 @@ const Summary = () => {
     }
   };
 
+  const getRatioData = async () => {
+    const bankIds = ratioCheckedBanks.map(
+      (item) => banks?.find((bank) => bank.name === item).id
+    );
+    const category = keyRatioCategories
+      .find((item) => (item.name === ratioCategory ? item.value : ""))
+      .value.toString();
+    const credentials = {
+      category: category,
+      bankIds: bankIds,
+      interval: ratioDate.interval,
+      startDate: ratioDate.startDate,
+      endDate: ratioDate.endDate,
+    };
+    try {
+      if (Object.keys(ratioDate).length !== 0) {
+        const response = await getRatio(credentials);
+        if (response.data) {
+          setRatio(response.data.result);
+        } else {
+          showToast("Error!", response.error.result);
+        }
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
+
   const getYears = async () => {
     try {
       const response = await getAllYears();
@@ -133,14 +164,14 @@ const Summary = () => {
           interval: "YEARLY",
           startDate: new Date(`01/01/${response.data.result[0]}`),
           endDate: new Date(
-            `01/01/${response.data.result[response.data.result.length - 1]}`
+            `01/01/${response.data.result[response.data.result.length - 2]}`
           ),
         });
         setRatioDate({
           interval: "YEARLY",
           startDate: new Date(`01/01/${response.data.result[0]}`),
           endDate: new Date(
-            `01/01/${response.data.result[response.data.result.length - 1]}`
+            `01/01/${response.data.result[response.data.result.length - 2]}`
           ),
         });
       }
@@ -170,6 +201,10 @@ const Summary = () => {
   useEffect(() => {
     getItemData();
   }, [itemDate, itemCategory, itemCheckedBanks]);
+
+  useEffect(() => {
+    getRatioData();
+  }, [ratioDate, ratioCategory, ratioCheckedBanks]);
 
   return (
     <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10 gap-10">
@@ -208,7 +243,7 @@ const Summary = () => {
                 ref={ref}
                 data={item}
                 xAxis={true}
-                colors={bankColorsLabel}
+                colors={itemBankLabel.bankColorsLabel}
               />
             )}
           </div>
@@ -246,18 +281,20 @@ const Summary = () => {
           <div className="lg:sticky lg:top-20 w-full sm:w-auto lg:w-1/6 h-auto">
             <SelectCategory
               category={ratioCategory}
-              categories={ratioCategories}
               setCategory={setRatioCategory}
+              categories={keyRatioCategories}
             />
           </div>
           <div className="flex flex-col h-[300px] md:h-[600px] w-full lg:w-4/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
-            <VisualiseLineChart
-              ref={ref}
-              data={data}
-              xAxis={true}
-              colors={bankColors}
-              dataFormatter={dataFormatterPercentage}
-            />
+            {ratio.length !== 0 && (
+              <VisualiseLineChart
+                ref={ref}
+                data={ratio}
+                xAxis={true}
+                colors={ratioBankLabel.bankColorsLabel}
+                dataFormatter={ratioBankLabel.dataFormatterPercentage}
+              />
+            )}
           </div>
           <div className="lg:sticky lg:top-14 w-full sm:w-auto lg:w-1/6 h-full">
             <SelectBanks
@@ -276,7 +313,7 @@ const Summary = () => {
             </span>
             <ToggleBank data={banks} bank={bank} setBank={setBank} />
           </div>
-          <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+          <div className="flex flex-col h-auto w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
             {figures.length !== 0 && (
               <VisualiseTable
                 title={bank}
