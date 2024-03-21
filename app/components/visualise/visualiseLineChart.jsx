@@ -71,8 +71,9 @@ const VisualiseLineChart = forwardRef(function VisualiseLineChart(
         borderColor: [colors[ind]],
         borderWidth: 2,
         color: [colors[ind]],
-        pointHitRadius: 2,
         pointStyle: "circle",
+        pointBorderColour: "rgba(75,192,192,1)",
+        pointHitRadius: 10,
         pointRadius: 0,
         tension: 0,
       };

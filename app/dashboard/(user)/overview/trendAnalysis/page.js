@@ -12,6 +12,7 @@ import {
   trendAnalysisCategories,
   trendTableCategories,
 } from "@/app/data/categoryData";
+import { combineData } from "@/util/combineData";
 import Header from "@/app/components/dashboard/trendAnalysis/header";
 import { generateColumns } from "@/app/components/visualise/columns";
 import { visualisationLabelUtils } from "@/util/visualizationLabelUtils";
@@ -22,6 +23,7 @@ import { useGetRatioBankMutation } from "@/lib/features/services/keyRatioApi";
 import VisualiseLineChart from "@/app/components/visualise/visualiseLineChart";
 import { useGetTrendTableMutation } from "@/lib/features/services/individualBankApi";
 import SelectCategory from "@/app/components/dashboard/trendAnalysis/selectCategory";
+import VisualiseLineBarChart from "@/app/components/visualise/visualiseLineBarChart";
 
 const TrendAndCompetitionAnalysis = () => {
   let ref = useRef();
@@ -124,6 +126,11 @@ const TrendAndCompetitionAnalysis = () => {
           category: "income",
           setData: setIncome,
         });
+        getItemBankData({
+          table: "incomeStatement",
+          category: "operatingIncome",
+          setData: setOperatingIncome,
+        });
       }
     }
   }, [category, checkedBanks]);
@@ -201,37 +208,16 @@ const TrendAndCompetitionAnalysis = () => {
 
   useEffect(() => {
     if (operatingIncome.length !== 0 && operatingExpense.length !== 0) {
-      const combineData = () => {
-        const combined = [];
-        operatingIncome.forEach((incomeItem) => {
-          const label = incomeItem.label;
-          const correspondingExpense = operatingExpense.find(
-            (expenseItem) => expenseItem.label === label
-          );
-          if (correspondingExpense) {
-            const entry = {
-              label: label,
-            };
-            for (let bank in incomeItem) {
-              if (bank !== "label") {
-                entry[`${bank} Income`] = incomeItem[bank];
-                const correspondingExpenseBank = operatingExpense.find(
-                  (expenseItem) => expenseItem.label === label
-                );
-                if (correspondingExpenseBank) {
-                  entry[`${bank} Expense`] = correspondingExpenseBank[bank];
-                } else {
-                  entry[`${bank} Expense`] = null;
-                }
-              }
-            }
-            combined.push(entry);
-          }
-        });
-        return combined;
-      };
-
-      setIncomeExpense(combineData());
+      const { bankColorsLabel, combined } = combineData(
+        banks,
+        operatingIncome,
+        operatingExpense
+      );
+      setBankLabel((prev) => {
+        const updatedBankLabel = { ...prev, bankColorsLabel };
+        return updatedBankLabel;
+      });
+      setIncomeExpense(combined);
     }
   }, [operatingIncome, operatingExpense]);
 
@@ -317,14 +303,11 @@ const TrendAndCompetitionAnalysis = () => {
             ) : category === "incomeExpense" ? (
               <div className="h-[400px] sm:h-[60vh] md:h-[80vh] my-10">
                 {incomeExpense.length !== 0 && (
-                  <VisualiseBarChart
+                  <VisualiseLineChart
                     ref={ref}
                     xAxis={false}
                     data={incomeExpense}
-                    colors={bankLabel.bankColorsLabel.flatMap((value) => [
-                      value,
-                      null,
-                    ])}
+                    colors={bankLabel.bankColorsLabel}
                     dataFormatter={bankLabel.dataFormatterCurrency}
                   />
                 )}
@@ -332,20 +315,20 @@ const TrendAndCompetitionAnalysis = () => {
             ) : category === "income" ? (
               <div className="h-[400px] sm:h-[60vh] md:h-[80vh] my-10">
                 {income.length !== 0 && (
-                  <VisualiseLineChart
+                  <VisualiseLineBarChart
                     ref={ref}
                     legend={true}
                     xAxis={false}
-                    data={income}
+                    data1={income}
+                    data2={operatingIncome}
                     colors={bankLabel.bankColorsLabel}
-                    dataFormatter={bankLabel.dataFormatterPercentage}
                   />
                 )}
               </div>
             ) : category === "investments" ? (
               <div className="h-[400px] sm:h-[60vh] md:h-[80vh] my-10">
                 {investments.length !== 0 && (
-                  <VisualiseLineChart
+                  <VisualiseBarChart
                     ref={ref}
                     legend={true}
                     xAxis={false}

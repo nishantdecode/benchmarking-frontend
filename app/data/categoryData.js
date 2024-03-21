@@ -33,7 +33,7 @@ const executiveSummaryCategories = [
   },
   {
     name: "Income before Provisions, Zakat and Taxes",
-    value: "income_before_provisions_zakat_and_taxes",
+    value: "income_before_provision_zakat_and_taxes",
   },
   {
     name: "Provision Expenses",
