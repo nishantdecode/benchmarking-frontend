@@ -1,8 +1,6 @@
-"use client";
-
 import * as React from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,23 +10,34 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+
 import { BiCalendar } from "react-icons/bi";
 
-const CompetitionHeader = ({ year, setYear }) => {
+const CompetitionHeader = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentYear = new Date().getFullYear();
+
+  function navigate({ paramNameToUpdate, newValue }) {
+    const updatedParams = new URLSearchParams(searchParams);
+    updatedParams.set(paramNameToUpdate, newValue);
+    router.push(`?${updatedParams.toString()}`, { scroll: false });
+  }
   return (
-    <div className="flex flex-row justify-between w-full h-auto">
+    <div className="flex flex-row justify-between h-auto w-full">
       <div className="flex flex-col sm:flex-row justify-start gap-2 sm:gap-5">
-        <div className="text-foreground text-xl font-medium">Competition</div>
+        <div className="text-xl font-medium text-foreground">Competition</div>
         <div className="flex flex-row gap-2 sm:gap-5">
-          <div className="flex flex-row justify-start gap-2 mt-1.5">
-            <div className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 sm:mt-0 bg-green-600"></div>
-            <div className="text-foreground text-[10px] sm:text-xs">
+          <div className="flex flex-row justify-start mt-1.5 gap-2">
+            <div className="h-3 sm:h-4 w-3 sm:w-4 mt-0.5 sm:mt-0 bg-green-600"></div>
+            <div className="text-[10px] sm:text-xs text-foreground">
               Highest
             </div>
           </div>
-          <div className="flex flex-row justify-start gap-2 mt-1.5">
-            <div className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 sm:mt-0 bg-red-500"></div>
-            <div className="text-foreground text-[10px] sm:text-xs">Lowest</div>
+          <div className="flex flex-row justify-start mt-1.5 gap-2">
+            <div className="h-3 sm:h-4 w-3 sm:w-4 mt-0.5 sm:mt-0 bg-red-500"></div>
+            <div className="text-[10px] sm:text-xs text-foreground">Lowest</div>
           </div>
         </div>
       </div>
@@ -36,21 +45,36 @@ const CompetitionHeader = ({ year, setYear }) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="outline"
-              className="gap-2 px-5 sm:px-10 rounded-xl"
+              size="sm"
+              variant="dropdown"
+              className="px-5 sm:px-8 gap-2 dark:border-2 rounded-lg"
             >
-              <BiCalendar size={20} /> {year}
+              <BiCalendar size={20} /> {searchParams.get("year") || currentYear}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-30">
-            <DropdownMenuLabel>Select Year</DropdownMenuLabel>
+          <DropdownMenuContent className="w-40">
+            <DropdownMenuLabel className="flex flex-row justify-center w-full">
+              Select Year
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuRadioGroup value={year} onValueChange={setYear}>
+            <DropdownMenuRadioGroup
+              value={searchParams.get("year") || currentYear}
+              onValueChange={(year) => {
+                navigate({
+                  paramNameToUpdate: "year",
+                  newValue: year,
+                });
+              }}
+            >
               {Array.from({ length: 5 }).map((_, index) => {
                 const currentYear = new Date().getFullYear();
                 const year = currentYear - index;
                 return (
-                  <DropdownMenuRadioItem key={index} value={`${year}`}>
+                  <DropdownMenuRadioItem
+                    key={index}
+                    value={`${year}`}
+                    className="flex flex-row justify-center w-full"
+                  >
                     {year}
                   </DropdownMenuRadioItem>
                 );

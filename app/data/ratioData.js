@@ -41,67 +41,67 @@ const bankMultipleRatioData = [
   {
     "year": "2022",
     "SAIB": 12.25,
-    "Albilad": 13.43,
+    "Bank Albilad": 13.43,
     "Saudi Awwal Bank": 24.55
   },
   {
     "year": "2021",
     "SAIB": 7.51,
-    "Albilad": 14.86,
+    "Bank Albilad": 14.86,
     "Saudi Awwal Bank": 20.78
   },
   {
     "year": "2020",
     "SAIB": 19.36,
-    "Albilad": 13.68,
+    "Bank Albilad": 13.68,
     "Saudi Awwal Bank": 17.65
   },
   {
     "year": "2019",
     "SAIB": 23.97,
-    "Albilad": 21.98,
+    "Bank Albilad": 21.98,
     "Saudi Awwal Bank": 27.82
   },
   {
     "year": "2018",
     "SAIB": 32.56,
-    "Albilad": 25.39,
+    "Bank Albilad": 25.39,
     "Saudi Awwal Bank": 37.93
   },
   {
     "year": "2017",
     "SAIB": 29.08,
-    "Albilad": 28.85,
+    "Bank Albilad": 28.85,
     "Saudi Awwal Bank": 32.04
   },
   {
     "year": "2016",
     "SAIB": 35.63,
-    "Albilad": 32.29,
+    "Bank Albilad": 32.29,
     "Saudi Awwal Bank": 40.14
   },
   {
     "year": "2015",
     "SAIB": 41.18,
-    "Albilad": 35.73,
+    "Bank Albilad": 35.73,
     "Saudi Awwal Bank": 45.26
   },
   {
     "year": "2014",
     "SAIB": 48.73,
-    "Albilad": 39.18,
+    "Bank Albilad": 39.18,
     "Saudi Awwal Bank": 54.39
   },
   {
     "year": "2013",
     "SAIB": 43.26,
-    "Albilad": 42.64,
+    "Bank Albilad": 42.64,
     "Saudi Awwal Bank": 48.46
   },
   {
     "year": "2012",
     "SAIB": 57.81,
-    "Albilad": 46.09,
+    "Bank Albilad": 46.09,
     "Saudi Awwal Bank": 62.54
   }
 ]

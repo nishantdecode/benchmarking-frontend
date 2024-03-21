@@ -34,8 +34,8 @@ const CommandDialog = ({
 }
 
 const CommandInput = React.forwardRef(({ className, ...props }, ref) => (
-  <div className="flex items-center border-0 bg-toggle rounded-lg px-3 mb-3" cmdk-input-wrapper="">
-    <FaSearch className="h-4 w-4 shrink-0 opacity-50" />
+  <div className="flex items-center border-0 bg-secondary dark:bg-toggle rounded-lg px-3 mb-3" cmdk-input-wrapper="">
+    <FaSearch className="h-4 w-4 shrink-0 opacity-5" />
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
@@ -67,7 +67,7 @@ const CommandGroup = React.forwardRef(({ className, ...props }, ref) => (
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      "overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
+      "w-full overflow-hidden text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
       className
     )}
     {...props} />
@@ -84,7 +84,7 @@ const CommandItem = React.forwardRef(({ className, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center mb-3 rounded-sm text-sm font-semibold outline-none hover:bg-toggle hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "w-full relative flex cursor-default select-none items-center mb-3 rounded-sm text-sm font-semibold outline-none hover:bg-toggle hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props} />

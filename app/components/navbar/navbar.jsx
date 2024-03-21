@@ -1,12 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useTheme } from "next-themes";
-import { usePathname, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
+import { usePathname, useRouter } from "next/navigation";
 import { setAuthenticated, setUser } from "@/lib/features/slices/authSlice";
 
-import { Button } from "@/components/ui/button";
+import { RxAvatar } from "react-icons/rx";
+import { LuLogOut } from "react-icons/lu";
+import { MdDarkMode } from "react-icons/md";
+import { IoIosArrowForward } from "react-icons/io";
+import { BsFillPieChartFill } from "react-icons/bs";
+import { MdOutlineLightMode } from "react-icons/md";
+
 import {
   Drawer,
   DrawerClose,
@@ -16,45 +22,28 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { IoIosArrowForward } from "react-icons/io";
-import { BsFillPieChartFill } from "react-icons/bs";
-import { MdDarkMode } from "react-icons/md";
-import { MdOutlineLightMode } from "react-icons/md";
-import { RxAvatar } from "react-icons/rx";
-import { LuLogOut } from "react-icons/lu";
-
 import MenuList from "./menuList";
+import showToast from "@/util/showToast";
 import { LogoutDialog } from "./logoutDialog";
+import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
-
-const Navbar = ({ user }) => {
+const Navbar = () => {
   const router = useRouter();
-  const pathname = usePathname();
   const dispatch = useDispatch();
+  const pathname = usePathname();
   const { theme, setTheme } = useTheme();
 
-  const [username, setUsername] = useState('username')
-  const [role, setRole] = useState('User')
-
-  useEffect(()=>{
-    if (typeof window !== "undefined" && window.localStorage) {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const name = user?.name.first + " " + user?.name.last
-      setUsername(name)
-      setRole(user?.role)
-      dispatch(setUser(user));
-      dispatch(setAuthenticated(true));
-    }
-  },[])
+  const user = useSelector((state) => state.auth.user)
 
   const handleLogout = () => {
     dispatch(setUser(undefined));
     dispatch(setAuthenticated(false));
+    router.push("/dashboard/login");
     localStorage.removeItem('accessToken');
-    localStorage.removeItem('user');
-    router.push("./login");
+    showToast("Logged Out!","Please Login.")
   };
+
   return (
     <div>
       <Drawer direction="left" className="h-full">
@@ -94,10 +83,10 @@ const Navbar = ({ user }) => {
               )}
               <div>{theme} Mode</div>
             </Button>
-            <Button variant={`${pathname === '/admin' ? 'default' : 'link'}`} className="w-full gap-3" onClick={()=>{role === 'Admin' ? router.push('/admin') : router.push('/dashboard')}}>
+            <Button variant={`${pathname === '/dashboard/admin' ? 'default' : 'link'}`} className="w-full gap-3" onClick={()=>{router.push('/dashboard/admin')}}>
               <RxAvatar size={20} />
               <div>
-                {username}
+                {user?.name?.first} {user?.name?.last}
               </div>
             </Button>
             <AlertDialog>
