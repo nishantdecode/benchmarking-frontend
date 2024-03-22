@@ -115,7 +115,7 @@ const progressCol = ({ key, color }) => {
       return (
         <div className="flex flex-row w-full">
           <Progress value={row.getValue(key)} bg={color}>
-            {row.getValue(key)}
+            {row.getValue(key)?.toFixed(2)+"%"}
           </Progress>
         </div>
       );
@@ -138,7 +138,7 @@ const progressBankCol = ({ key, banks }) => {
       return (
         <div className="flex flex-row w-full">
           <Progress value={row.getValue(key)} bg={color}>
-            {row.getValue(key)}
+            {row.getValue(key).toFixed(2)+"%"}
           </Progress>
         </div>
       );
@@ -277,7 +277,7 @@ export const generateColumns = ({ data, initialType, type, color, banks }) => {
       } else if (type === "progress") {
         return progressCol({ key: accessorKey, color, banks });
       } else if (type === "progressBank") {
-        return progressBankCol({ key: accessorKey });
+        return progressBankCol({ key: accessorKey, banks });
       } else if (type === "itemRank") {
         return itemRankCol({ key: accessorKey, banks });
       } else if (type === "ms") {

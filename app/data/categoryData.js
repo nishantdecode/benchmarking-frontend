@@ -155,7 +155,7 @@ const marketShareCategories = [
     value: "depreciation_and_amortisation",
   },
   {
-    name: "Other General & Admin. Expenses",
+    name: "Other General & Admin Expenses",
     value: "other_general_and_admin_expenses",
   },
   {

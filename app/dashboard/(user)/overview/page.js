@@ -45,8 +45,8 @@ const Dashboard = () => {
   const [bank, setBank] = useState("");
 
   const bankLabel =
-    provision.length !== 0 && banks.length !== 0
-      ? visualisationLabelUtils(banks, provision)
+    nim.length !== 0 && banks.length !== 0
+      ? visualisationLabelUtils(banks, nim)
       : [];
 
   const getYears = async () => {
