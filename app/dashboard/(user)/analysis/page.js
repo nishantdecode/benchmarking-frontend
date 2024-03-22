@@ -1,20 +1,13 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSelector } from "react-redux";
+import React, { useRef, useState, useEffect } from "react";
 
 import {
-  balanceSheetCategories,
-  balanceSheetData,
-  incomeStatementCategories,
-  msBalanceSheetCategories,
-  msBalanceSheetData,
-  msIncomeStatementCategories,
-  ratioCategories,
-} from "@/app/data/analysis";
-import { banks } from "@/app/data/data";
+  itemAnalysisCategories,
+  keyRatioCategories,
+} from "@/app/data/categoryData";
 import { IoIosArrowDown } from "react-icons/io";
-import { bankMultipleRatioData } from "@/app/data/ratioData";
 
 import {
   DropdownMenu,
@@ -26,71 +19,244 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+import {
+  useGetAllYearsMutation,
+  useGetFiguresByCategoryMutation,
+  useGetRatioMutation,
+} from "@/lib/features/services/keyRatioApi";
 import { SelectBanks } from "@/app/components/selectBanks";
-import { visualisationUtils } from "@/util/visualisationUtils";
 import { downloadImage, downloadPDF } from "@/util/exportUtils";
-import OptionButtons from "@/app/components/visualise/optionButtons";
 import { SelectCategory } from "@/app/components/selectCategory";
 import { generateColumns } from "@/app/components/visualise/columns";
+import OptionButtons from "@/app/components/visualise/optionButtons";
+import { visualisationLabelUtils } from "@/util/visualizationLabelUtils";
 import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
 import VisualiseLineChart from "@/app/components/visualise/visualiseLineChart";
+import { useGetItemByCategoryMutation } from "@/lib/features/services/analysisApi";
 
 const AnalysisPage = () => {
   let ref = useRef();
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const analysis = searchParams.get("item") || "Balance Sheet/BN";
+  const [getRatio] = useGetRatioMutation();
+  const [getAllYears] = useGetAllYearsMutation();
+  const [getItemCategory] = useGetItemByCategoryMutation();
+  const [getFiguresCategory] = useGetFiguresByCategoryMutation();
 
-  const checkedBanks =
-    JSON.parse(searchParams.get("checkedBanks")) ||
-    banks.map((bank) => bank.name);
+  const [ratio, setRatio] = useState([]);
+  const [balanceSheet, setBalanceSheet] = useState([]);
+  const [msBalanceSheet, setMsBalanceSheet] = useState([]);
+  const [incomeStatement, setIncomeStatement] = useState([]);
+  const [msIncomeStatement, setMsIncomeStatement] = useState([]);
+  const [figuresCategory, setFiguresCategory] = useState([]);
 
-  const ratioCategory =
-    searchParams.get("ratioCategory") || ratioCategories[0].name;
-  const balanceSheetCategory =
-    searchParams.get("balanceSheetCategory") || balanceSheetCategories[0].name;
-  const msBalanceSheetCategory =
-    searchParams.get("msBalanceSheetCategory") ||
-    msBalanceSheetCategories[0].name;
-  const incomeStatementCategory =
-    searchParams.get("incomeStatementCategory") ||
-    incomeStatementCategories[0].name;
-  const msIncomeStatementCategory =
-    searchParams.get("msIncomeStatementCategory") ||
-    msIncomeStatementCategories[0].name;
+  const banks = useSelector((state) => state.bank.banks);
 
-  useEffect(() => {
-    router.push(
-      `?item=${analysis}&checkedBanks=${JSON.stringify(
-        checkedBanks
-      )}&ratioCategory=${ratioCategory}&balanceSheetCategory=${balanceSheetCategory}&msBalanceSheetCategory=${msBalanceSheetCategory}&incomeStatementCategory=${incomeStatementCategory}&msIncomeStatementCategory=${msIncomeStatementCategory}`,
-      { scroll: false }
-    );
-  }, []);
+  const [date, setDate] = useState({});
+  const [checkedBanks, setCheckedBanks] = useState([]);
+  const [analysis, setAnalysis] = useState("Balance Sheet/BN");
 
-  const { data, bankColors, dataFormatterPercentage } = visualisationUtils(
-    ratioCategory,
-    bankMultipleRatioData
+  const [ratioCategory, setRatioCategory] = useState(
+    keyRatioCategories[0].name
+  );
+  const [balanceSheetCategory, setBalanceSheetCategory] = useState(
+    itemAnalysisCategories.balanceSheet[0].name
+  );
+  const [msBalanceSheetCategory, setMsBalanceSheetCategory] = useState(
+    itemAnalysisCategories.msBalanceSheet[0].name
+  );
+  const [incomeStatementCategory, setIncomeStatementCategory] = useState(
+    itemAnalysisCategories.incomeStatement[0].name
+  );
+  const [msIncomeStatementCategory, setMsIncomeStatementCategory] = useState(
+    itemAnalysisCategories.msIncomeStatement[0].name
   );
 
-  const rankColumns = generateColumns({
-    data: balanceSheetData,
-    initialType: "bank",
-    type: "itemRank",
-  });
-
-  const msColumns = generateColumns({
-    data: balanceSheetData,
-    initialType: "bank",
-    type: "ms",
-  });
-
-  function navigate({ paramNameToUpdate, newValue }) {
-    const updatedParams = new URLSearchParams(searchParams);
-    updatedParams.set(paramNameToUpdate, newValue);
-    router.push(`?${updatedParams.toString()}`, { scroll: false });
+  let balanceSheetColumns = null;
+  if (balanceSheet.length !== 0) {
+    balanceSheetColumns = generateColumns({
+      data: balanceSheet,
+      initialType: "bank",
+      type: "itemRank",
+      banks,
+    });
   }
+
+  let msBalanceSheetColumns = null;
+  if (msBalanceSheet.length !== 0) {
+    msBalanceSheetColumns = generateColumns({
+      data: msBalanceSheet,
+      initialType: "bank",
+      type: "ms",
+      banks,
+    });
+  }
+
+  let incomeStatementColumns = null;
+  if (incomeStatement.length !== 0) {
+    incomeStatementColumns = generateColumns({
+      data: incomeStatement,
+      initialType: "bank",
+      type: "itemRank",
+      banks,
+    });
+  }
+
+  let msIncomeStatementColumns = null;
+  if (msIncomeStatement.length !== 0) {
+    msIncomeStatementColumns = generateColumns({
+      data: msIncomeStatement,
+      initialType: "bank",
+      type: "ms",
+      banks,
+    });
+  }
+
+  let ratioColumns = null;
+  if (figuresCategory.length !== 0) {
+    ratioColumns = generateColumns({
+      data: figuresCategory,
+      initialType: "bank",
+      banks,
+    });
+  }
+
+  const ratioBankLabel =
+    ratio.length !== 0 && banks.length !== 0
+      ? visualisationLabelUtils(banks, ratio)
+      : [];
+
+  const getItemCategoryData = async ({
+    table,
+    setData,
+    category,
+    categories,
+  }) => {
+    const categoryValue = categories.find(
+      (item) => item.name === category
+    ).value;
+    try {
+      const response = await getItemCategory({ table, category:categoryValue });
+      if (response.data) {
+        setData(response.data.result);
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
+
+  const getRatioData = async () => {
+    const bankIds = checkedBanks.map(
+      (item) => banks?.find((bank) => bank.name === item).id
+    );
+    const category = keyRatioCategories
+      .find((item) => (item.name === ratioCategory ? item.value : ""))
+      .value.toString();
+    const credentials = {
+      category: category,
+      bankIds: bankIds,
+      interval: date.interval,
+      startDate: date.startDate,
+      endDate: date.endDate,
+    };
+    try {
+      if (Object.keys(date).length !== 0) {
+        const response = await getRatio(credentials);
+        if (response.data) {
+          setRatio(response.data.result);
+        } else {
+          showToast("Error!", response.error.result);
+        }
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
+
+  const getFiguresCategoryData = async () => {
+    const category = keyRatioCategories.find(
+      (item) => item.name === ratioCategory
+    ).value;
+    try {
+      const response = await getFiguresCategory({ category });
+      if (response.data) {
+        setFiguresCategory(response.data.result);
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
+
+  const getYears = async () => {
+    try {
+      const response = await getAllYears();
+      if (response.data) {
+        setDate({
+          interval: "YEARLY",
+          startDate: new Date(`01/01/${response.data.result[0]}`),
+          endDate: new Date(
+            `01/01/${response.data.result[response.data.result.length - 1]}`
+          ),
+        });
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
+
+  useEffect(() => {
+    getYears();
+  }, []);
+
+  useEffect(() => {
+    if (banks && banks.length > 0) {
+      setCheckedBanks(banks.map((bank) => bank.name));
+    }
+  }, [banks]);
+
+  useEffect(() => {
+    getRatioData();
+  }, [date, ratioCategory, checkedBanks]);
+
+  useEffect(() => {
+    getFiguresCategoryData();
+  }, [ratioCategory]);
+
+  useEffect(() => {
+    getItemCategoryData({
+      table: "balanceSheet",
+      setData: setBalanceSheet,
+      category: balanceSheetCategory,
+      categories: itemAnalysisCategories.balanceSheet,
+    });
+  }, [balanceSheetCategory]);
+
+  useEffect(() => {
+    getItemCategoryData({
+      table: "balanceSheet",
+      setData: setMsBalanceSheet,
+      category: msBalanceSheetCategory,
+      categories: itemAnalysisCategories.msBalanceSheet,
+    });
+  }, [msBalanceSheetCategory]);
+
+  useEffect(() => {
+    getItemCategoryData({
+      table: "incomeStatement",
+      setData: setIncomeStatement,
+      category: incomeStatementCategory,
+      categories: itemAnalysisCategories.incomeStatement,
+    });
+  }, [incomeStatementCategory]);
+
+  useEffect(() => {
+    getItemCategoryData({
+      table: "incomeStatement",
+      setData: setMsIncomeStatement,
+      category: msIncomeStatementCategory,
+      categories: itemAnalysisCategories.msIncomeStatement,
+    });
+  }, [msIncomeStatementCategory]);
+
   return (
     <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10 gap-10">
       <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
@@ -108,10 +274,7 @@ const AnalysisPage = () => {
               <DropdownMenuRadioGroup
                 value={analysis}
                 onValueChange={(v) => {
-                  navigate({
-                    paramNameToUpdate: "item",
-                    newValue: v,
-                  });
+                  setAnalysis(v);
                 }}
               >
                 <DropdownMenuRadioItem
@@ -135,21 +298,24 @@ const AnalysisPage = () => {
         </div>
         {analysis === "Balance Sheet/BN" ? (
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+            <div className="lg:sticky lg:top-14 h-auto w-full sm:w-auto lg:w-1/6">
               <SelectCategory
                 height="h-[700px]"
                 search={true}
-                categories={balanceSheetCategories}
-                categoryName="balanceSheetCategory"
+                category={balanceSheetCategory}
+                setCategory={setBalanceSheetCategory}
+                categories={itemAnalysisCategories.balanceSheet}
               />
             </div>
             <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
-              <VisualiseTable
-                data={balanceSheetData}
-                columns={rankColumns}
-                exportXls="true"
-                title={balanceSheetCategory}
-              />
+              {balanceSheet.length !== 0 && (
+                <VisualiseTable
+                  exportXls="true"
+                  data={balanceSheet}
+                  title={balanceSheetCategory}
+                  columns={balanceSheetColumns}
+                />
+              )}
             </div>
           </div>
         ) : analysis === "Income Statement/BN" ? (
@@ -158,27 +324,31 @@ const AnalysisPage = () => {
               <SelectCategory
                 height="h-[700px]"
                 search={true}
-                categories={incomeStatementCategories}
-                categoryName="incomeStatementCategory"
+                category={incomeStatementCategory}
+                setCategory={setIncomeStatementCategory}
+                categories={itemAnalysisCategories.incomeStatement}
               />
             </div>
             <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
-              <VisualiseTable
-                data={balanceSheetData}
-                columns={rankColumns}
-                exportXls="true"
-                title={incomeStatementCategory}
-              />
+              {incomeStatement.length !== 0 && (
+                <VisualiseTable
+                  exportXls="true"
+                  data={incomeStatement}
+                  title={incomeStatementCategory}
+                  columns={incomeStatementColumns}
+                />
+              )}
             </div>
           </div>
         ) : (
           <div className="flex flex-col lg:flex-row justify-between items-start min-w-full gap-3">
             <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
               <SelectCategory
-                search={true}
-                categories={ratioCategories}
-                categoryName="ratioCategory"
                 height="h-[650px]"
+                search={true}
+                category={ratioCategory}
+                setCategory={setRatioCategory}
+                categories={keyRatioCategories}
               />
             </div>
             <div className="flex flex-col w-full lg:w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-5">
@@ -193,16 +363,22 @@ const AnalysisPage = () => {
               </div>
               <div className="flex flex-row h-full w-full">
                 <div className="flex flex-col h-[300px] md:h-[600px] w-full lg:w-4/5 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
-                  <VisualiseLineChart
-                    ref={ref}
-                    data={data}
-                    colors={bankColors}
-                    xAxis={true}
-                    dataFormatter={dataFormatterPercentage}
-                  />
+                  {ratio.length !== 0 && (
+                    <VisualiseLineChart
+                      ref={ref}
+                      xAxis={true}
+                      data={ratio}
+                      colors={ratioBankLabel.bankColorsLabel}
+                      dataFormatter={ratioBankLabel.dataFormatterPercentage}
+                    />
+                  )}
                 </div>
                 <div className="lg:sticky lg:top-14 w-full sm:w-auto lg:w-1/5 h-full">
-                  <SelectBanks banks={banks} />
+                  <SelectBanks
+                    banks={banks}
+                    checkedBanks={checkedBanks}
+                    setCheckedBanks={setCheckedBanks}
+                  />
                 </div>
               </div>
             </div>
@@ -216,17 +392,20 @@ const AnalysisPage = () => {
               <SelectCategory
                 height="h-[700px]"
                 search={true}
-                categories={msBalanceSheetCategories}
-                categoryName="msBalanceSheetCategory"
+                category={msBalanceSheetCategory}
+                setCategory={setMsBalanceSheetCategory}
+                categories={itemAnalysisCategories.msBalanceSheet}
               />
             </div>
             <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
-              <VisualiseTable
-                data={msBalanceSheetData}
-                columns={msColumns}
-                title={msBalanceSheetCategory}
-                exportXls="true"
-              />
+              {msBalanceSheet.length !== 0 && (
+                <VisualiseTable
+                  exportXls="true"
+                  data={msBalanceSheet}
+                  title={msBalanceSheetCategory}
+                  columns={msBalanceSheetColumns}
+                />
+              )}
             </div>
           </div>
         </Card>
@@ -237,17 +416,20 @@ const AnalysisPage = () => {
               <SelectCategory
                 height="h-[700px]"
                 search={true}
-                categories={msIncomeStatementCategories}
-                categoryName="msIncomeStatementCategory"
+                category={msIncomeStatementCategory}
+                setCategory={setMsIncomeStatementCategory}
+                categories={itemAnalysisCategories.msIncomeStatement}
               />
             </div>
             <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
-              <VisualiseTable
-                data={msBalanceSheetData}
-                columns={msColumns}
-                title={msIncomeStatementCategory}
-                exportXls="true"
-              />
+              {msIncomeStatement.length !== 0 && (
+                <VisualiseTable
+                  exportXls="true"
+                  data={msIncomeStatement}
+                  title={msIncomeStatementCategory}
+                  columns={msIncomeStatementColumns}
+                />
+              )}
             </div>
           </div>
         </Card>
@@ -258,17 +440,20 @@ const AnalysisPage = () => {
               <SelectCategory
                 height="h-[700px]"
                 search={true}
-                categories={ratioCategories}
-                categoryName="ratioCategory"
+                category={ratioCategory}
+                setCategory={setRatioCategory}
+                categories={keyRatioCategories}
               />
             </div>
             <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
-              <VisualiseTable
-                data={msBalanceSheetData}
-                columns={msColumns}
-                title={msIncomeStatementCategory}
-                exportXls="true"
-              />
+              {figuresCategory.length !== 0 && (
+                <VisualiseTable
+                  data={figuresCategory}
+                  columns={ratioColumns}
+                  title={ratioCategory}
+                  exportXls="true"
+                />
+              )}
             </div>
           </div>
         </Card>

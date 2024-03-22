@@ -1,5 +1,6 @@
 import React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Cloudinary } from "@cloudinary/url-gen";
+import { AdvancedImage, responsive, placeholder } from "@cloudinary/react";
 
 import { IoIosArrowDown } from "react-icons/io";
 
@@ -17,23 +18,30 @@ import { Button } from "@/components/ui/button";
 import useMediaQuery from "@/app/hooks/useMediaQuery";
 import OptionButtons from "@/app/components/visualise/optionButtons";
 
-const Header = ({ banks, downloadPDF, downloadImage, downloadSheet }) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+const Header = ({
+  banks,
+  category,
+  checkedBanks,
+  setCheckedBanks,
+  downloadPDF,
+  downloadImage,
+  downloadSheet,
+}) => {
   const headerBreakPoint = useMediaQuery("(max-width: 1170px)");
-  const selectedBanks =
-    JSON.parse(searchParams.get("banks")) ||
-    banks.slice(0, 3).map((bank) => bank.name);
-  const bank1 = selectedBanks[0];
-  const bank2 = selectedBanks[1];
-  const bank3 = selectedBanks[2];
-  const category = searchParams.get("category");
-
-  function navigate({ paramNameToUpdate, newValue }) {
-    const updatedParams = new URLSearchParams(searchParams);
-    updatedParams.set(paramNameToUpdate, newValue);
-    router.push(`?${updatedParams.toString()}`, { scroll: false });
+  if (!banks || banks.length === 0) {
+    return null;
   }
+  const cld = new Cloudinary({
+    cloud: {
+      cloudName: "dohnlambm",
+    },
+  });
+  const bank1 = checkedBanks[0];
+  const bank2 = checkedBanks[1];
+  const bank3 = checkedBanks[2];
+  const myImage1 = cld.image(banks.find((item) => item.name === bank1)?.iconUrl);
+  const myImage2 = cld.image(banks.find((item) => item.name === bank2)?.iconUrl);
+  const myImage3 = cld.image(banks.find((item) => item.name === bank3)?.iconUrl);
   return (
     <div
       className={`flex ${
@@ -51,12 +59,11 @@ const Header = ({ banks, downloadPDF, downloadImage, downloadSheet }) => {
               >
                 <div className="flex flex-row gap-2">
                   <div className="flex flex-row justify-center items-center min-h-7 min-w-7 rounded-full bg-secondary dark:bg-white">
-                    <img
-                      src={`${
-                        banks.find((item) => bank1 === item.name).iconUrl
-                      }`}
-                      className="h-4 w-4"
-                    ></img>
+                    <AdvancedImage
+                      className="w-4 h-4 object-cover rounded-full bg-white"
+                      cldImg={myImage1}
+                      plugins={[responsive(), placeholder()]}
+                    />
                   </div>
                   <div className="mt-1.5">
                     {!bank1 || bank1 === "null" ? "Select Bank:" : bank1}
@@ -72,10 +79,7 @@ const Header = ({ banks, downloadPDF, downloadImage, downloadSheet }) => {
             <DropdownMenuRadioGroup
               value={bank1}
               onValueChange={(v) => {
-                navigate({
-                  paramNameToUpdate: "banks",
-                  newValue: `["${v}","${bank2}","${bank3}"]`,
-                });
+                setCheckedBanks([v, bank2, bank3]);
               }}
             >
               {banks
@@ -104,12 +108,11 @@ const Header = ({ banks, downloadPDF, downloadImage, downloadSheet }) => {
               >
                 <div className="flex flex-row gap-2">
                   <div className="flex flex-row justify-center items-center min-h-7 min-w-7 rounded-full bg-secondary dark:bg-white">
-                    <img
-                      src={`${
-                        banks.find((item) => bank2 === item.name).iconUrl
-                      }`}
-                      className="h-4 w-4"
-                    ></img>
+                    <AdvancedImage
+                      className="w-4 h-4 object-cover rounded-full bg-white"
+                      cldImg={myImage2}
+                      plugins={[responsive(), placeholder()]}
+                    />
                   </div>
                   <div className="mt-1.5">
                     {!bank2 || bank2 === "null" ? "Select Bank:" : bank2}
@@ -125,10 +128,7 @@ const Header = ({ banks, downloadPDF, downloadImage, downloadSheet }) => {
             <DropdownMenuRadioGroup
               value={bank2}
               onValueChange={(v) => {
-                navigate({
-                  paramNameToUpdate: "banks",
-                  newValue: `["${bank1}","${v}","${bank3}"]`,
-                });
+                setCheckedBanks([bank1, v, bank3]);
               }}
             >
               {banks
@@ -159,12 +159,11 @@ const Header = ({ banks, downloadPDF, downloadImage, downloadSheet }) => {
               >
                 <div className="flex flex-row gap-2">
                   <div className="flex flex-row justify-center items-center min-h-7 min-w-7 rounded-full bg-secondary dark:bg-white">
-                    <img
-                      src={`${
-                        banks.find((item) => bank3 === item.name).iconUrl
-                      }`}
-                      className="h-4 w-4"
-                    ></img>
+                    <AdvancedImage
+                      className="w-4 h-4 object-cover rounded-full bg-white"
+                      cldImg={myImage3}
+                      plugins={[responsive(), placeholder()]}
+                    />
                   </div>
                   <div className="mt-1.5">
                     {!bank3 || bank3 === "null" ? "Select Bank:" : bank3}
@@ -180,10 +179,7 @@ const Header = ({ banks, downloadPDF, downloadImage, downloadSheet }) => {
             <DropdownMenuRadioGroup
               value={bank3}
               onValueChange={(v) => {
-                navigate({
-                  paramNameToUpdate: "banks",
-                  newValue: `["${bank1}","${bank2}","${v}"]`,
-                });
+                setCheckedBanks([bank1, bank2, v]);
               }}
             >
               {banks
@@ -204,7 +200,7 @@ const Header = ({ banks, downloadPDF, downloadImage, downloadSheet }) => {
         </DropdownMenu>
       </div>
       <div className="hidden lg:flex flex-row justify-end gap-1">
-        {["Total Deposits", "Total Gross Loans"].includes(category) ? (
+        {["totalDeposits", "totalGrossLoans"].includes(category) ? (
           <OptionButtons
             type="table"
             view={true}

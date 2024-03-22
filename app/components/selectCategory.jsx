@@ -50,7 +50,7 @@ export function SelectCategory({ category, setCategory, search, categories, heig
                   }`}
                 >
                   <button
-                    className="h-12 w-full py-2.5 px-6 truncate text-ellipsis text-left text-xs"
+                    className="h-10 w-full py-2.5 px-6 truncate text-ellipsis text-left text-xs"
                     onClick={() => {
                       setCategory(item.name)
                     }}
@@ -97,7 +97,7 @@ export function SelectCategory({ category, setCategory, search, categories, heig
                       }`}
                     >
                       <button
-                        className="h-12 w-full py-2.5 px-6 truncate text-ellipsis text-left text-xs"
+                        className="h-10 w-full py-2.5 px-6 truncate text-ellipsis text-left text-xs"
                         onClick={() => {
                           setOpen(false);
                           setCategory(item.name)

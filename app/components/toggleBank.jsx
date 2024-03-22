@@ -4,10 +4,8 @@ import { AdvancedImage, responsive, placeholder } from "@cloudinary/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -25,7 +23,7 @@ export function ToggleBank({ data, bank, setBank }) {
       cloudName: "dohnlambm",
     },
   });
-  const myImage = cld.image(bank.iconUrl);
+  const myImage = cld.image(data.find((item) => item.name === bank).iconUrl);
   return (
     <>
       <div className="hidden lg:flex flex-col justify-start items-start w-full gap-1">
@@ -48,9 +46,6 @@ export function ToggleBank({ data, bank, setBank }) {
                 cldImg={myImage}
                 plugins={[responsive(), placeholder()]}
               />
-              {/* <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
-                <img src={item.iconUrl} className="h-4 w-4"></img>
-              </div> */}
               <span className="text-xs truncate text-ellipsis">
                 {item.name}
               </span>
@@ -73,19 +68,14 @@ export function ToggleBank({ data, bank, setBank }) {
                 }}
               ></div>
               <AdvancedImage
-                className="w-20 h-20 object-cover rounded-full bg-white"
+                className="w-6 h-6 object-cover rounded-full bg-white"
                 cldImg={myImage}
                 plugins={[responsive(), placeholder()]}
               />
-              {/* <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
-                <img src={icon} className="h-4 w-4"></img>
-              </div> */}
               <span className="text-xs">{bank}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-60">
-            <DropdownMenuLabel>Select Category</DropdownMenuLabel>
-            <DropdownMenuSeparator />
             <DropdownMenuRadioGroup
               value={bank}
               onValueChange={(v) => {
@@ -96,13 +86,23 @@ export function ToggleBank({ data, bank, setBank }) {
               }}
             >
               {data.map((item, index) => {
+                const myImage = cld.image(item.iconUrl);
                 return (
                   <DropdownMenuRadioItem
                     key={index}
                     value={`${item.name}`}
-                    className="flex flex-row justify-start w-full pl-10"
+                    className="flex flex-row justify-start w-full pl-4 gap-3"
                   >
-                    {item.name}
+                    <div
+                      className="min-h-4 min-w-4"
+                      style={{ backgroundColor: item.color }}
+                    ></div>
+                    <AdvancedImage
+                      className="w-6 h-6 object-cover rounded-full bg-white"
+                      cldImg={myImage}
+                      plugins={[responsive(), placeholder()]}
+                    />
+                    <span className="text-xs">{item.name}</span>
                   </DropdownMenuRadioItem>
                 );
               })}

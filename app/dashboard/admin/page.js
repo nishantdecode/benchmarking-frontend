@@ -97,8 +97,8 @@ const Admin = () => {
   };
 
   useEffect(() => {
-    if(userObj) {
-      setPublicId(userObj.picture)
+    if (userObj) {
+      setPublicId(userObj.picture);
     }
     setDataObj({
       data: [],
@@ -121,58 +121,67 @@ const Admin = () => {
       <div className="flex flex-col w-full h-full mt-14 p-5 pl-7 sm:pl-10 gap-10">
         <div className="flex flex-col sm:flex-row justify-center items-center gap-5">
           <div className="h-[220px] sm:h-[300px] w-full sm:w-4/6">
-            <Card className="h-full w-full p-5 sm:p-14">
-              <div className="flex flex-row justify-between">
-                <div className="flex flex-col items-start">
-                  <div className="rounded-full bg-foreground mb-5">
-                    {publicId ? (
-                      <AdvancedImage
-                        className="w-20 h-20 object-cover rounded-full bg-white"
-                        cldImg={myImage}
-                        plugins={[responsive(), placeholder()]}
+            {userObj ? (
+              <Card className="h-full w-full p-5 sm:p-14">
+                <div className="flex flex-row justify-between">
+                  <div className="flex flex-col items-start">
+                    <div className="rounded-full bg-foreground mb-5">
+                      {publicId ? (
+                        <AdvancedImage
+                          className="w-20 h-20 object-cover rounded-full bg-white"
+                          cldImg={myImage}
+                          plugins={[responsive(), placeholder()]}
+                        />
+                      ) : (
+                        <div className="flex justify-center items-center h-20 w-20 bg-foreground rounded-full">
+                          <RxAvatar size={20} className="text-secondary" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-row text-semibold">
+                      <span>{`${userObj?.name?.first} ${userObj?.name?.last}`}</span>
+                    </div>
+                    <div className="text-medium text-sm mb-5">
+                      {userObj?.email}
+                    </div>
+                    <div className="text-xs">Role:</div>
+                    <div>{role}</div>
+                  </div>
+                  <div className="flex flex-col items-end gap-14">
+                    <div className="flex flex-row gap-2">
+                      <div className="text-xs mt-1">Joined:</div>{" "}
+                      {formattedDate}
+                    </div>
+                    <Button variant="outline">
+                      <BiEdit
+                        size={15}
+                        onClick={() =>
+                          router.push(
+                            `/dashboard/admin/user?action=edit&userId=${userObj.id}&entity=User`
+                          )
+                        }
                       />
-                    ) : (
-                      <div className="flex justify-center items-center h-20 w-20 bg-foreground rounded-full">
-                        <RxAvatar size={20} className="text-secondary" />
-                      </div>
-                    )}
+                    </Button>
                   </div>
-                  <div className="flex flex-row text-semibold">
-                    <span>{`${userObj?.name?.first} ${userObj?.name?.last}`}</span>
-                  </div>
-                  <div className="text-medium text-sm mb-5">
-                    {userObj?.email}
-                  </div>
-                  <div className="text-xs">Role:</div>
-                  <div>{role}</div>
                 </div>
-                <div className="flex flex-col items-end gap-14">
-                  <div className="flex flex-row gap-2">
-                    <div className="text-xs mt-1">Joined:</div> {formattedDate}
-                  </div>
-                  <Button variant="outline">
-                    <BiEdit
-                      size={15}
-                      onClick={() =>
-                        router.push(
-                          `/dashboard/admin/user?action=edit&userId=${userObj.id}&entity=User`
-                        )
-                      }
-                    />
-                  </Button>
-                </div>
-              </div>
-            </Card>
+              </Card>
+            ) : (
+              <Skeleton className="h-full w-full"></Skeleton>
+            )}
           </div>
           <div className="flex flex-col justify-center items-center h-[200px] sm:h-[300px] w-full sm:w-2/6 gap-5">
-            <Card
-              className={`${
-                role === "User" ? "h-full" : "h-1/2"
-              } flex flex-row justify-center items-center gap-3 w-full`}
-            >
-              <div className="text-lg">Total Banks: </div>
-              <div className="text-3xl md:text-7xl">{banks?.length}</div>
-            </Card>
+            {banks ? (
+              <Card
+                className={`${
+                  role === "User" ? "h-full" : "h-1/2"
+                } flex flex-row justify-center items-center gap-3 w-full`}
+              >
+                <div className="text-lg">Total Banks: </div>
+                <div className="text-3xl md:text-7xl">{banks?.length}</div>
+              </Card>
+            ) : (
+              <Skeleton className="h-full w-full"></Skeleton>
+            )}
             {role !== "User" && (
               <Card className="flex flex-row justify-center items-center gap-3 h-1/2 w-full">
                 <div className="text-lg">Total Users: </div>
@@ -205,7 +214,7 @@ const Admin = () => {
                   />
                 )}
               </div>
-              <div className="flex flex-col max-h-[500px] sm:max-h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+              <div className="flex flex-col h-auto w-full lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
                 {dataObj.data.length !== 0 && (
                   <VisualiseTable
                     data={dataObj.data}

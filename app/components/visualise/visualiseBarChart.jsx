@@ -49,6 +49,9 @@ const VisualiseBarChart = forwardRef(function VisualiseBarChart({ data, colors, 
   const fields = Object.keys(data[0]);
   const index = fields[0];
   const categories = fields.slice(1, fields.length);
+  if(!colors || colors.length === 0) {
+    return null;
+  }
   const chartData = {
     labels: data.map((data) => data[index]),
     datasets: categories.map((category, ind) => {

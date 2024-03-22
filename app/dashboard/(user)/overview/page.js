@@ -1,115 +1,416 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect } from "react";
-
-import {
-  competitionData,
-  analysisCategories,
-  bankData,
-  bankBarData,
-  tableData,
-} from "@/app/data/dashboardData";
-import { banks } from "@/app/data/data";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
+import {
+  useGetAllYearsMutation,
+  useGetRatioBankMutation,
+} from "@/lib/features/services/keyRatioApi";
 import SelectBank from "@/app/components/dashboard/selectBank";
+import { visualisationLabelUtils } from "@/util/visualizationLabelUtils";
 import CompetitionCards from "@/app/components/dashboard/competitionCards";
 import CompetitionHeader from "@/app/components/dashboard/competitionHeader";
-import VisualiseLineChart from "@/app/components/visualise/visualiseLineChart";
 import VisualiseBarChart from "@/app/components/visualise/visualiseBarChart";
+import { useGetItemBankMutation } from "@/lib/features/services/analysisApi";
+import VisualiseLineChart from "@/app/components/visualise/visualiseLineChart";
+import { useGetCompetitionDataMutation } from "@/lib/features/services/individualBankApi";
 
 const Dashboard = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const currentYear = new Date().getFullYear();
-  const year = searchParams.get("year") || currentYear;
-  const bank = searchParams.get("bank") || banks[0].name;
+
+  const [getAllYears] = useGetAllYearsMutation();
+  const [getItemBank] = useGetItemBankMutation();
+  const [getRatioBank] = useGetRatioBankMutation();
+  const [getCompetition] = useGetCompetitionDataMutation();
+
+  const [years, setYears] = useState([]);
+  const [competition, setCompetition] = useState([]);
+  const [provision, setProvision] = useState([]);
+  const [nim, setNim] = useState([]);
+  const [cor, setCor] = useState([]);
+  const [operatingIncome, setOperatingIncome] = useState([]);
+  const [operatingExpense, setOperatingExpense] = useState([]);
+  const [incomeExpense, setIncomeExpense] = useState([]);
+  const [income, setIncome] = useState([]);
+  const [investments, setInvestments] = useState([]);
+
+  const banks = useSelector((state) => state.bank.banks);
+
+  const [year, setYear] = useState("");
+  const [bank, setBank] = useState("");
+
+  const bankLabel =
+    provision.length !== 0 && banks.length !== 0
+      ? visualisationLabelUtils(banks, provision)
+      : [];
+
+  const getYears = async () => {
+    try {
+      const response = await getAllYears();
+      if (response.data) {
+        const data = response.data.result;
+        setYears(data);
+        setYear(data[data.length - 2].toString());
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
+
+  const getCompetitionData = async () => {
+    try {
+      let response = await getCompetition({ year });
+      if (response.data) {
+        setCompetition(response.data.result);
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
+
+  const getRatioBankData = async ({ bankIds, category, setData }) => {
+    try {
+      const response = await getRatioBank({ bankIds, category });
+      if (response.data) {
+        setData(response.data.result);
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
+
+  const getItemBankData = async ({ bankIds, table, category, setData }) => {
+    try {
+      const response = await getItemBank({ bankIds, table, category });
+      if (response.data) {
+        setData(response.data.result);
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
 
   useEffect(() => {
-    router.push(`?year=${year}&bank=${bank}`);
+    getYears();
   }, []);
 
-  return (
-    <>
-      <div className="flex flex-col h-full w-full mt-14 p-5 pl-7 sm:pl-10 gap-10">
-        <div className="flex flex-col justify-start items-start h-auto w-full gap-3">
-          <CompetitionHeader />
-          <CompetitionCards data={competitionData} />
-        </div>
+  useEffect(() => {
+    if (banks && banks.length > 0) {
+      setBank(banks[0].name);
+    }
+  }, [banks]);
 
-        <SelectBank banks={banks} />
+  useEffect(() => {
+    if (year) {
+      getCompetitionData();
+    }
+  }, [year]);
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {analysisCategories.map((item, ind) => {
-            const displayedCategory = analysisCategories.find(
-              (categoryObj) => categoryObj.category === item.category
-            );
-            const data =
-              displayedCategory.visualise === "line"
-                ? bankData
-                : displayedCategory.visualise === "bar"
-                ? bankBarData
-                : tableData;
+  useEffect(() => {
+    if (bank) {
+      const bankId = banks.find((item) => item.name === bank).id;
+      getRatioBankData({
+        bankIds: [bankId],
+        category: "nim",
+        setData: setNim,
+      });
+      getRatioBankData({
+        bankIds: [bankId],
+        category: "cor",
+        setData: setCor,
+      });
+      getRatioBankData({
+        bankIds: [bankId],
+        category: "income",
+        setData: setIncome,
+      });
+    }
+  }, [bank]);
 
-            const names = Object.keys(data[0])
-              .map((key) => key.replace(/ Income$/, ""))
-              .filter((key) => key !== "year");
-            const bankColors = names.map((name) => {
-              const bankInfo = banks.find((bank) => bank.name === name);
-              return bankInfo ? bankInfo.color : null;
+  useEffect(() => {
+    if (bank) {
+      const bankId = banks.find((item) => item.name === bank).id;
+      getItemBankData({
+        bankIds: [bankId],
+        table: "incomeStatement",
+        category: "income_before_provisions",
+        setData: setProvision,
+      });
+      getItemBankData({
+        bankIds: [bankId],
+        table: "balanceSheet",
+        category: "investments",
+        setData: setInvestments,
+      });
+      getItemBankData({
+        bankIds: [bankId],
+        table: "incomeStatement",
+        category: "operatingIncome",
+        setData: setOperatingIncome,
+      });
+      getItemBankData({
+        bankIds: [bankId],
+        table: "incomeStatement",
+        category: "operatingExpenses",
+        setData: setOperatingExpense,
+      });
+    }
+  }, [bank]);
+
+  useEffect(() => {
+    if (operatingIncome.length !== 0 && operatingExpense.length !== 0) {
+      const combineData = () => {
+        const combined = [];
+        operatingIncome.forEach((incomeItem) => {
+          const correspondingExpense = operatingExpense.find(
+            (expenseItem) => expenseItem.label === incomeItem.label
+          );
+          if (correspondingExpense) {
+            combined.push({
+              label: incomeItem.label,
+              [`${Object.keys(incomeItem)[1]} Income`]:
+                incomeItem[Object.keys(incomeItem)[1]],
+              [`${Object.keys(correspondingExpense)[1]} Expense`]:
+                correspondingExpense[Object.keys(correspondingExpense)[1]],
             });
-            const dataFormatter = (value) => {
-              return "$" + value;
-            };
-            return (
-              <Card key={ind} className="flex flex-col p-4 sm:p-4 md:p-8">
-                <CardHeader className="flex flex-row justify-between py-2 pb-4 px-0">
-                  <CardTitle className="text-lg md:text-xl">
-                    {item.category}
-                  </CardTitle>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="px-3 sm:px-5 rounded-md sm:rounded-lg text-xs sm:text-md"
-                    onClick={() => {
-                      router.push(
-                        `/dashboard/overview/trendAnalysis?category=${item.category}&bank=${bank}`
-                      );
-                    }}
-                  >
-                    View More
-                  </Button>
-                </CardHeader>
-                {item.visualise === "line" ? (
-                  <div className="h-[250px] xs:h-[300px] md:h-[350px]">
-                    <VisualiseLineChart
-                      data={data}
-                      colors={bankColors}
-                      xAxis={false}
-                      dataFormatter={dataFormatter}
-                    />
-                  </div>
-                ) : item.visualise === "bar" ? (
-                  <div className="h-[250px] xs:h-[300px] md:h-[350px]">
-                    <VisualiseBarChart
-                      data={data}
-                      colors={bankColors}
-                      xAxis={false}
-                      dataFormatter={dataFormatter}
-                    />
-                  </div>
-                ) : (
-                  ""
-                )}
-              </Card>
-            );
-          })}
-        </div>
+          }
+        });
+        return combined;
+      };
+
+      setIncomeExpense(combineData());
+    }
+  }, [operatingIncome, operatingExpense]);
+
+  return (
+    <div className="flex flex-col h-full w-full mt-14 p-5 pl-7 sm:pl-10 gap-5 lg:gap-10">
+      <div className="flex flex-col justify-start items-start h-auto w-full gap-3">
+        <CompetitionHeader years={years} year={year} setYear={setYear} />
+        <CompetitionCards data={competition} />
       </div>
-    </>
+
+      <SelectBank banks={banks} bank={bank} setBank={setBank} />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Card className="flex flex-col p-4 sm:p-4 md:p-8">
+          <CardHeader className="flex flex-row justify-between py-2 pb-4 px-0">
+            <CardTitle className="text-lg md:text-xl">
+              Income before Provisions
+            </CardTitle>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="px-3 sm:px-5 rounded-md sm:rounded-lg text-xs sm:text-md"
+              onClick={() => {
+                router.push(
+                  `/dashboard/overview/trendAnalysis?category=income_before_provisions&bank=${bank}`
+                );
+              }}
+            >
+              View More
+            </Button>
+          </CardHeader>
+          <div className="h-[250px] xs:h-[300px] md:h-[350px]">
+            {provision.length !== 0 && (
+              <VisualiseLineChart
+                legend={true}
+                xAxis={false}
+                data={provision}
+                colors={bankLabel.bankColorsLabel}
+                dataFormatter={bankLabel.dataFormatterCurrency}
+              />
+            )}
+          </div>
+        </Card>
+        <Card className="flex flex-col p-4 sm:p-4 md:p-8">
+          <CardHeader className="flex flex-row justify-between py-2 pb-4 px-0">
+            <CardTitle className="text-lg md:text-xl">NIM %</CardTitle>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="px-3 sm:px-5 rounded-md sm:rounded-lg text-xs sm:text-md"
+              onClick={() => {
+                router.push(
+                  `/dashboard/overview/trendAnalysis?category=nim&bank=${bank}`
+                );
+              }}
+            >
+              View More
+            </Button>
+          </CardHeader>
+          <div className="h-[250px] xs:h-[300px] md:h-[350px]">
+            {nim.length !== 0 && (
+              <VisualiseLineChart
+                legend={true}
+                xAxis={false}
+                data={nim}
+                colors={bankLabel.bankColorsLabel}
+                dataFormatter={bankLabel.dataFormatterPercentage}
+              />
+            )}
+          </div>
+        </Card>
+        <Card className="flex flex-col p-4 sm:p-4 md:p-8">
+          <CardHeader className="flex flex-row justify-between py-2 pb-4 px-0">
+            <CardTitle className="text-lg md:text-xl">Cost of Risk %</CardTitle>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="px-3 sm:px-5 rounded-md sm:rounded-lg text-xs sm:text-md"
+              onClick={() => {
+                router.push(
+                  `/dashboard/overview/trendAnalysis?category=cor&bank=${bank}`
+                );
+              }}
+            >
+              View More
+            </Button>
+          </CardHeader>
+          <div className="h-[250px] xs:h-[300px] md:h-[350px]">
+            {cor.length !== 0 && (
+              <VisualiseLineChart
+                legend={true}
+                xAxis={false}
+                data={cor}
+                colors={bankLabel.bankColorsLabel}
+                dataFormatter={bankLabel.dataFormatterPercentage}
+              />
+            )}
+          </div>
+        </Card>
+        <Card className="flex flex-col p-4 sm:p-4 md:p-8">
+          <CardHeader className="flex flex-row justify-between py-2 pb-4 px-0">
+            <CardTitle className="text-lg md:text-xl">
+              Operating Income/Expense
+            </CardTitle>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="px-3 sm:px-5 rounded-md sm:rounded-lg text-xs sm:text-md"
+              onClick={() => {
+                router.push(
+                  `/dashboard/overview/trendAnalysis?category=incomeExpense&bank=${bank}`
+                );
+              }}
+            >
+              View More
+            </Button>
+          </CardHeader>
+          <div className="h-[250px] xs:h-[300px] md:h-[350px]">
+            {incomeExpense.length !== 0 && (
+              <VisualiseBarChart
+                xAxis={false}
+                data={incomeExpense}
+                colors={bankLabel?.bankColorsLabel?.flatMap((value) => [
+                  value,
+                  null,
+                ])}
+                dataFormatter={bankLabel.dataFormatterCurrency}
+              />
+            )}
+          </div>
+        </Card>
+        <Card className="flex flex-col p-4 sm:p-4 md:p-8">
+          <CardHeader className="flex flex-row justify-between py-2 pb-4 px-0">
+            <CardTitle className="text-lg md:text-xl">
+              Cost of Income %
+            </CardTitle>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="px-3 sm:px-5 rounded-md sm:rounded-lg text-xs sm:text-md"
+              onClick={() => {
+                router.push(
+                  `/dashboard/overview/trendAnalysis?category=income&bank=${bank}`
+                );
+              }}
+            >
+              View More
+            </Button>
+          </CardHeader>
+          <div className="h-[250px] xs:h-[300px] md:h-[350px]">
+            {income.length !== 0 && (
+              <VisualiseLineChart
+                legend={true}
+                xAxis={false}
+                data={income}
+                colors={bankLabel.bankColorsLabel}
+                dataFormatter={bankLabel.dataFormatterPercentage}
+              />
+            )}
+          </div>
+        </Card>
+        <Card className="flex flex-col p-4 sm:p-4 md:p-8">
+          <CardHeader className="flex flex-row justify-between py-2 pb-4 px-0">
+            <CardTitle className="text-lg md:text-xl">Investments</CardTitle>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="px-3 sm:px-5 rounded-md sm:rounded-lg text-xs sm:text-md"
+              onClick={() => {
+                router.push(
+                  `/dashboard/overview/trendAnalysis?category=investments&bank=${bank}`
+                );
+              }}
+            >
+              View More
+            </Button>
+          </CardHeader>
+          <div className="h-[250px] xs:h-[300px] md:h-[350px]">
+            {investments.length !== 0 && (
+              <VisualiseLineChart
+                legend={true}
+                xAxis={false}
+                data={investments}
+                colors={bankLabel.bankColorsLabel}
+                dataFormatter={bankLabel.dataFormatterCurrency}
+              />
+            )}
+          </div>
+        </Card>
+        <Card className="flex flex-col p-4 sm:p-4 md:p-8">
+          <CardHeader className="flex flex-row justify-between py-2 pb-4 px-0">
+            <CardTitle className="text-lg md:text-xl">Total Deposits</CardTitle>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="px-3 sm:px-5 rounded-md sm:rounded-lg text-xs sm:text-md"
+              onClick={() => {
+                router.push(
+                  `/dashboard/overview/trendAnalysis?category=totalDeposits&bank=${bank}`
+                );
+              }}
+            >
+              View More
+            </Button>
+          </CardHeader>
+        </Card>
+        <Card className="flex flex-col p-4 sm:p-4 md:p-8">
+          <CardHeader className="flex flex-row justify-between py-2 pb-4 px-0">
+            <CardTitle className="text-lg md:text-xl">
+              Total Gross Loans
+            </CardTitle>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="px-3 sm:px-5 rounded-md sm:rounded-lg text-xs sm:text-md"
+              onClick={() => {
+                router.push(
+                  `/dashboard/overview/trendAnalysis?category=totalGrossLoans&bank=${bank}`
+                );
+              }}
+            >
+              View More
+            </Button>
+          </CardHeader>
+        </Card>
+      </div>
+    </div>
   );
 };
 

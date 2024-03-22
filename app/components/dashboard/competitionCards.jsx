@@ -1,31 +1,76 @@
 import React from "react";
-
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Card } from "../../../components/ui/card";
+import { useSelector } from "react-redux";
 
 import { TbCurrencyRiyal } from "react-icons/tb";
 
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+
 const CompetitionCards = ({ data }) => {
+  const banks = useSelector((state) => state.bank.banks);
+  if (!data || data.length === 0) {
+    return (
+      <ScrollArea className="w-full whitespace-nowrap">
+        <div className="flex w-full space-x-4 pb-5">
+          {Array.from({ length: 10 }, (_, index) => (
+            <Skeleton key={index} className="h-[90px] w-[280px]" />
+          ))}
+        </div>
+      </ScrollArea>
+    );
+  }
   return (
     <ScrollArea className="w-full whitespace-nowrap">
       <div className="flex w-full space-x-4 pb-5">
-        {data.map((item) => (
-          <Card key={item.category} className="w-[280px] p-3">
-            <div className="p-1 pl-2 overflow-hidden rounded-md text-xs font-bold bg-black text-white">
-              {item.category}
-            </div>
-            <div className="pt-2 text-xs">
-              <div className="flex flex-row justify-between font-bold text-foreground">
-                <div className="flex flex-row gap-2 text-green-600">{item.highest.name}</div>
-                <div className="flex flex-row gap-2">{item.highest.valueType === 'currency' ? <TbCurrencyRiyal size={16}/> : ''}{item.highest.value}</div>
+        {data.map((item) => {
+          if (!item) {
+            return null;
+          }
+          return (
+            <Card key={item.category} className="w-[280px] p-3">
+              <div className="p-1 pl-2 overflow-hidden rounded-md text-xs font-bold bg-black text-white">
+                {item.category}
               </div>
-              <div className="flex flex-row justify-between font-bold text-foreground">
-                <div className="flex flex-row gap-2 text-red-500">{item.lowest.name}</div>
-                <div className="flex flex-row gap-2">{item.lowest.valueType === 'currency' ? <TbCurrencyRiyal size={16}/> : ''}{item.lowest.value}</div>
+              <div className="pt-2 text-xs">
+                <div className="flex flex-row justify-between font-bold text-foreground">
+                  <div className="flex flex-row gap-2 text-green-600">
+                    {
+                      banks?.find((bank) => bank.id === item.highest.bankId)
+                        ?.name
+                    }
+                  </div>
+                  <div className="flex flex-row gap-2">
+                    {item.highest.valueType === "currency" ? (
+                      <TbCurrencyRiyal size={16} />
+                    ) : (
+                      ""
+                    )}
+                    {item.highest.value}
+                    {item.highest.valueType === "percentage" ? "%" : ""}
+                  </div>
+                </div>
+                <div className="flex flex-row justify-between font-bold text-foreground">
+                  <div className="flex flex-row gap-2 text-red-500">
+                    {
+                      banks?.find((bank) => bank.id === item.lowest.bankId)
+                        ?.name
+                    }
+                  </div>
+                  <div className="flex flex-row gap-2">
+                    {item.lowest.valueType === "currency" ? (
+                      <TbCurrencyRiyal size={16} />
+                    ) : (
+                      ""
+                    )}
+                    {item.lowest.value}
+                    {item.lowest.valueType === "percentage" ? "%" : ""}
+                  </div>
+                </div>
               </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
       </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>

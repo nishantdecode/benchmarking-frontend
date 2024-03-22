@@ -1,5 +1,4 @@
 import React from "react";
-import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 
 import { CgSelectR } from "react-icons/cg";
@@ -19,19 +18,13 @@ import OptionButtons from "@/app/components/visualise/optionButtons";
 
 const SelectCategory = ({
   categories,
+  setCategory,
   downloadPDF,
   downloadImage,
   downloadSheet,
 }) => {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const category = searchParams.get("category") || categories[0].category;
-
-  function navigate({ paramNameToUpdate, newValue }) {
-    const updatedParams = new URLSearchParams(searchParams);
-    updatedParams.set(paramNameToUpdate, newValue);
-    router.push(`?${updatedParams.toString()}`, { scroll: false });
-  }
+  const category = searchParams.get("category");
   return (
     <>
       <div className="hidden lg:flex flex-col justify-start w-full gap-2">
@@ -40,16 +33,13 @@ const SelectCategory = ({
             <Button
               key={index}
               variant={`${
-                category === item.category ? "selectActive" : "select"
+                category === item.value ? "selectActive" : "select"
               }`}
               onClick={() => {
-                navigate({
-                  paramNameToUpdate: "category",
-                  newValue: item.category,
-                });
+                setCategory(item.value)
               }}
             >
-              {item.category}
+              {item.name}
             </Button>
           );
         })}
@@ -61,7 +51,7 @@ const SelectCategory = ({
               variant="outline"
               className="flex justify-center gap-2 px-5 sm:px-10 rounded-lg w-full sm:w-[300px]"
             >
-              <CgSelectR size={20} /> {category}
+              <CgSelectR size={20} /> {categories.find(item => item.value === category)?.name}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-60">
@@ -70,27 +60,24 @@ const SelectCategory = ({
             <DropdownMenuRadioGroup
               value={category}
               onValueChange={(v) => {
-                navigate({
-                  paramNameToUpdate: "category",
-                  newValue: v,
-                });
+                setCategory(v)
               }}
             >
               {categories.map((item, index) => {
                 return (
                   <DropdownMenuRadioItem
                     key={index}
-                    value={`${item.category}`}
+                    value={`${item.value}`}
                     className="flex flex-row justify-start w-full pl-10"
                   >
-                    {item.category}
+                    {item.name}
                   </DropdownMenuRadioItem>
                 );
               })}
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        {["Total Deposits", "Total Gross Loans"].includes(category) ? (
+        {["totalDeposits", "totalGrossLoans"].includes(category) ? (
           <OptionButtons
             type="table"
             view={true}
