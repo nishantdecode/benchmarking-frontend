@@ -133,7 +133,7 @@ export function VisualiseTable({
           )}
         </div>
       </div>
-      <div className="rounded-md border max-h-[500px] sm:max-h-[650px] w-full overflow-scroll">
+      <div className=" !max-h-[500px] !sm:max-h-[650px] w-full ">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -156,7 +156,7 @@ export function VisualiseTable({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow

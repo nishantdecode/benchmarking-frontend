@@ -307,7 +307,7 @@ const AnalysisPage = () => {
                 categories={itemAnalysisCategories.balanceSheet}
               />
             </div>
-            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2  sm:gap-3 md:gap-8 lg:gap-10">
               {balanceSheet.length !== 0 && (
                 <VisualiseTable
                   exportXls="true"
@@ -329,7 +329,7 @@ const AnalysisPage = () => {
                 categories={itemAnalysisCategories.incomeStatement}
               />
             </div>
-            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2  sm:gap-3 md:gap-8 lg:gap-10">
               {incomeStatement.length !== 0 && (
                 <VisualiseTable
                   exportXls="true"
@@ -397,7 +397,7 @@ const AnalysisPage = () => {
                 categories={itemAnalysisCategories.msBalanceSheet}
               />
             </div>
-            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2  sm:gap-3 md:gap-8 lg:gap-10">
               {msBalanceSheet.length !== 0 && (
                 <VisualiseTable
                   exportXls="true"
@@ -421,7 +421,7 @@ const AnalysisPage = () => {
                 categories={itemAnalysisCategories.msIncomeStatement}
               />
             </div>
-            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2  sm:gap-3 md:gap-8 lg:gap-10">
               {msIncomeStatement.length !== 0 && (
                 <VisualiseTable
                   exportXls="true"
@@ -445,7 +445,7 @@ const AnalysisPage = () => {
                 categories={keyRatioCategories}
               />
             </div>
-            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
               {figuresCategory.length !== 0 && (
                 <VisualiseTable
                   data={figuresCategory}

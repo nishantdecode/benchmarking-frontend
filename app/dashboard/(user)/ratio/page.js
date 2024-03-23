@@ -210,7 +210,7 @@ const Ratio = () => {
             </span>
             <ToggleBank data={banks} bank={bank} setBank={setBank} />
           </div>
-          <div className="flex flex-col h-auto w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+          <div className="flex flex-col h-auto w-full lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
             {figures.length !== 0 && (
               <VisualiseTable
                 title={bank}

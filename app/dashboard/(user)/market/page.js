@@ -148,7 +148,7 @@ const Market = () => {
   }, [banks]);
 
   return (
-    <div className="flex flex-col justify-center items-start h-auto w-screen overflow-clip mt-14 p-5 pl-7 sm:pl-10 gap-10">
+    <div className="flex flex-col justify-center items-start h-auto w-full overflow-clip mt-14 p-5 pl-7 sm:pl-10 gap-10">
       <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
           <div className="flex flex-col justify-center items-center lg:items-start h-full w-full sm:w-auto lg:w-1/6 gap-7">
@@ -157,7 +157,7 @@ const Market = () => {
             </span>
             <ToggleBank data={banks} bank={bank} setBank={setBank} />
           </div>
-          <div className="flex flex-col h-auto w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+          <div className="flex flex-col h-auto w-[75vw] lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
             {individualMSData.length !== 0 && (
               <VisualiseTable
                 title={bank}
@@ -169,7 +169,7 @@ const Market = () => {
           </div>
         </div>
       </Card>
-      <Card className="flex flex-col items-center w-full h-auto p-3 md:p-5 gap-3 md:gap-5">
+      {/* <Card className="flex flex-col items-center w-full h-auto p-3 md:p-5 gap-3 md:gap-5">
         <div className="flex flex-col lg:flex-row justify-between items-center min-w-full gap-3">
           <span className="w-auto lg:w-1/6 text-2xl font-bold mt-2 truncate text-ellipsis">
             Comparision
@@ -209,7 +209,7 @@ const Market = () => {
             />
           </div>
         </div>
-      </Card>
+      </Card> */}
     </div>
   );
 };
