@@ -57,7 +57,7 @@ const Header = ({
                 variant="dropdown"
                 className="flex justify-between w-full lg:w-[180px] text-xs rounded-lg"
               >
-                <div className="flex flex-row gap-2">
+                <div className="flex flex-row gap-2 truncate">
                   <div className="flex flex-row justify-center items-center min-h-7 min-w-7 rounded-full bg-secondary dark:bg-white">
                     <AdvancedImage
                       className="w-4 h-4 object-cover rounded-full bg-white"
@@ -65,7 +65,7 @@ const Header = ({
                       plugins={[responsive(), placeholder()]}
                     />
                   </div>
-                  <div className="mt-1.5">
+                  <div className="mt-1.5 text-xs truncate text-ellipsis">
                     {!bank1 || bank1 === "null" ? "Select Bank:" : bank1}
                   </div>
                 </div>
@@ -106,7 +106,7 @@ const Header = ({
                 variant="dropdown"
                 className="flex justify-between w-full lg:w-[180px] text-xs rounded-lg"
               >
-                <div className="flex flex-row gap-2">
+                <div className="flex flex-row gap-2 truncate">
                   <div className="flex flex-row justify-center items-center min-h-7 min-w-7 rounded-full bg-secondary dark:bg-white">
                     <AdvancedImage
                       className="w-4 h-4 object-cover rounded-full bg-white"
@@ -114,7 +114,7 @@ const Header = ({
                       plugins={[responsive(), placeholder()]}
                     />
                   </div>
-                  <div className="mt-1.5">
+                  <div className="mt-1.5 text-xs truncate text-ellipsis">
                     {!bank2 || bank2 === "null" ? "Select Bank:" : bank2}
                   </div>
                 </div>
@@ -157,7 +157,7 @@ const Header = ({
                 variant="dropdown"
                 className="flex justify-between w-full lg:w-[180px] text-xs rounded-lg"
               >
-                <div className="flex flex-row gap-2">
+                <div className="flex flex-row gap-2 truncate">
                   <div className="flex flex-row justify-center items-center min-h-7 min-w-7 rounded-full bg-secondary dark:bg-white">
                     <AdvancedImage
                       className="w-4 h-4 object-cover rounded-full bg-white"
@@ -165,7 +165,7 @@ const Header = ({
                       plugins={[responsive(), placeholder()]}
                     />
                   </div>
-                  <div className="mt-1.5">
+                  <div className="mt-1.5 text-xs truncate text-ellipsis">
                     {!bank3 || bank3 === "null" ? "Select Bank:" : bank3}
                   </div>
                 </div>

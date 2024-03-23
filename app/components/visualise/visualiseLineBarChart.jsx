@@ -67,7 +67,7 @@ const VisualiseLineBarChart = forwardRef(function VisualiseBarChart(
       .map((category, ind) => {
         const lineObject = {
           type: "line",
-          label: category,
+          label: category + " COI%",
           data: data1.map((dataObj) => dataObj[category]),
           backgroundColor: [
             colors[ind] ? colors[ind] : darkenColor(colors[ind - 1], 0.3),
@@ -85,7 +85,7 @@ const VisualiseLineBarChart = forwardRef(function VisualiseBarChart(
         const barObject = [
           {
             type: "bar",
-            label: category,
+            label: category + " Operating Income",
             data: data2.map((dataObj) => dataObj[category]),
             backgroundColor: [
               colors[ind] ? colors[ind] : darkenColor(colors[ind - 1], 0.3),

@@ -280,7 +280,7 @@ const TrendAndCompetitionAnalysis = () => {
                   <VisualiseLineChart
                     ref={ref}
                     legend={true}
-                    xAxis={false}
+                    xAxis={true}
                     data={nim}
                     colors={bankLabel.bankColorsLabel}
                     dataFormatter={bankLabel.dataFormatterPercentage}
@@ -293,7 +293,7 @@ const TrendAndCompetitionAnalysis = () => {
                   <VisualiseLineChart
                     ref={ref}
                     legend={true}
-                    xAxis={false}
+                    xAxis={true}
                     data={cor}
                     colors={bankLabel.bankColorsLabel}
                     dataFormatter={bankLabel.dataFormatterPercentage}
@@ -318,7 +318,7 @@ const TrendAndCompetitionAnalysis = () => {
                   <VisualiseLineBarChart
                     ref={ref}
                     legend={true}
-                    xAxis={false}
+                    xAxis={true}
                     data1={income}
                     data2={operatingIncome}
                     colors={bankLabel.bankColorsLabel}
@@ -331,7 +331,7 @@ const TrendAndCompetitionAnalysis = () => {
                   <VisualiseBarChart
                     ref={ref}
                     legend={true}
-                    xAxis={false}
+                    xAxis={true}
                     data={investments}
                     colors={bankLabel.bankColorsLabel}
                     dataFormatter={bankLabel.dataFormatterCurrency}

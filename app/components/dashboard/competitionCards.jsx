@@ -46,7 +46,7 @@ const CompetitionCards = ({ data }) => {
                     ) : (
                       ""
                     )}
-                    {item.highest.value}
+                    {item.highest.value.toFixed(2)}
                     {item.highest.valueType === "percentage" ? "%" : ""}
                   </div>
                 </div>
@@ -63,7 +63,7 @@ const CompetitionCards = ({ data }) => {
                     ) : (
                       ""
                     )}
-                    {item.lowest.value}
+                    {item.lowest.value.toFixed(2)}
                     {item.lowest.valueType === "percentage" ? "%" : ""}
                   </div>
                 </div>

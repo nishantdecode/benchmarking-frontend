@@ -51,10 +51,10 @@ const MultiBankPage = () => {
   );
   const [checkedBanks, setCheckedBanks] = useState([]);
 
-  const banks = useSelector((state) => state.bank.banks);
+  const banks = useSelector((state) => state.bank.banks) || [];
 
   let assetsColumns = null;
-  if (assets.length !== 0) {
+  if (assets.length !== 0 && banks.length !== 0) {
     assetsColumns = generateColumns({
       data: assets,
       type: "progressBank",
@@ -63,7 +63,7 @@ const MultiBankPage = () => {
   }
 
   let liabilityColumns = null;
-  if (liabilities.length !== 0) {
+  if (liabilities.length !== 0 && banks.length !== 0) {
     liabilityColumns = generateColumns({
       data: liabilities,
       type: "progressBank",
@@ -72,7 +72,7 @@ const MultiBankPage = () => {
   }
 
   let equityColumns = null;
-  if (shareholdersEquity.length !== 0) {
+  if (shareholdersEquity.length !== 0 && banks.length !== 0) {
     equityColumns = generateColumns({
       data: shareholdersEquity,
       type: "progressBank",
@@ -81,7 +81,7 @@ const MultiBankPage = () => {
   }
 
   let incomeColumns = null;
-  if (operatingIncome.length !== 0) {
+  if (operatingIncome.length !== 0 && banks.length !== 0) {
     incomeColumns = generateColumns({
       data: operatingIncome,
       type: "progressBank",
@@ -90,7 +90,7 @@ const MultiBankPage = () => {
   }
 
   let expenseColumns = null;
-  if (operatingExpenses.length !== 0) {
+  if (operatingExpenses.length !== 0 && banks.length !== 0) {
     expenseColumns = generateColumns({
       data: operatingExpenses,
       type: "progressBank",
