@@ -22,9 +22,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 import showToast from "@/util/showToast";
-import {
-  useGetTablesDataMutation,
-} from "@/lib/features/services/individualBankApi";
+import { useGetTablesDataMutation } from "@/lib/features/services/individualBankApi";
 import { downloadSheet } from "@/util/exportUtils";
 import { SelectCategory } from "@/app/components/selectCategory";
 import { generateColumns } from "@/app/components/visualise/columns";
@@ -153,7 +151,12 @@ const Bank = () => {
           break;
         case "Cost of Risk %":
           tableGroups = {
-            costRisk: ["timeSaving", "otherIncomeRevenues", "provisions", "loan"],
+            costRisk: [
+              "timeSaving",
+              "otherIncomeRevenues",
+              "provisions",
+              "loan",
+            ],
           };
           break;
         case "Market Share %":
@@ -250,7 +253,15 @@ const Bank = () => {
         </DropdownMenu>
         <OptionButtons
           type="table"
-          downloadSheet={() => downloadSheet(data, "Sheet Name", "File Name")}
+          downloadSheet={() =>
+            downloadSheet(
+              Object.keys(data).map((item) => {
+                return data[item];
+              }),
+              Object.keys(data),
+              category
+            )
+          }
         />
       </div>
       <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
@@ -275,7 +286,7 @@ const Bank = () => {
             })}
           </Card>
         ) : (
-          <Skeleton className="hidden lg:flex h-full lg:h-[600px] w-full"/>
+          <Skeleton className="hidden lg:flex h-full lg:h-[600px] w-full" />
         )}
       </div>
     </div>

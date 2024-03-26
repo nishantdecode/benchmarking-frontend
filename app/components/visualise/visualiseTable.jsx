@@ -5,10 +5,10 @@ import { usePathname, useRouter } from "next/navigation";
 
 import {
   flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
   useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 
 import {
@@ -21,10 +21,10 @@ import {
 } from "@/components/ui/table";
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
   DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,12 +34,15 @@ import { IoIosArrowDown } from "react-icons/io";
 import { downloadSheet } from "@/util/exportUtils";
 
 export function VisualiseTable({
-  columns,
   data,
-  search,
-  exportXls,
-  navigate,
   title,
+  search,
+  columns,
+  navigate,
+  fileName,
+  exportXls,
+  sheetNames,
+  exportData = [],
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -64,7 +67,11 @@ export function VisualiseTable({
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col lg:flex-row w-full justify-between items-center gap-4">
-        {title && <span className="hidden lg:flex justify-center lg:justify-start w-full text-sm">{title}</span>}
+        {title && (
+          <span className="hidden lg:flex justify-center lg:justify-start w-full text-sm">
+            {title}
+          </span>
+        )}
         <div className="flex flex-col lg:flex-row w-full justify-between items-center lg:justify-end gap-4">
           {search && (
             <div className="flex flex-col sm:flex-row items-center justify-end w-full sm:w-auto gap-2">
@@ -103,9 +110,7 @@ export function VisualiseTable({
                   >
                     <DropdownMenuItem
                       value="xls"
-                      onClick={() =>
-                        downloadSheet(data, "Sheet Name", "File Name")
-                      }
+                      onClick={() => downloadSheet(exportData, sheetNames, fileName)}
                     >
                       <div className="flex flex-row justify-start gap-2">
                         <BsFiletypeXls size={15} className="mt-0.5" />

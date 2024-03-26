@@ -213,11 +213,14 @@ const Ratio = () => {
           <div className="flex flex-col h-auto w-full lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
             {figures.length !== 0 && (
               <VisualiseTable
+                search="true"
+                exportXls="true"
                 title={bank}
                 data={figures}
                 columns={columns}
-                search="true"
-                exportXls="true"
+                exportData={[figures]}
+                sheetNames={["figures"]}
+                fileName="Key Ratio Figures"
               />
             )}
           </div>

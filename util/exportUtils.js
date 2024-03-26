@@ -1,5 +1,7 @@
-import xlsx from "json-as-xlsx";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import { PDFDocument } from "pdf-lib";
+import jsonexport from "jsonexport";
 
 export const downloadImage = (ref) => {
   const link = document.createElement("a");
@@ -27,29 +29,42 @@ export const downloadPDF = async (ref) => {
   link.click();
 };
 
-export function downloadSheet(data, sheetName, fileName) {
-  const dataColumns = Object.keys(data[0])
-    .filter((key) => key !== "id")
-    .reverse()
-    .map((key, index) => {
-      if (index === 0) {
-        return { label: key, value: key };
-      } else {
-        return { label: key, value: key };
-      }
+export function downloadSheet(exportData, sheetNames, fileName) {
+  let ind = 0;
+  let csvData = {};
+  for (const item of exportData) {
+    jsonexport(item, function (err, csv) {
+      if (err) return console.error(err);
+      csvData[sheetNames[ind]] = csv;
     });
-    
-  let columns = [
-    {
-      sheet: sheetName,
-      columns: dataColumns,
-      content: data,
-    },
-  ];
+    ind++;
+  }
 
-  let settings = {
-    fileName: fileName,
-  };
+  const reversedCSVData = Object.fromEntries(
+    sheetNames.map((table) => {
+      const rows = csvData[table].split("\n");
 
-  xlsx(columns, settings);
+      const modifiedRows = rows.map((row) => {
+        const columns = row.split(",");
+        columns.reverse();
+        return columns.slice(1);
+      });
+      return [table, modifiedRows.join("\n")];
+    })
+  );
+
+  const workbook = XLSX.utils.book_new();
+
+  Object.entries(reversedCSVData).forEach(([table, csvContent]) => {
+    const csvData = csvContent.split("\n").map((row) => row.split(","));
+    const worksheet = XLSX.utils.aoa_to_sheet(csvData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, table);
+  });
+
+  const excelBuffer = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
+  const excelBlob = new Blob([excelBuffer], {
+    type: "application/octet-stream",
+  });
+
+  saveAs(excelBlob, fileName + ".xlsx");
 }
