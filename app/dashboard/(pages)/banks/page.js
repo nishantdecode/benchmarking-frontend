@@ -178,6 +178,9 @@ const Bank = () => {
           );
         }
         setData(transformedData);
+      } else {
+        setData([]);
+        showToast("No Data!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -255,11 +258,13 @@ const Bank = () => {
           type="table"
           downloadSheet={() =>
             downloadSheet(
+              banks,
+              null,
+              category,
+              Object.keys(data),
               Object.keys(data).map((item) => {
                 return data[item];
-              }),
-              Object.keys(data),
-              category
+              })
             )
           }
         />

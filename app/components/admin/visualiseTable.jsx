@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Cloudinary } from "@cloudinary/url-gen";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { AdvancedImage, responsive, placeholder } from "@cloudinary/react";
 
 import {
@@ -292,7 +292,7 @@ const userColumns = [
   },
 ];
 
-const adminColumns = [
+const organisationColumns = [
   {
     accessorKey: "name",
     header: () => {
@@ -321,41 +321,41 @@ const adminColumns = [
             )}
           </div>
           <span className="mt-2 text-xs truncate text-ellipsis">
-            {row.getValue("name").first} {row.getValue("name").last}
+            {row.getValue("name")}
           </span>
         </div>
       );
     },
   },
   {
-    accessorKey: "email",
+    accessorKey: "headquarter",
     header: () => {
       return (
         <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
-          Email ID
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      return (
-        <div className="text-center font-medium">{row.getValue("email")}</div>
-      );
-    },
-  },
-  {
-    accessorKey: "role",
-    header: () => {
-      return (
-        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
-          Role
+          Headquarter
         </div>
       );
     },
     cell: ({ row }) => {
       return (
         <div className="text-center font-medium">
-          {row.getValue("role")?.name}
+          {row.getValue("headquarter")}
         </div>
+      );
+    },
+  },
+  {
+    accessorKey: "contact",
+    header: () => {
+      return (
+        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
+          Contact
+        </div>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div className="text-center font-medium">{row.getValue("contact")}</div>
       );
     },
   },
@@ -367,7 +367,7 @@ const adminColumns = [
       );
     },
     cell: ({ row }) => {
-      const user = row.original;
+      const organisation = row.original;
       return (
         <div className="text-center font-medium">
           <Button
@@ -376,7 +376,7 @@ const adminColumns = [
             className="flex flex-row text-xs rounded-sm"
           >
             <Link
-              href={`/dashboard/admin/user?action=edit&userId=${user.id}&entity=Organisation`}
+              href={`/dashboard/admin/organisation?action=edit&organisationId=${organisation.id}`}
             >
               <BiEdit size={15} />
             </Link>
@@ -389,23 +389,25 @@ const adminColumns = [
 
 export function VisualiseTable({ data, columnName, role, search, title }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const category = searchParams.get("category");
+  const category = title;
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
 
   let columns = null;
   if (columnName === "bankColumns" && role === "SuperAdmin")
     columns = bankColumns;
-  else if (columnName === "bankColumns" && role === "Admin")
+  else if (
+    columnName === "bankColumns" &&
+    (role === "Admin" || role === "User")
+  )
     columns = bankViewColumns;
-  else if (columnName === "adminColumns" && role === "SuperAdmin")
-    columns = adminColumns;
+  else if (columnName === "organisationColumns" && role === "SuperAdmin")
+    columns = organisationColumns;
   else if (columnName === "userColumns") columns = userColumns;
 
   const table = useReactTable({
-    data,
-    columns,
+    data: data ? data : [],
+    columns: columns ? columns : [],
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
@@ -426,7 +428,7 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
           </div>
         )}
         <div className="flex flex-col lg:flex-row w-full justify-between items-center lg:justify-end gap-4">
-          {search && (
+          {data? search : false && (
             <div className="flex flex-col sm:flex-row items-center justify-end w-full sm:w-auto gap-2">
               <Input
                 placeholder="Filter data..."
@@ -446,9 +448,7 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
                   category === "Banks"
                     ? router.push("/dashboard/admin/bank?action=add")
                     : category === "Organisations"
-                    ? router.push(
-                        "/dashboard/admin/user?action=add&entity=Organisation"
-                      )
+                    ? router.push("/dashboard/admin/organisation?action=add")
                     : router.push(
                         "/dashboard/admin/user?action=add&entity=User"
                       )
@@ -480,27 +480,29 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
       </div>
       <div className="max-h-[500px] sm:max-h-[700px] w-full overflow-scroll rounded-md border">
         <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header, index) => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      className={`${index === 0 ? "border-r-[1px]" : ""}`}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
+          {data.length !== 0 && (
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header, index) => {
+                    return (
+                      <TableHead
+                        key={header.id}
+                        className={`${index === 0 ? "border-r-[1px]" : ""}`}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+          )}
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
@@ -526,7 +528,7 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={columns?.length}
                   className="h-24 text-center"
                 >
                   No results.

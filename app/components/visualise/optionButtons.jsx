@@ -36,7 +36,7 @@ const OptionButtons = ({
               variant="secondary"
               className="flex justify-between w-full sm:w-auto gap-2 text-xs"
             >
-              <div className="flex flex-row gap-2">Export as</div>
+              <div className="flex flex-row gap-2 text-primary font-bold">Export as</div>
               <IoIosArrowDown size={16} className="flex dark:text-primary" />
             </Button>
           </DropdownMenuTrigger>
@@ -69,7 +69,7 @@ const OptionButtons = ({
               variant="secondary"
               className="flex justify-between w-full sm:w-auto gap-2 text-xs"
             >
-              <div className="flex flex-row gap-2">Export as</div>
+              <div className="flex flex-row gap-2 text-primary font-bold">Export as</div>
               <IoIosArrowDown size={16} className="flex dark:text-primary" />
             </Button>
           </DropdownMenuTrigger>

@@ -32,7 +32,7 @@ const executiveSummaryCategories = [
     value: "operatingExpenses",
   },
   {
-    name: "Income before Provisions, Zakat and Taxes",
+    name: "Income before Provisions Zakat and Taxes",
     value: "income_before_provision_zakat_and_taxes",
   },
   {
@@ -729,7 +729,7 @@ const commonSizeCategories = {
       value: "depreciation_and_amortisation",
     },
     {
-      name: "Other General & Admin. Expenses",
+      name: "Other General & Admin Expenses",
       value: "other_general_and_admin_expenses",
     },
     {

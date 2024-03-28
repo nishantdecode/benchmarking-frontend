@@ -79,10 +79,7 @@ export function ToggleBank({ data, bank, setBank }) {
             <DropdownMenuRadioGroup
               value={bank}
               onValueChange={(v) => {
-                navigate({
-                  paramNameToUpdate: bankName,
-                  newValue: v,
-                });
+                setBank(v)
               }}
             >
               {data.map((item, index) => {

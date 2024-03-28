@@ -45,7 +45,7 @@ const VisualiseLineChart = forwardRef(function VisualiseLineChart(
     xAxis,
     legend = false,
     dataFormatter = function (value, index, ticks) {
-      return value.toFixed(2);
+      return value.toFixed(4);
     },
   },
   ref
@@ -54,7 +54,7 @@ const VisualiseLineChart = forwardRef(function VisualiseLineChart(
   const isSmallScreen = useMediaQuery("(max-width: 500px)");
   ChartJS.defaults.color = theme === "dark" ? "#fff" : "#000";
   ChartJS.defaults.borderColor = "rgba(0,0,0,0)";
-  ChartJS.defaults.backgroundColor = "rgba(75,192,192,1)";
+  ChartJS.defaults.backgroundColor = "rgba(1,1,1,1)";
   const fields = Object.keys(data[0]);
   const index = fields[0];
   const categories = fields.slice(1, fields.length);

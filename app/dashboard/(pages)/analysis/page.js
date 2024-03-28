@@ -24,6 +24,8 @@ import {
   useGetFiguresByCategoryMutation,
   useGetRatioMutation,
 } from "@/lib/features/services/keyRatioApi";
+import showToast from "@/util/showToast";
+import useMediaQuery from "@/app/hooks/useMediaQuery";
 import { SelectBanks } from "@/app/components/selectBanks";
 import { downloadImage, downloadPDF } from "@/util/exportUtils";
 import { SelectCategory } from "@/app/components/selectCategory";
@@ -36,6 +38,10 @@ import { useGetItemByCategoryMutation } from "@/lib/features/services/analysisAp
 
 const AnalysisPage = () => {
   let ref = useRef();
+
+  const break1 = useMediaQuery("(max-width: 1300px)");
+  const break2 = useMediaQuery("(max-width: 1450px)");
+  const break3 = useMediaQuery("(max-width: 1600px)");
 
   const [getRatio] = useGetRatioMutation();
   const [getAllYears] = useGetAllYearsMutation();
@@ -135,9 +141,15 @@ const AnalysisPage = () => {
       (item) => item.name === category
     ).value;
     try {
-      const response = await getItemCategory({ table, category:categoryValue });
+      const response = await getItemCategory({
+        table,
+        category: categoryValue,
+      });
       if (response.data) {
         setData(response.data.result);
+      } else {
+        setData([]);
+        showToast("No Data!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -164,6 +176,7 @@ const AnalysisPage = () => {
         if (response.data) {
           setRatio(response.data.result);
         } else {
+          setRatio([]);
           showToast("Error!", response.error.result);
         }
       }
@@ -180,6 +193,9 @@ const AnalysisPage = () => {
       const response = await getFiguresCategory({ category });
       if (response.data) {
         setFiguresCategory(response.data.result);
+      } else {
+        setFiguresCategory([]);
+        showToast("Error!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -197,6 +213,9 @@ const AnalysisPage = () => {
             `01/01/${response.data.result[response.data.result.length - 1]}`
           ),
         });
+      } else {
+        setDate([]);
+        showToast("Error!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -267,7 +286,11 @@ const AnalysisPage = () => {
                 variant="toggleActive"
                 className="flex justify-between text-md py-6 px-4 rounded-xl font-bold w-full sm:w-[230px]"
               >
-                {analysis} <IoIosArrowDown className="text-primary" size={23} />
+                {analysis}{" "}
+                <IoIosArrowDown
+                  className="text-secondary dark:text-primary"
+                  size={23}
+                />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-60">
@@ -298,51 +321,67 @@ const AnalysisPage = () => {
         </div>
         {analysis === "Balance Sheet/BN" ? (
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-            <div className="lg:sticky lg:top-14 h-auto w-full sm:w-auto lg:w-1/6">
+            <div className="lg:sticky lg:top-14 h-auto w-full sm:w-auto lg:w-[23vw] lg:max-w-1/6">
               <SelectCategory
-                height="h-[700px]"
+                height="h-[650px]"
                 search={true}
                 category={balanceSheetCategory}
                 setCategory={setBalanceSheetCategory}
                 categories={itemAnalysisCategories.balanceSheet}
               />
             </div>
-            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2  sm:gap-3 md:gap-8 lg:gap-10">
+            <div
+              className={`flex flex-col h-auto w-full ${
+                break1 ? "lg:w-[66vw]" : break2 ? "lg:w-[70vw]" : break3 ? "lg:w-[74vw]" : "lg:w-[76vw]"
+              } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}
+            >
               {balanceSheet.length !== 0 && (
                 <VisualiseTable
+                  value="value"
                   exportXls="true"
                   data={balanceSheet}
                   title={balanceSheetCategory}
                   columns={balanceSheetColumns}
+                  exportData={[balanceSheet]}
+                  sheetNames={["balanceSheet"]}
+                  fileName="Item Analysis - Balance Sheet"
                 />
               )}
             </div>
           </div>
         ) : analysis === "Income Statement/BN" ? (
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[23vw] lg:max-w-1/6">
               <SelectCategory
-                height="h-[700px]"
+                height="h-[650px]"
                 search={true}
                 category={incomeStatementCategory}
                 setCategory={setIncomeStatementCategory}
                 categories={itemAnalysisCategories.incomeStatement}
               />
             </div>
-            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2  sm:gap-3 md:gap-8 lg:gap-10">
+            <div
+              className={`flex flex-col h-auto w-full ${
+                break1 ? "lg:w-[66vw]" : break2 ? "lg:w-[70vw]" : break3 ? "lg:w-[74vw]" : "lg:w-[76vw]"
+              } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}
+            >
               {incomeStatement.length !== 0 && (
                 <VisualiseTable
+                  value="value"
                   exportXls="true"
                   data={incomeStatement}
                   title={incomeStatementCategory}
                   columns={incomeStatementColumns}
+                  exportData={[incomeStatement]}
+                  sheetNames={["incomeStatement"]}
+                  fileName="Item Analysis - Income Statement"
                 />
               )}
             </div>
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row justify-between items-start min-w-full gap-3">
-            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+          <div className="flex flex-col lg:flex-row justify-center lg:justify-between items-center min-w-full gap-3">
+            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[23vw] lg:max-w-1/6">
               <SelectCategory
                 height="h-[650px]"
                 search={true}
@@ -351,17 +390,40 @@ const AnalysisPage = () => {
                 categories={keyRatioCategories}
               />
             </div>
-            <div className="flex flex-col w-full lg:w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-5">
-              <div className="flex flex-row w-full justify-between">
-                <div className="text-xl font-semibold">{ratioCategory} :</div>
+            <div
+              className={`flex flex-col w-full ${
+                break1 ? "lg:w-[66vw]" : break2 ? "lg:w-[70vw]" : break3 ? "lg:w-[74vw]" : "lg:w-[76vw]"
+              } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-5`}
+            >
+              <div className="flex flex-col lg:flex-row w-full justify-center lg:justify-between items-center gap-5">
+                <div className="hidden lg:flex text-xl font-semibold">
+                  {ratioCategory} :
+                </div>
                 <OptionButtons
-                  downloadImage={() => downloadImage(ref)}
-                  downloadPDF={() => downloadPDF(ref)}
+                  downloadImage={() =>
+                    downloadImage(
+                      ref,
+                      banks,
+                      checkedBanks,
+                      "Item Analysis - Key Ratios",
+                      `${ratioCategory}`,
+                      "#666"
+                    )
+                  }
+                  downloadPDF={() =>
+                    downloadPDF(
+                      ref,
+                      banks,
+                      checkedBanks,
+                      "Item Analysis - Key Ratios",
+                      `${ratioCategory}`,
+                      "#666"
+                    )
+                  }
                   type="chart"
-                  view={true}
                 />
               </div>
-              <div className="flex flex-row h-full w-full">
+              <div className="flex flex-col lg:flex-row items-center h-full w-full gap-4">
                 <div className="flex flex-col h-[300px] md:h-[600px] w-full lg:w-4/5 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
                   {ratio.length !== 0 && (
                     <VisualiseLineChart
@@ -388,22 +450,30 @@ const AnalysisPage = () => {
       {analysis === "Balance Sheet/BN" ? (
         <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+            <div className="lg:sticky lg:top-14 flex h-full w-full sm:w-auto lg:w-[23vw] lg:max-w-1/6">
               <SelectCategory
-                height="h-[700px]"
+                height="h-[650px]"
                 search={true}
                 category={msBalanceSheetCategory}
                 setCategory={setMsBalanceSheetCategory}
                 categories={itemAnalysisCategories.msBalanceSheet}
               />
             </div>
-            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2  sm:gap-3 md:gap-8 lg:gap-10">
+            <div
+              className={`flex flex-col h-auto w-full ${
+                break1 ? "lg:w-[66vw]" : break2 ? "lg:w-[70vw]" : break3 ? "lg:w-[74vw]" : "lg:w-[76vw]"
+              } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}
+            >
               {msBalanceSheet.length !== 0 && (
                 <VisualiseTable
+                  value="share"
                   exportXls="true"
                   data={msBalanceSheet}
                   title={msBalanceSheetCategory}
                   columns={msBalanceSheetColumns}
+                  exportData={[msBalanceSheet]}
+                  sheetNames={["msBalanceSheet"]}
+                  fileName="Item Analysis - Balance Sheet Market Share"
                 />
               )}
             </div>
@@ -412,22 +482,30 @@ const AnalysisPage = () => {
       ) : analysis === "Income Statement/BN" ? (
         <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[23vw] lg:max-w-1/6">
               <SelectCategory
-                height="h-[700px]"
+                height="h-[650px]"
                 search={true}
                 category={msIncomeStatementCategory}
                 setCategory={setMsIncomeStatementCategory}
                 categories={itemAnalysisCategories.msIncomeStatement}
               />
             </div>
-            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2  sm:gap-3 md:gap-8 lg:gap-10">
+            <div
+              className={`flex flex-col h-auto w-full ${
+                break1 ? "lg:w-[66vw]" : break2 ? "lg:w-[70vw]" : break3 ? "lg:w-[74vw]" : "lg:w-[76vw]"
+              } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}
+            >
               {msIncomeStatement.length !== 0 && (
                 <VisualiseTable
+                  value="share"
                   exportXls="true"
                   data={msIncomeStatement}
                   title={msIncomeStatementCategory}
                   columns={msIncomeStatementColumns}
+                  exportData={[msIncomeStatement]}
+                  sheetNames={["msIncomeStatement"]}
+                  fileName="Item Analysis - Income Statement Market Share"
                 />
               )}
             </div>
@@ -436,22 +514,29 @@ const AnalysisPage = () => {
       ) : (
         <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[23vw] lg:max-w-1/6">
               <SelectCategory
-                height="h-[700px]"
+                height="h-[650px]"
                 search={true}
                 category={ratioCategory}
                 setCategory={setRatioCategory}
                 categories={keyRatioCategories}
               />
             </div>
-            <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
+            <div
+              className={`flex flex-col h-auto w-full ${
+                break1 ? "lg:w-[66vw]" : break2 ? "lg:w-[70vw]" : break3 ? "lg:w-[74vw]" : "lg:w-[76vw]"
+              } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}
+            >
               {figuresCategory.length !== 0 && (
                 <VisualiseTable
-                  data={figuresCategory}
-                  columns={ratioColumns}
-                  title={ratioCategory}
                   exportXls="true"
+                  data={figuresCategory}
+                  title={ratioCategory}
+                  columns={ratioColumns}
+                  exportData={[figuresCategory]}
+                  sheetNames={["figuresCategory"]}
+                  fileName="Item Analysis - Key Ratio"
                 />
               )}
             </div>

@@ -13,6 +13,7 @@ import {
   useGetRatioMutation,
 } from "@/lib/features/services/keyRatioApi";
 import showToast from "@/util/showToast";
+import useMediaQuery from "@/app/hooks/useMediaQuery";
 import { ToggleBank } from "@/app/components/toggleBank";
 import { SelectBanks } from "@/app/components/selectBanks";
 import { downloadImage, downloadPDF } from "@/util/exportUtils";
@@ -26,6 +27,8 @@ import VisualiseLineChart from "@/app/components/visualise/visualiseLineChart";
 
 const Ratio = () => {
   let ref = useRef();
+
+  const break1 = useMediaQuery("(max-width: 1270px)");
 
   const [getRatio] = useGetRatioMutation();
   const [getFigures] = useGetFiguresMutation();
@@ -78,6 +81,9 @@ const Ratio = () => {
       if (response.data) {
         const transformedData = replaceCategoryNames(response.data.result);
         setFigures(transformedData);
+      } else {
+        setFigures([]);
+        showToast("No Data!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -104,7 +110,8 @@ const Ratio = () => {
         if (response.data) {
           setRatio(response.data.result);
         } else {
-          showToast("Error!", response.error.result);
+          setRatio([]);
+          showToast("No Data!", response.error.result);
         }
       }
     } catch (err) {
@@ -169,8 +176,26 @@ const Ratio = () => {
           <div className="flex justify-center lg:justify-end w-full lg:w-1/6">
             <OptionButtons
               type="chart"
-              downloadPDF={() => downloadPDF(ref)}
-              downloadImage={() => downloadImage(ref)}
+              downloadPDF={() =>
+                downloadPDF(
+                  ref,
+                  banks,
+                  checkedBanks,
+                  "Key Ratios",
+                  `${category}  ${date.startDate.getFullYear()} - ${date.endDate.getFullYear()}`,
+                  "#666"
+                )
+              }
+              downloadImage={() =>
+                downloadImage(
+                  ref,
+                  banks,
+                  checkedBanks,
+                  "Key Ratios",
+                  `${category}  ${date.startDate.getFullYear()} - ${date.endDate.getFullYear()}`,
+                  "#666"
+                )
+              }
             />
           </div>
         </div>
@@ -204,13 +229,13 @@ const Ratio = () => {
       </Card>
       <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-          <div className="flex flex-col justify-center items-center lg:items-start h-full w-full sm:w-auto lg:w-1/6 gap-7">
+          <div className="flex flex-col justify-center items-center lg:items-start h-full w-full sm:auto lg:w-[25vw] lg:max-w-1/6 gap-7">
             <span className="text-lg lg:text-2xl font-bold truncate text-ellipsis">
               Individual Bank
             </span>
             <ToggleBank data={banks} bank={bank} setBank={setBank} />
           </div>
-          <div className="flex flex-col h-auto w-full lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
+          <div className={`flex flex-col h-auto w-full ${break1 ? "lg:w-[69vw]" : "lg:w-[75vw]"} lg:max-w-5/6  gap-2 sm:gap-3 md:gap-8 lg:gap-10`}>
             {figures.length !== 0 && (
               <VisualiseTable
                 search="true"

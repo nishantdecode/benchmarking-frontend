@@ -156,7 +156,7 @@ const BankPage = () => {
             onClick={() => {
               router.push("/dashboard/admin");
             }}
-            className="mt-1"
+            className="cursor-pointer mt-1"
           />
           <RxAvatar size={32} />
           <h1 className="pl-1 text-lg sm:text-2xl text-foreground dark:text-foreground">
@@ -307,20 +307,6 @@ const BankPage = () => {
               </div>
             </form>
           </Form>
-          {searchParams.get("action") === "edit" ? (
-            <div className="flex flex-row w-full justify-center md:justify-start">
-              <Button
-                variant="destructive"
-                className="p-0 text-sm md:mt-[-80px]"
-                onClick={() => {}}
-              >
-                <MdDelete size={24} />
-                Delete User
-              </Button>
-            </div>
-          ) : (
-            <></>
-          )}
         </Card>
       </div>
     </div>

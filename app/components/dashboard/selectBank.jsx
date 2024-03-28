@@ -51,7 +51,7 @@ const SelectBank = ({ banks, bank, setBank }) => {
                       : "hover:bg-secondary/50 dark:hover:bg-toggle/80"
                   } border-0`}
                 >
-                  <CardContent className="flex items-center justify-start w-full p-2 px-4 gap-4 truncate">
+                  <CardContent className="cursor-pointer flex items-center justify-start w-full p-2 px-4 gap-4 truncate">
                     <div
                       className="min-h-5 min-w-5"
                       style={{ backgroundColor: item.color }}

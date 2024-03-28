@@ -115,7 +115,7 @@ const progressCol = ({ key, color }) => {
       return (
         <div className="flex flex-row w-full">
           <Progress value={row.getValue(key)} bg={color}>
-            {row.getValue(key)?.toFixed(2)+"%"}
+            {row.getValue(key)?.toFixed(4) + "%"}
           </Progress>
         </div>
       );
@@ -134,11 +134,13 @@ const progressBankCol = ({ key, banks }) => {
       );
     },
     cell: ({ row }) => {
-      const color = banks?.find(item => item.name.toString() === key.toString()).color
+      const color = banks?.find(
+        (item) => item.name.toString() === key.toString()
+      ).color;
       return (
         <div className="flex flex-row w-full">
           <Progress value={row.getValue(key)} bg={color}>
-            {row.getValue(key).toFixed(2)+"%"}
+            {row.getValue(key) || "0.0000" + "%"}
           </Progress>
         </div>
       );
@@ -151,7 +153,7 @@ const itemRankCol = ({ key, banks }) => {
     accessorKey: key,
     header: ({ column }) => {
       return (
-        <div className="flex flex-row justify-center font-bold min-w-[150px] gap-2">
+        <div className="flex flex-row justify-center font-bold min-w-[190px] gap-2">
           {key}
         </div>
       );
@@ -163,7 +165,7 @@ const itemRankCol = ({ key, banks }) => {
             {row.getValue(key).value}
           </div>
           <div
-            className="flex flex-row justify-center items-center h-6 w-6 rounded-full font-bold"
+            className="flex flex-row justify-center items-center h-6 w-6 rounded-full font-bold text-white"
             style={{
               backgroundColor: banks?.find(
                 (item) =>
@@ -191,7 +193,7 @@ const rankCol = ({ key, banks }) => {
       );
     },
     cell: ({ row }) => {
-      const bank = banks?.find(item => item.name === row.getValue(key))
+      const bank = banks?.find((item) => item.name === row.getValue(key));
       const cld = new Cloudinary({
         cloud: {
           cloudName: "dohnlambm",
@@ -227,7 +229,7 @@ const msCol = ({ key, banks }) => {
     accessorKey: key,
     header: ({ column }) => {
       return (
-        <div className="flex flex-row justify-between pl-2 pr-6 font-bold min-w-[200px] gap-2">
+        <div className="flex flex-row justify-between pl-2 pr-6 font-bold min-w-[240px] gap-2">
           {key}
           <div>Market Share</div>
         </div>
@@ -235,13 +237,13 @@ const msCol = ({ key, banks }) => {
     },
     cell: ({ row }) => {
       return (
-        <div className="flex flex-row justify-between">
+        <div className="flex flex-row justify-between px-2">
           <div className="text-center font-medium">
             {row.getValue(key).value}
           </div>
           <Progress
             value={row.getValue(key).share}
-            className="w-[150px]"
+            className="w-[120px]"
             bg={
               banks?.find(
                 (item) =>
@@ -250,7 +252,7 @@ const msCol = ({ key, banks }) => {
               )?.color
             }
           >
-            {row.getValue(key).share}
+            {row.getValue(key).share + "%"}
           </Progress>
         </div>
       );

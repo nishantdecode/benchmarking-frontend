@@ -105,7 +105,7 @@ const Header = ({ pathname }) => {
             onClick={() => {
               router.push("/dashboard");
             }}
-            className="mt-1"
+            className="cursor-pointer mt-1"
           />
           {icon}
           <h1 className="pl-1 text-lg sm:text-2xl text-foreground dark:text-foreground">

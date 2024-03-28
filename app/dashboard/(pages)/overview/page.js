@@ -11,6 +11,7 @@ import {
   useGetAllYearsMutation,
   useGetRatioBankMutation,
 } from "@/lib/features/services/keyRatioApi";
+import showToast from "@/util/showToast";
 import SelectBank from "@/app/components/dashboard/selectBank";
 import { visualisationLabelUtils } from "@/util/visualizationLabelUtils";
 import CompetitionCards from "@/app/components/dashboard/competitionCards";
@@ -18,7 +19,7 @@ import CompetitionHeader from "@/app/components/dashboard/competitionHeader";
 import VisualiseBarChart from "@/app/components/visualise/visualiseBarChart";
 import { useGetItemBankMutation } from "@/lib/features/services/analysisApi";
 import VisualiseLineChart from "@/app/components/visualise/visualiseLineChart";
-import { useGetCompetitionDataMutation } from "@/lib/features/services/individualBankApi";
+import { useGetBankDataMutation, useGetCompetitionDataMutation } from "@/lib/features/services/individualBankApi";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -26,6 +27,7 @@ const Dashboard = () => {
   const [getAllYears] = useGetAllYearsMutation();
   const [getItemBank] = useGetItemBankMutation();
   const [getRatioBank] = useGetRatioBankMutation();
+  const [getBankData] = useGetBankDataMutation();
   const [getCompetition] = useGetCompetitionDataMutation();
 
   const [years, setYears] = useState([]);
@@ -38,6 +40,8 @@ const Dashboard = () => {
   const [incomeExpense, setIncomeExpense] = useState([]);
   const [income, setIncome] = useState([]);
   const [investments, setInvestments] = useState([]);
+  const [totalDeposits, setTotalDeposits] = useState([]);
+  const [totalGrossLoans, setTotalGrossLoans] = useState([]);
 
   const banks = useSelector((state) => state.bank.banks);
 
@@ -67,6 +71,9 @@ const Dashboard = () => {
       let response = await getCompetition({ year });
       if (response.data) {
         setCompetition(response.data.result);
+      } else {
+        setCompetition([]);
+        showToast("No Data!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -78,6 +85,9 @@ const Dashboard = () => {
       const response = await getRatioBank({ bankIds, category });
       if (response.data) {
         setData(response.data.result);
+      } else {
+        setData([]);
+        showToast("No Data!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -89,6 +99,23 @@ const Dashboard = () => {
       const response = await getItemBank({ bankIds, table, category });
       if (response.data) {
         setData(response.data.result);
+      } else {
+        setData([]);
+        showToast("No Data!", response.error.result);
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
+
+  const getBankLineData = async ({ bankId, table, category, setData }) => {
+    try {
+      const response = await getBankData({ bankId, table, category });
+      if (response.data) {
+        setData(response.data.result);
+      } else {
+        setData([]);
+        showToast("No Data!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -158,6 +185,24 @@ const Dashboard = () => {
         table: "incomeStatement",
         category: "operatingExpenses",
         setData: setOperatingExpense,
+      });
+    }
+  }, [bank]);
+
+  useEffect(() => {
+    if (bank) {
+      const bankId = banks.find((item) => item.name === bank).id;
+      getBankLineData({
+        bankId,
+        table: "customerDeposit",
+        category: "totalDeposits",
+        setData: setTotalDeposits,
+      });
+      getBankLineData({
+        bankId,
+        table: "total",
+        category: "gross",
+        setData: setTotalGrossLoans,
       });
     }
   }, [bank]);
@@ -389,12 +434,21 @@ const Dashboard = () => {
               View More
             </Button>
           </CardHeader>
+          <div className="h-[250px] xs:h-[300px] md:h-[350px]">
+            {totalDeposits.length !== 0 && (
+              <VisualiseLineChart
+                legend={true}
+                xAxis={false}
+                data={totalDeposits}
+                colors={bankLabel.bankColorsLabel}
+                dataFormatter={bankLabel.dataFormatterCurrency}
+              />
+            )}
+          </div>
         </Card>
         <Card className="flex flex-col p-4 sm:p-4 md:p-8">
           <CardHeader className="flex flex-row justify-between py-2 pb-4 px-0">
-            <CardTitle className="text-lg md:text-xl">
-              Total Gross Loans
-            </CardTitle>
+            <CardTitle className="text-lg md:text-xl">Total Gross Loans</CardTitle>
             <Button
               size="sm"
               variant="secondary"
@@ -408,6 +462,17 @@ const Dashboard = () => {
               View More
             </Button>
           </CardHeader>
+          <div className="h-[250px] xs:h-[300px] md:h-[350px]">
+            {totalGrossLoans.length !== 0 && (
+              <VisualiseLineChart
+                legend={true}
+                xAxis={false}
+                data={totalGrossLoans}
+                colors={bankLabel.bankColorsLabel}
+                dataFormatter={bankLabel.dataFormatterCurrency}
+              />
+            )}
+          </div>
         </Card>
       </div>
     </div>

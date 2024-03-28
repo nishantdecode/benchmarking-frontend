@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useTheme } from "next-themes";
+import { Cloudinary } from "@cloudinary/url-gen";
 import { useSelector, useDispatch } from "react-redux";
 import { usePathname, useRouter } from "next/navigation";
+import { AdvancedImage, responsive, placeholder } from "@cloudinary/react";
 import { setAuthenticated, setUser } from "@/lib/features/slices/authSlice";
 
 import { RxAvatar } from "react-icons/rx";
@@ -34,20 +36,28 @@ const Navbar = () => {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
 
-  const user = useSelector((state) => state.auth.user)
+  const user = useSelector((state) => state.auth.user);
+
+  const [publicId] = useState(user?.picture);
+  const cld = new Cloudinary({
+    cloud: {
+      cloudName: "dohnlambm",
+    },
+  });
+  const myImage = cld.image(publicId);
 
   const handleLogout = () => {
     dispatch(setUser(undefined));
     dispatch(setAuthenticated(false));
     router.push("/dashboard/login");
-    localStorage.removeItem('accessToken');
-    showToast("Logged Out!","Please Login.")
+    localStorage.removeItem("accessToken");
+    showToast("Logged Out!", "Please Login.");
   };
 
   return (
     <div>
-      <Drawer direction="left" className="h-full">
-        <DrawerTrigger asChild>
+      <Drawer direction="left" className="select-none h-full">
+        <DrawerTrigger asChild className="select-none">
           <div className="fixed top-0 flex flex-col justify-center w-2 h-screen bg-card dark:bg-card">
             <div className="flex flex-col justify-center align-middle w-5 h-16 rounded-r-full bg-card dark:bg-card">
               <IoIosArrowForward className="text-primary font-bold size-6" />
@@ -81,22 +91,43 @@ const Navbar = () => {
               ) : (
                 <MdOutlineLightMode size={20} />
               )}
-              <div>{theme} Mode</div>
+              <div>
+                {theme && theme[0]?.toUpperCase() + theme?.slice(1)} Mode
+              </div>
             </Button>
-            <Button variant={`${pathname === '/dashboard/admin' ? 'default' : 'link'}`} className="w-full gap-3" onClick={()=>{router.push('/dashboard/admin')}}>
-              <RxAvatar size={20} />
+            <Button
+              variant={`${
+                pathname === "/dashboard/admin" ? "default" : "link"
+              }`}
+              className="w-full gap-3"
+              onClick={() => {
+                router.push("/dashboard/admin");
+              }}
+            >
+              {publicId ? (
+                <AdvancedImage
+                  className="w-6 h-6 object-cover border-[1px] rounded-full bg-white"
+                  cldImg={myImage}
+                  plugins={[responsive(), placeholder()]}
+                />
+              ) : (
+                <RxAvatar size={20} className="text-foreground" />
+              )}
               <div>
                 {user?.name?.first} {user?.name?.last}
               </div>
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="w-full font-bold gap-3">
+                <Button
+                  variant="destructive"
+                  className="w-full font-bold gap-3"
+                >
                   <LuLogOut size={20} />
                   <div>Logout</div>
                 </Button>
               </AlertDialogTrigger>
-              <LogoutDialog handleLogout={handleLogout}/>
+              <LogoutDialog handleLogout={handleLogout} />
             </AlertDialog>
           </DrawerFooter>
         </DrawerContent>

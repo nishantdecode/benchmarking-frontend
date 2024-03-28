@@ -1,7 +1,7 @@
 "use client";
 
 import * as z from "zod";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import showToast from "@/util/showToast";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -26,6 +27,8 @@ const formSchema = z.object({
 });
 
 const Login = () => {
+  const [type, setType] = useState("password");
+
   const [login, { isLoading, error }] = useLoginMutation();
   const router = useRouter();
   const form = useForm({
@@ -35,6 +38,14 @@ const Login = () => {
       password: "",
     },
   });
+
+  const handleToggle = () => {
+    if (type === "password") {
+      setType("text");
+    } else {
+      setType("password");
+    }
+  };
 
   const handleSubmit = async (values) => {
     const credentials = {
@@ -49,14 +60,13 @@ const Login = () => {
           localStorage.setItem("accessToken", response.data.result.token);
           router.push("/");
         } else {
-          if(Number(response.error.status) >= 500)
-            showToast("Server Error",response.error.data.message)
-          else 
-            showToast("Login Error",response.error.data.message)
+          if (Number(response.error.status) >= 500)
+            showToast("Server Error", response.error.data.message);
+          else showToast("Login Error", response.error.data.message);
         }
       }
     } catch (err) {
-      showToast("Error Logging In!","Please try again later.")
+      showToast("Error Logging In!", "Please try again later.");
     }
   };
   return (
@@ -104,12 +114,24 @@ const Login = () => {
                       Password* :
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="password"
-                        type="password"
-                        {...field}
-                        className="md:max-w-[300px]"
-                      />
+                      <div className="relative w-full md:max-w-[300px]">
+                        <Input
+                          placeholder="Password"
+                          type={type}
+                          {...field}
+                          className="md:max-w-[300px]"
+                        />
+                        <span
+                          className="absolute right-2 top-1.5 bottom-0 m-auto cursor-pointer"
+                          onClick={handleToggle}
+                        >
+                          {type === "password" ? (
+                            <IoEyeOff size={25} />
+                          ) : (
+                            <IoEye size={25} />
+                          )}
+                        </span>
+                      </div>
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -122,7 +144,7 @@ const Login = () => {
               size="sm"
               variant={isLoading ? "ghost" : "default"}
               type="submit"
-              className="w-auto text-xs justify-center px-8 py-0 rounded-xl"
+              className="select-none w-auto text-xs justify-center px-8 py-0 rounded-xl"
             >
               Submit
             </Button>
@@ -132,7 +154,7 @@ const Login = () => {
       <div className="flex flex-row w-full justify-center md:justify-start">
         <Button
           variant="link"
-          className="p-0 text-xs md:mt-[-40px]"
+          className="select-none p-0 text-xs md:mt-[-40px]"
           onClick={() => router.push("/dashboard/forgetPassword")}
         >
           Forget Password?
