@@ -203,13 +203,11 @@ const Header = ({
         {["totalDeposits", "totalGrossLoans"].includes(category) ? (
           <OptionButtons
             type="table"
-            view={true}
             downloadSheet={downloadSheet}
           />
         ) : (
           <OptionButtons
             type="chart"
-            view={true}
             downloadPDF={downloadPDF}
             downloadImage={downloadImage}
           />

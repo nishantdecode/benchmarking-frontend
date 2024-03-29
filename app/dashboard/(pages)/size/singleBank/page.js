@@ -18,12 +18,15 @@ import {
 import showToast from "@/util/showToast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import useMediaQuery from "@/app/hooks/useMediaQuery";
 import { ToggleBank } from "@/app/components/toggleBank";
 import { generateColumns } from "@/app/components/visualise/columns";
 import { useGetSizeByBankMutation } from "@/lib/features/services/sizeApi";
 import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
 
 const SingleBankPage = () => {
+  const break1 = useMediaQuery("(max-width: 1310px)");
+
   const [getSizeByBank] = useGetSizeByBankMutation();
 
   const [individualBankSize, setIndividualBankSize] = useState(null);
@@ -105,7 +108,7 @@ const SingleBankPage = () => {
       const response = await getSizeByBank({ bankId });
       if (response.data) {
         let data = response.data.result;
-        let transformedData = {}
+        let transformedData = {};
         for (const item of Object.keys(data)) {
           transformedData[item] = replaceCategoryNames(
             data[item],
@@ -113,6 +116,9 @@ const SingleBankPage = () => {
           );
         }
         setIndividualBankSize(transformedData);
+      } else {
+        setIndividualBankSize(null);
+        showToast("No Data!", undefined);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -141,7 +147,7 @@ const SingleBankPage = () => {
   return (
     <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10">
       <Card className="flex flex-col lg:flex-row h-auto w-full p-3 md:p-5 gap-3 lg:gap-2">
-        <div className="lg:sticky lg:top-14 flex flex-col justify-start items-center h-full w-full lg:w-1/6 pr-2 gap-5">
+        <div className="lg:sticky lg:top-14 flex flex-col justify-start items-center h-full w-full lg:w-[23vw] lg:max-w-1/6 pr-2 gap-5">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -168,7 +174,7 @@ const SingleBankPage = () => {
           <ToggleBank data={banks} bank={bank} setBank={setBank} />
         </div>
         {size === "BS-CS" ? (
-          <div className="flex flex-col justify-start items-center w-full lg:w-5/6 gap-10">
+          <div className={`flex flex-col h-auto w-full ${break1 ? "lg:w-[67vw]" : "lg:w-[75vw]"} lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}>
             <div className="h-auto w-full">
               {individualBankSize && (
                 <VisualiseTable
@@ -186,9 +192,20 @@ const SingleBankPage = () => {
                     </div>
                   }
                   navigate={true}
-                  exportXls={true}
-                  columns={assetsColumns}
+                  exportXls="true"
                   data={individualBankSize.assets}
+                  columns={assetsColumns}
+                  fileName="Common Size Individual Bank"
+                  sheetNames={[
+                    "assets",
+                    "liabilities",
+                    "shareholdersEquity",
+                    "operatingIncome",
+                    "operatingExpense",
+                  ]}
+                  exportData={Object.keys(individualBankSize).map((item) => {
+                    return individualBankSize[item];
+                  })}
                 />
               )}
             </div>
@@ -258,9 +275,20 @@ const SingleBankPage = () => {
                     </div>
                   }
                   navigate={true}
-                  exportXls={true}
-                  columns={incomeColumns}
+                  exportXls="true"
                   data={individualBankSize.operating_income}
+                  columns={incomeColumns}
+                  fileName="Common Size Individual Bank"
+                  sheetNames={[
+                    "assets",
+                    "liabilities",
+                    "shareholdersEquity",
+                    "operatingIncome",
+                    "operatingExpense",
+                  ]}
+                  exportData={Object.keys(individualBankSize).map((item) => {
+                    return individualBankSize[item];
+                  })}
                 />
               )}
             </div>

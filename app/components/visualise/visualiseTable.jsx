@@ -1,14 +1,15 @@
 "use client";
 
 import React from "react";
+import { useSelector } from "react-redux";
 import { usePathname, useRouter } from "next/navigation";
 
 import {
   flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
   useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 
 import {
@@ -21,10 +22,10 @@ import {
 } from "@/components/ui/table";
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
   DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,16 +35,22 @@ import { IoIosArrowDown } from "react-icons/io";
 import { downloadSheet } from "@/util/exportUtils";
 
 export function VisualiseTable({
-  columns,
   data,
-  search,
-  exportXls,
-  navigate,
   title,
+  width,
+  search,
+  columns,
+  navigate,
+  fileName,
+  exportXls,
+  sheetNames,
+  value = null,
+  exportData = [],
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const page = pathname.split("/")[pathname.split("/").length - 1];
+  const banks = useSelector((state) => state.bank.banks);
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
 
@@ -62,9 +69,13 @@ export function VisualiseTable({
   });
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col w-full gap-5">
       <div className="flex flex-col lg:flex-row w-full justify-between items-center gap-4">
-        {title && <span className="hidden lg:flex justify-center lg:justify-start w-full text-sm">{title}</span>}
+        {title && (
+          <span className="hidden lg:flex justify-center lg:justify-start w-full text-sm">
+            {title}
+          </span>
+        )}
         <div className="flex flex-col lg:flex-row w-full justify-between items-center lg:justify-end gap-4">
           {search && (
             <div className="flex flex-col sm:flex-row items-center justify-end w-full sm:w-auto gap-2">
@@ -88,7 +99,9 @@ export function VisualiseTable({
                     variant="secondary"
                     className="flex justify-between w-auto gap-2 text-xs"
                   >
-                    <div className="flex flex-row gap-2">Export as</div>
+                    <div className="flex flex-row gap-2 text-primary font-bold">
+                      Export as
+                    </div>
                     <IoIosArrowDown
                       size={16}
                       className="flex dark:text-primary"
@@ -104,7 +117,13 @@ export function VisualiseTable({
                     <DropdownMenuItem
                       value="xls"
                       onClick={() =>
-                        downloadSheet(data, "Sheet Name", "File Name")
+                        downloadSheet(
+                          banks,
+                          value,
+                          fileName,
+                          sheetNames,
+                          exportData
+                        )
                       }
                     >
                       <div className="flex flex-row justify-start gap-2">
@@ -133,7 +152,7 @@ export function VisualiseTable({
           )}
         </div>
       </div>
-      <div className=" !max-h-[500px] !sm:max-h-[650px] w-full ">
+      <div className="relative max-h-[500px] lg:max-h-[650px] rounded-md border overflow-scroll">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -156,7 +175,7 @@ export function VisualiseTable({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="">
+          <TableBody style={{ width: `${width}px`, maxHeight: "650px" }}>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow

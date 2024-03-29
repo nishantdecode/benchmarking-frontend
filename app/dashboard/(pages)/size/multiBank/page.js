@@ -23,15 +23,16 @@ import OptionButtons from "@/app/components/visualise/optionButtons";
 import { generateColumns } from "@/app/components/visualise/columns";
 import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
 import { useGetSizeOfBanksMutation } from "@/lib/features/services/sizeApi";
+import { downloadSheet } from "@/util/exportUtils";
 
 const MultiBankPage = () => {
   const [getSizeOfBanks] = useGetSizeOfBanksMutation();
 
-  const [assets, setAssets] = useState([])
-  const [liabilities, setLiabilities] = useState([])
-  const [shareholdersEquity, setShareholdersEquity] = useState([])
-  const [operatingIncome, setOperatingIncome] = useState([])
-  const [operatingExpenses, setOperatingExpenses] = useState([])
+  const [assets, setAssets] = useState([]);
+  const [liabilities, setLiabilities] = useState([]);
+  const [shareholdersEquity, setShareholdersEquity] = useState([]);
+  const [operatingIncome, setOperatingIncome] = useState([]);
+  const [operatingExpenses, setOperatingExpenses] = useState([]);
 
   const [size, setSize] = useState("BS-CS");
   const [assetCategory, setAssetCategory] = useState(
@@ -106,6 +107,9 @@ const MultiBankPage = () => {
       const response = await getSizeOfBanks({ bankIds, table, category });
       if (response.data) {
         setData(response.data.result);
+      } else {
+        setData([]);
+        showToast("No Data!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -114,56 +118,76 @@ const MultiBankPage = () => {
 
   useEffect(() => {
     if (assetCategory && checkedBanks.length !== 0) {
-      const category = commonSizeCategories.assets.find(item => item.name === assetCategory).value
+      const category = commonSizeCategories.assets.find(
+        (item) => item.name === assetCategory
+      ).value;
       getMultipleBankData({
         category,
         table: "assets",
-        setData : setAssets
+        setData: setAssets,
       });
+    } else {
+      setAssets([])
     }
   }, [assetCategory, checkedBanks]);
 
   useEffect(() => {
     if (liabilityCategory && checkedBanks.length !== 0) {
-      const category = commonSizeCategories.liabilities.find(item => item.name === liabilityCategory).value
+      const category = commonSizeCategories.liabilities.find(
+        (item) => item.name === liabilityCategory
+      ).value;
       getMultipleBankData({
         category,
         table: "liabilities",
-        setData : setLiabilities
+        setData: setLiabilities,
       });
+    } else {
+      setLiabilities([])
     }
   }, [liabilityCategory, checkedBanks]);
 
   useEffect(() => {
     if (equityCategory && checkedBanks.length !== 0) {
-      const category = commonSizeCategories.shareholders_equity.find(item => item.name === equityCategory).value
+      const category = commonSizeCategories.shareholders_equity.find(
+        (item) => item.name === equityCategory
+      ).value;
       getMultipleBankData({
         category,
         table: "shareholders_equity",
-        setData : setShareholdersEquity
+        setData: setShareholdersEquity,
       });
+    } else {
+      setShareholdersEquity([])
     }
   }, [equityCategory, checkedBanks]);
 
   useEffect(() => {
     if (incomeCategory && checkedBanks.length !== 0) {
-      const category = commonSizeCategories.operating_income.find(item => item.name === incomeCategory).value
+      const category = commonSizeCategories.operating_income.find(
+        (item) => item.name === incomeCategory
+      ).value;
       getMultipleBankData({
         category,
         table: "operating_income",
-        setData : setOperatingIncome
+        setData: setOperatingIncome,
       });
+    } else {
+      setOperatingIncome([])
     }
   }, [incomeCategory, checkedBanks]);
 
   useEffect(() => {
     if (expenseCategory && checkedBanks.length !== 0) {
-      const category = commonSizeCategories.operating_expenses.find(item => item.name === expenseCategory).value
+      const category = commonSizeCategories.operating_expenses.find(
+        (item) => item.name === expenseCategory
+      ).value;
       getMultipleBankData({
         category,
         table: "operating_expenses",
-        setData : setOperatingExpenses
+        setData: setOperatingExpenses,
       });
+    } else {
+      setOperatingExpenses([])
     }
   }, [expenseCategory, checkedBanks]);
 
@@ -202,7 +226,30 @@ const MultiBankPage = () => {
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-          <OptionButtons navigate={true} />
+          <OptionButtons
+            navigate={true}
+            downloadSheet={() => {
+              downloadSheet(
+                banks,
+                null,
+                "Common Size Multiple Banks",
+                [
+                  "assets",
+                  "liabilities",
+                  "shareholdersEquity",
+                  "operatingIncome",
+                  "operatingExpense",
+                ],
+                [
+                  assets,
+                  liabilities,
+                  shareholdersEquity,
+                  operatingIncome,
+                  operatingExpenses,
+                ]
+              );
+            }}
+          />
         </div>
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-3">
           {size === "BS-CS" ? (
@@ -220,10 +267,7 @@ const MultiBankPage = () => {
                 </div>
                 <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
                   {assets.length !== 0 && (
-                    <VisualiseTable
-                      data={assets}
-                      columns={assetsColumns}
-                    />
+                    <VisualiseTable data={assets} columns={assetsColumns} />
                   )}
                 </div>
               </div>

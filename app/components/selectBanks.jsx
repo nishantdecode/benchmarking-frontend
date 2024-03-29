@@ -53,7 +53,7 @@ export function SelectBanks({ banks, checkedBanks, setCheckedBanks, checkedBankN
               key={bank.name}
               className={`${
                 checkedBanks.includes(bank.name)
-                  ? "bg-toggle text-toggle-foreground"
+                  ? "bg-secondary text-foreground dark:bg-toggle dark:text-toggle-foreground"
                   : " "
               } flex flex-row justify-start items-center h-10 w-full py-3 px-3 gap-2 rounded-md`}
             >

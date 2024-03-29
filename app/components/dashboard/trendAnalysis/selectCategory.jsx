@@ -33,7 +33,7 @@ const SelectCategory = ({
             <Button
               key={index}
               variant={`${
-                category === item.value ? "selectActive" : "select"
+                category?.toString() === item.value.toString() ? "selectActive" : "select"
               }`}
               onClick={() => {
                 setCategory(item.value)

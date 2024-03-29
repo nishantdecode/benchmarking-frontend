@@ -13,6 +13,7 @@ import {
   useGetMultipleBankDataMutation,
 } from "@/lib/features/services/marketApi";
 import showToast from "@/util/showToast";
+import useMediaQuery from "@/app/hooks/useMediaQuery";
 import generateMarketData from "@/util/marketDataUtils";
 import { ToggleBank } from "@/app/components/toggleBank";
 import { SelectBanks } from "@/app/components/selectBanks";
@@ -26,6 +27,8 @@ import VisualiseDonutChart from "@/app/components/visualise/visualiseDonutChart"
 
 const Market = () => {
   let ref = useRef();
+
+  const break1 = useMediaQuery("(max-width: 1600px)");
 
   const [getAllYears] = useGetAllYearsMutation();
   const [getMultipleBankData] = useGetMultipleBankDataMutation();
@@ -63,7 +66,7 @@ const Market = () => {
       const response = await getAllYears();
       if (response.data) {
         const data = response.data.result;
-        setYear(data[data.length - 1]);
+        setYear(data[0]);
         setYears(data);
       }
     } catch (err) {
@@ -97,7 +100,7 @@ const Market = () => {
         setIndividualMSData(transformedData);
       } else {
         setIndividualMSData([]);
-        showToast("Error!", response.error.result);
+        showToast("No Data!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -116,7 +119,7 @@ const Market = () => {
         setMultipleMSData(response.data.result);
       } else {
         setMultipleMSData([]);
-        showToast("Error!", response.error.result);
+        showToast("No Data!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -151,30 +154,33 @@ const Market = () => {
     <div className="flex flex-col justify-center items-start h-auto w-full overflow-clip mt-14 p-5 pl-7 sm:pl-10 gap-10">
       <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-          <div className="flex flex-col justify-center items-center lg:items-start h-full w-full sm:w-auto lg:w-1/6 gap-7">
+          <div className="flex flex-col justify-center items-center lg:items-start h-full w-full sm:auto lg:w-[24vw] lg:min-w-1/6 gap-7 truncate">
             <span className="text-lg lg:text-2xl font-bold truncate text-ellipsis">
               Individual Bank
             </span>
             <ToggleBank data={banks} bank={bank} setBank={setBank} />
           </div>
-          <div className="flex flex-col h-auto w-[75vw] lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
+          <div className="flex flex-col h-auto w-full lg:w-[76vw] lg:min-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
             {individualMSData.length !== 0 && (
               <VisualiseTable
-                title={bank}
-                columns={columns}
                 exportXls="true"
+                title={bank}
                 data={individualMSData}
+                columns={columns}
+                exportData={[individualMSData]}
+                fileName="Market Share"
+                sheetNames={["Individual Bank"]}
               />
             )}
           </div>
         </div>
       </Card>
-      {/* <Card className="flex flex-col items-center w-full h-auto p-3 md:p-5 gap-3 md:gap-5">
-        <div className="flex flex-col lg:flex-row justify-between items-center min-w-full gap-3">
-          <span className="w-auto lg:w-1/6 text-2xl font-bold mt-2 truncate text-ellipsis">
+      <Card className="flex flex-col items-center w-full h-auto p-3 md:p-5 gap-3 md:gap-5">
+        <div className="flex flex-col lg:flex-row justify-between items-center min-w-full gap-3 truncate">
+          <span className="w-auto lg:w-1/6 text-lg lg:text-2xl font-bold mt-2 truncate text-ellipsis">
             Comparision
           </span>
-          <div className="flex justify-start w-full lg:w-4/6 text-xs sm:text-sm font-medium">
+          <div className="hidden lg:flex justify-center w-full lg:w-4/6 text-xs sm:text-sm font-medium">
             <span className="text-lg lg:text-sm font-medium truncate text-ellipsis">
               {category}
             </span>
@@ -182,26 +188,50 @@ const Market = () => {
           <div className="flex justify-center lg:justify-end w-full lg:w-1/6">
             <OptionButtons
               type="chart"
-              downloadPDF={() => downloadPDF(ref)}
-              downloadImage={() => downloadImage(ref)}
+              downloadPDF={() =>
+                downloadPDF(
+                  ref,
+                  banks,
+                  checkedBanks,
+                  "Market Share",
+                  `${category}  Year - ${year}`,
+                  "#666",
+                  marketData.map((data) => data.value)
+                )
+              }
+              downloadImage={() =>
+                downloadImage(
+                  ref,
+                  banks,
+                  checkedBanks,
+                  "Market Share",
+                  `${category}  Year - ${year}`,
+                  "#666",
+                  marketData.map((data) => data.value)
+                )
+              }
             />
           </div>
         </div>
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-14 lg:gap-2">
-          <div className="lg:sticky lg:top-20 w-full sm:w-auto lg:w-1/6 h-auto">
+          <div className="lg:sticky lg:top-20 w-full sm:w-auto lg:w-[20vw] lg:max-w-1/6 h-auto">
             <SelectCategory
               category={category}
               setCategory={setCategory}
               categories={marketShareCategories}
             />
           </div>
-          <div className="flex flex-col justify-center items-center h-[300px] xs:h-[400] md:h-[500px] w-full lg:w-4/6 md:mt-10 gap-5 md:gap-8 lg:gap-10">
+          <div
+            className={`flex flex-col justify-center items-center h-[300px] xs:h-[400] md:h-[500px] w-full ${
+              break1 ? "lg:w-[50vw]" : "lg:w-[60vw]"
+            } lg:max-w-4/6 md:mt-10 gap-5 md:gap-8 lg:gap-10`}
+          >
             {marketData && (
               <VisualiseDonutChart ref={ref} marketData={marketData} />
             )}
             <DonutPagination years={years} year={year} setYear={setYear} />
           </div>
-          <div className="lg:sticky lg:top-14 w-full sm:w-auto lg:w-1/6 h-full">
+          <div className="lg:sticky lg:top-14 w-full sm:w-auto lg:w-[20vw] lg:max-w-1/6 h-full">
             <SelectBanks
               banks={banks}
               checkedBanks={checkedBanks}
@@ -209,7 +239,7 @@ const Market = () => {
             />
           </div>
         </div>
-      </Card> */}
+      </Card>
     </div>
   );
 };

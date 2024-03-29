@@ -11,6 +11,7 @@ import { SelectCategory } from "@/app/components/selectCategory";
 import { generateColumns } from "@/app/components/visualise/columns";
 import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
 import { useGetRankByCategoryMutation } from "@/lib/features/services/analysisApi";
+import showToast from "@/util/showToast";
 
 const Ranking = () => {
   const [getRank] = useGetRankByCategoryMutation();
@@ -60,6 +61,9 @@ const Ranking = () => {
       const response = await getRank({ table, category: categoryValue });
       if (response.data) {
         setData(response.data.result);
+      } else {
+        setData([]);
+        showToast("No Data!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -109,6 +113,9 @@ const Ranking = () => {
                 data={balanceSheet}
                 title={balanceSheetCategory}
                 columns={balanceSheetColumns}
+                exportData={[balanceSheet]}
+                sheetNames={["balanceSheetRank"]}
+                fileName="Ranking - Balance Sheet"
               />
             )}
           </div>
@@ -137,6 +144,9 @@ const Ranking = () => {
                 data={incomeStatement}
                 title={incomeStatementCategory}
                 columns={incomeStatementColumns}
+                exportData={[incomeStatement]}
+                sheetNames={["incomeStatementRank"]}
+                fileName="Ranking - Income Statement"
               />
             )}
           </div>

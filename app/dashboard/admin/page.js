@@ -22,12 +22,13 @@ import { formatDate } from "@/util/formatDateUtils";
 import { SelectCategory } from "../../components/selectCategory";
 import { VisualiseTable } from "@/app/components/admin/visualiseTable";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useGetAllOrganisationsMutation } from "@/lib/features/services/organisationApi";
 
 const Admin = () => {
   let token = null;
   const router = useRouter();
   const [dataObj, setDataObj] = useState({
-    data: [],
+    data: null,
     columnName: "",
   });
   const [category, setCategory] = useState("Users");
@@ -35,6 +36,7 @@ const Admin = () => {
   const [noOfUsers, setNoOfUsers] = useState();
   const [getAllAdmins] = useGetAllAdminsMutation();
   const [getAllUsers] = useGetAllUsersMutation();
+  const [getAllOrganisations] = useGetAllOrganisationsMutation();
   const [getAllUsersOfAdmin] = useGetAllUsersOfAdminMutation();
 
   if (typeof window !== "undefined" && window.localStorage)
@@ -53,14 +55,14 @@ const Admin = () => {
   const role = userObj?.role?.type || "User";
   const formattedDate = formatDate(userObj?.createdAt);
 
-  const getAdmins = async () => {
+  const getOrganisationsData = async () => {
     try {
       if (role === "SuperAdmin") {
-        const response = await getAllAdmins({ token });
+        const response = await getAllOrganisations({ token });
         if (response.data) {
           setDataObj({
-            data: response.data.result.admins,
-            columnName: "adminColumns",
+            data: response.data.result.organisations,
+            columnName: "organisationColumns",
           });
         }
       }
@@ -110,7 +112,7 @@ const Admin = () => {
         columnName: "bankColumns",
       });
     } else if (category === "Organisations") {
-      getAdmins();
+      getOrganisationsData();
     } else if (category === "Users") {
       getUsers();
     }
@@ -147,20 +149,20 @@ const Admin = () => {
                     <div className="text-xs">Role:</div>
                     <div>{role}</div>
                   </div>
-                  <div className="flex flex-col items-end gap-14">
+                  <div className="flex flex-col items-end gap-10">
                     <div className="flex flex-row gap-2">
                       <div className="text-xs mt-1">Joined:</div>{" "}
                       {formattedDate}
                     </div>
-                    <Button variant="outline">
-                      <BiEdit
-                        size={15}
-                        onClick={() =>
-                          router.push(
-                            `/dashboard/admin/user?action=edit&userId=${userObj.id}&entity=User`
-                          )
-                        }
-                      />
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        router.push(
+                          `/dashboard/admin/user?action=edit&userId=${userObj.id}&entity=User`
+                        )
+                      }
+                    >
+                      <BiEdit size={15} />
                     </Button>
                   </div>
                 </div>
@@ -190,49 +192,52 @@ const Admin = () => {
             )}
           </div>
         </div>
-        {role !== "User" ? (
-          <div className="flex flex-row justify-center items-center gap-5 h-auto w-full">
-            <Card className="flex flex-col lg:flex-row justify-center items-start gap-5 h-full w-full p-5 sm:p-8 sm:px-16">
-              <div className="flex flex-row justify-center h-auto w-full lg:w-1/6">
-                {role === "Admin" ? (
-                  <SelectCategory
-                    category={category}
-                    setCategory={setCategory}
-                    height={"h-[200px]"}
-                    categories={[{ name: "Banks" }, { name: "Users" }]}
-                  />
-                ) : (
-                  <SelectCategory
-                    category={category}
-                    setCategory={setCategory}
-                    height={"h-200"}
-                    categories={[
-                      { name: "Banks" },
-                      { name: "Organisations" },
-                      { name: "Users" },
-                    ]}
-                  />
-                )}
-              </div>
-              <div className="flex flex-col h-auto w-full lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
-                {dataObj.data.length !== 0 && (
-                  <VisualiseTable
-                    data={dataObj.data}
-                    columnName={dataObj.columnName}
-                    role={role}
-                    title={category}
-                    search={true}
-                  />
-                )}
-                {dataObj.data.length === 0 && (
-                  <Skeleton className="h-[400px] w-full bg-transparent"></Skeleton>
-                )}
-              </div>
-            </Card>
-          </div>
-        ) : (
-          <></>
-        )}
+        <div className="flex flex-row justify-center items-center gap-5 h-auto w-full">
+          <Card className="flex flex-col lg:flex-row justify-center items-start gap-5 h-full w-full p-5 sm:p-8 sm:px-16">
+            <div className="flex flex-row justify-center h-auto w-full lg:w-1/6">
+              {role === "User" ? (
+                <SelectCategory
+                  category={category}
+                  setCategory={setCategory}
+                  height={"h-[200px]"}
+                  categories={[{ name: "Banks" }]}
+                />
+              ) : role === "Admin" ? (
+                <SelectCategory
+                  category={category}
+                  setCategory={setCategory}
+                  height={"h-[200px]"}
+                  categories={[{ name: "Banks" }, { name: "Users" }]}
+                />
+              ) : (
+                <SelectCategory
+                  category={category}
+                  setCategory={setCategory}
+                  height={"h-200"}
+                  categories={[
+                    { name: "Banks" },
+                    { name: "Organisations" },
+                    { name: "Users" },
+                  ]}
+                />
+              )}
+            </div>
+            <div className="flex flex-col h-auto w-full lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
+              {dataObj.data && (
+                <VisualiseTable
+                  data={dataObj.data}
+                  columnName={dataObj.columnName}
+                  role={role}
+                  title={category}
+                  search={true}
+                />
+              )}
+              {dataObj && (
+                <Skeleton className="h-[400px] w-full bg-transparent"></Skeleton>
+              )}
+            </div>
+          </Card>
+        </div>
       </div>
     </>
   );

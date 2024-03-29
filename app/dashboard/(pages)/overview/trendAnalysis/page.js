@@ -12,6 +12,7 @@ import {
   trendAnalysisCategories,
   trendTableCategories,
 } from "@/app/data/categoryData";
+import showToast from "@/util/showToast";
 import { combineData } from "@/util/combineData";
 import Header from "@/app/components/dashboard/trendAnalysis/header";
 import { generateColumns } from "@/app/components/visualise/columns";
@@ -52,10 +53,6 @@ const TrendAndCompetitionAnalysis = () => {
   );
   const [checkedBanks, setCheckedBanks] = useState([]);
 
-  useEffect(() => {
-    router.push(`?category=${category}`);
-  }, [category]);
-
   const getTrendTableData = async ({ categories }) => {
     try {
       const bankIds = checkedBanks.map(
@@ -67,6 +64,9 @@ const TrendAndCompetitionAnalysis = () => {
       });
       if (response.data) {
         setTables(response.data.result);
+      } else {
+        setTables([]);
+        showToast("No Data!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -82,6 +82,9 @@ const TrendAndCompetitionAnalysis = () => {
       if (response.data) {
         setData(response.data.result);
         setBankLabel(visualisationLabelUtils(banks, response.data.result));
+      } else {
+        setData([]);
+        showToast("No Data!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
@@ -101,11 +104,21 @@ const TrendAndCompetitionAnalysis = () => {
       if (response.data) {
         setData(response.data.result);
         setBankLabel(visualisationLabelUtils(banks, response.data.result));
+      } else {
+        setData([]);
+        showToast("No Data!", response.error.result);
       }
     } catch (err) {
       showToast("Error!", undefined);
     }
   };
+
+  useEffect(() => {
+    if (category && checkedBanks.length !== 0)
+      router.push(
+        `/dashboard/overview/trendAnalysis?category=${category}&bank=${checkedBanks[0]}`
+      );
+  }, [category, checkedBanks]);
 
   useEffect(() => {
     if (category && checkedBanks.length !== 0) {
@@ -223,7 +236,12 @@ const TrendAndCompetitionAnalysis = () => {
 
   useEffect(() => {
     if (banks) {
-      setCheckedBanks(banks.slice(0, 3).map((bank) => bank.name));
+      const bank1 = searchParams.get("bank");
+      const otherBanks = banks
+        .filter((item) => item.name !== bank1)
+        .map((item) => item.name);
+      const data = [bank1, otherBanks.slice(0, 2)].flat();
+      setCheckedBanks(data);
     }
   }, [banks]);
 
@@ -235,10 +253,50 @@ const TrendAndCompetitionAnalysis = () => {
             <SelectCategory
               setCategory={setCategory}
               categories={trendAnalysisCategories}
-              downloadPDF={() => downloadPDF(ref)}
-              downloadImage={() => downloadImage(ref)}
+              downloadPDF={() =>
+                downloadPDF(
+                  ref,
+                  null,
+                  null,
+                  "Trend & Competitive Analysis",
+                  `${
+                    trendAnalysisCategories.find(
+                      (item) => item.value === category
+                    ).name
+                  }`,
+                  "#666"
+                )
+              }
+              downloadImage={() =>
+                downloadImage(
+                  ref,
+                  null,
+                  null,
+                  "Trend & Competitive Analysis",
+                  `${
+                    trendAnalysisCategories.find(
+                      (item) => item.value === category
+                    ).name
+                  }`,
+                  "#666"
+                )
+              }
               downloadSheet={() =>
-                downloadSheet(data, "Sheet Name", "File Name")
+                downloadSheet(
+                  banks,
+                  null,
+                  category,
+                  category === "totalGrossLoans"
+                    ? ["retail", "corporate", "total"]
+                    : [
+                        "demandDeposits",
+                        "customerSavings",
+                        "customerTimeInvestment",
+                      ],
+                  Object.keys(table).map((item) => {
+                    return table[item];
+                  })
+                )
               }
             />
           </div>
@@ -248,10 +306,50 @@ const TrendAndCompetitionAnalysis = () => {
               category={category}
               checkedBanks={checkedBanks}
               setCheckedBanks={setCheckedBanks}
-              downloadPDF={() => downloadPDF(ref)}
-              downloadImage={() => downloadImage(ref)}
+              downloadPDF={() =>
+                downloadPDF(
+                  ref,
+                  null,
+                  null,
+                  "Trend & Competitive Analysis",
+                  `${
+                    trendAnalysisCategories.find(
+                      (item) => item.value === category
+                    ).name
+                  }`,
+                  "#666"
+                )
+              }
+              downloadImage={() =>
+                downloadImage(
+                  ref,
+                  null,
+                  null,
+                  "Trend & Competitive Analysis",
+                  `${
+                    trendAnalysisCategories.find(
+                      (item) => item.value === category
+                    ).name
+                  }`,
+                  "#666"
+                )
+              }
               downloadSheet={() =>
-                downloadSheet(data, "Sheet Name", "File Name")
+                downloadSheet(
+                  banks,
+                  null,
+                  category,
+                  category === "totalGrossLoans"
+                    ? ["retail", "corporate", "total"]
+                    : [
+                        "demandDeposits",
+                        "customerSavings",
+                        "customerTimeInvestment",
+                      ],
+                  Object.keys(table).map((item) => {
+                    return table[item];
+                  })
+                )
               }
             />
             <div className="hidden sm:flex text-md sm:text-xl font-medium sm:font-bold">
@@ -305,7 +403,8 @@ const TrendAndCompetitionAnalysis = () => {
                 {incomeExpense.length !== 0 && (
                   <VisualiseLineChart
                     ref={ref}
-                    xAxis={false}
+                    legend={true}
+                    xAxis={true}
                     data={incomeExpense}
                     colors={bankLabel.bankColorsLabel}
                     dataFormatter={bankLabel.dataFormatterCurrency}
@@ -321,7 +420,7 @@ const TrendAndCompetitionAnalysis = () => {
                     xAxis={true}
                     data1={income}
                     data2={operatingIncome}
-                    colors={bankLabel.bankColorsLabel}
+                    banks={banks}
                   />
                 )}
               </div>

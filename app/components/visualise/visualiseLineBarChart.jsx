@@ -47,7 +47,7 @@ const darkTooltip = {
 };
 
 const VisualiseLineBarChart = forwardRef(function VisualiseBarChart(
-  { data1, data2, colors, xAxis, dataFormatter },
+  { data1, data2, banks, xAxis, dataFormatter },
   ref
 ) {
   const { theme } = useTheme();
@@ -58,9 +58,6 @@ const VisualiseLineBarChart = forwardRef(function VisualiseBarChart(
   const fields = Object.keys(data1[0]);
   const index = fields[0];
   const categories = fields.slice(1, fields.length);
-  if (!colors || colors.length === 0) {
-    return null;
-  }
   const chartData = {
     labels: data1.map((data) => data[index]),
     datasets: categories
@@ -69,15 +66,9 @@ const VisualiseLineBarChart = forwardRef(function VisualiseBarChart(
           type: "line",
           label: category + " COI%",
           data: data1.map((dataObj) => dataObj[category]),
-          backgroundColor: [
-            colors[ind] ? colors[ind] : darkenColor(colors[ind - 1], 0.3),
-          ],
-          borderColor: [
-            colors[ind] ? colors[ind] : darkenColor(colors[ind - 1], 0.3),
-          ],
-          color: [
-            colors[ind] ? colors[ind] : darkenColor(colors[ind - 1], 0.3),
-          ],
+          backgroundColor: banks.find((item)=> item.name.toString() === category).color,
+          borderColor: banks.find((item)=> item.name.toString() === category).color,
+          color: banks.find((item)=> item.name.toString() === category).color,
           pointStyle: false,
           tension: 0.1,
         };
@@ -87,15 +78,9 @@ const VisualiseLineBarChart = forwardRef(function VisualiseBarChart(
             type: "bar",
             label: category + " Operating Income",
             data: data2.map((dataObj) => dataObj[category]),
-            backgroundColor: [
-              colors[ind] ? colors[ind] : darkenColor(colors[ind - 1], 0.3),
-            ],
-            borderColor: [
-              colors[ind] ? colors[ind] : darkenColor(colors[ind - 1], 0.3),
-            ],
-            color: [
-              colors[ind] ? colors[ind] : darkenColor(colors[ind - 1], 0.3),
-            ],
+            backgroundColor: banks.find((item)=> item.name.toString() === category).color,
+            borderColor: banks.find((item)=> item.name.toString() === category).color,
+            color: banks.find((item)=> item.name.toString() === category).color,
             pointStyle: false,
             tension: 0.1,
           },

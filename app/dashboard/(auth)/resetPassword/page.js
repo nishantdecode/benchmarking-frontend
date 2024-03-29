@@ -1,6 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+
+import { IoEye, IoEyeOff } from "react-icons/io5";
 
 import * as z from "zod";
 import { useForm } from "react-hook-form";
@@ -26,6 +28,9 @@ const formSchema = z.object({
 });
 
 const ResetPassword = () => {
+  const [type, setType] = useState("password");
+  const [ctype, setCType] = useState("password");
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const [resetPassword, { isLoading, error }] = useResetPasswordMutation();
@@ -36,6 +41,22 @@ const ResetPassword = () => {
       confirmNewPassword: "",
     },
   });
+
+  const handleToggle = () => {
+    if (type === "password") {
+      setType("text");
+    } else {
+      setType("password");
+    }
+  };
+
+  const handleCToggle = () => {
+    if (ctype === "password") {
+      setCType("text");
+    } else {
+      setCType("password");
+    }
+  };
 
   const handleSubmit = async (values) => {
     const credentials = {
@@ -71,16 +92,28 @@ const ResetPassword = () => {
               return (
                 <FormItem>
                   <div className="flex flex-col md:flex-row justify-between gap-4">
-                    <FormLabel className="min-w-[170px] mt-3 text-xs md:text-sm">
+                    <FormLabel className="select-none min-w-[170px] mt-3 text-xs md:text-sm">
                       Enter new Password* :
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="New Password"
-                        type="password"
-                        {...field}
-                        className="md:max-w-[300px]"
-                      />
+                      <div className="relative w-full md:max-w-[300px]">
+                        <Input
+                          placeholder="New Password"
+                          type={type}
+                          {...field}
+                          className="md:max-w-[300px]"
+                        />
+                        <span
+                          className="absolute right-2 top-1.5 bottom-0 m-auto cursor-pointer"
+                          onClick={handleToggle}
+                        >
+                          {type === "password" ? (
+                            <IoEyeOff size={25} />
+                          ) : (
+                            <IoEye size={25} />
+                          )}
+                        </span>
+                      </div>
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -95,16 +128,28 @@ const ResetPassword = () => {
               return (
                 <FormItem>
                   <div className="flex flex-col md:flex-row justify-between gap-4">
-                    <FormLabel className="min-w-[170px] mt-3 text-xs md:text-sm">
+                    <FormLabel className="select-none min-w-[170px] mt-3 text-xs md:text-sm">
                       Confirm new Password* :
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Confirm Password"
-                        type="password"
-                        {...field}
-                        className="md:max-w-[300px]"
-                      />
+                      <div className="relative w-full md:max-w-[300px]">
+                        <Input
+                          placeholder="Confirm Password"
+                          type={ctype}
+                          {...field}
+                          className="md:max-w-[300px]"
+                        />
+                        <span
+                          className="absolute right-2 top-1.5 bottom-0 m-auto cursor-pointer"
+                          onClick={handleCToggle}
+                        >
+                          {ctype === "password" ? (
+                            <IoEyeOff size={25} />
+                          ) : (
+                            <IoEye size={25} />
+                          )}
+                        </span>
+                      </div>
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -117,7 +162,7 @@ const ResetPassword = () => {
               size="sm"
               variant="default"
               type="submit"
-              className="w-auto text-xs justify-center px-8 py-0 rounded-xl"
+              className="select-none w-auto text-xs justify-center px-8 py-0 rounded-xl"
             >
               Submit
             </Button>

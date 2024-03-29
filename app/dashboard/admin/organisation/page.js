@@ -1,7 +1,6 @@
 "use client";
 
 import * as z from "zod";
-import { useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { Cloudinary } from "@cloudinary/url-gen";
 import React, { useState, useEffect } from "react";
@@ -11,7 +10,6 @@ import { AdvancedImage, responsive, placeholder } from "@cloudinary/react";
 
 import { MdDelete } from "react-icons/md";
 import { RxAvatar } from "react-icons/rx";
-import { FaAngleDown } from "react-icons/fa6";
 import { FaArrowCircleLeft } from "react-icons/fa";
 
 import {
@@ -22,82 +20,55 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
 import showToast from "@/util/showToast";
-import UploadButton from "@/app/components/upload";
 import {
-  useDeleteUserMutation,
-  useGetUserMutation,
-  useRegisterMutation,
-  useUpdateUserMutation,
-} from "@/lib/features/services/authApi";
-
-const roles = [
-  "Bank Manager",
-  "Branch Manager",
-  "Accountant",
-  "Regional Manager",
-  "Loan Officer",
-  "Credit Analyst",
-  "Auditor",
-  "Financial Analyst",
-  "Investment Banker",
-  "Trader",
-];
+  useCreateMutation,
+  useDeleteOrganisationMutation,
+  useGetOrganisationMutation,
+  useUpdateOrganisationMutation,
+} from "@/lib/features/services/organisationApi";
+import UploadButton from "@/app/components/upload";
 
 const formSchema = z.object({
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  email: z.string().email(),
+  name: z.string().min(1),
+  headquarter: z.string().min(1),
+  contact: z.string().min(1),
 });
 
-const UserPage = () => {
+const OrganisationPage = () => {
   let token = null;
   const router = useRouter();
   const searchParams = useSearchParams();
-  
-  const [role, setRole] = useState("");
-  const [user, setUser] = useState(null);
-  const [id] = useState(searchParams.get("userId") || null);
-  let entity = searchParams.get("entity");
-  if (entity) entity = entity[0].toUpperCase() + entity.slice(1);
+
   let page = searchParams.get("action");
-  if (page) page = page[0].toUpperCase() + page.slice(1);
+  page = page[0].toUpperCase() + page.slice(1);
+  const [id] = useState(searchParams.get("organisationId") || null);
 
-  const [defaultValues, setDefaultValues] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-  });
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    values: defaultValues
-  });
-
-  const [getUser] = useGetUserMutation();
-  const [register] = useRegisterMutation();
-  const [update] = useUpdateUserMutation();
-  const [deleteUser] = useDeleteUserMutation();
-
-  const userObj = useSelector((state) => state.auth.user);
   if (typeof window !== "undefined" && window.localStorage)
     token = localStorage.getItem("accessToken");
 
-  //cloudinary for getting and uploading images
-  /*start*/
+  const [defaultValues, setDefaultValues] = useState({
+    name: "",
+    headquarter: "",
+    contact: "",
+  });
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    values: defaultValues,
+  });
+
+  const [getOrganisation] = useGetOrganisationMutation();
+  const [createOrganisation] = useCreateMutation();
+  const [updateOrganisation] = useUpdateOrganisationMutation();
+  const [deleteOrganisation] = useDeleteOrganisationMutation();
+
+  const [publicId, setPublicId] = useState("");
   const [cloudName] = useState("dohnlambm");
   const [uploadPreset] = useState("gfdxvyye");
-  const [publicId, setPublicId] = useState("");
   const [uwConfig] = useState({
     cloudName,
     uploadPreset,
@@ -108,82 +79,70 @@ const UserPage = () => {
     },
   });
   const myImage = cld.image(publicId);
-  /*end*/
 
-  const handleEntity = async (values) => {
+  const handleOrganisation = async (values) => {
     let credentials = {
       picture: publicId,
-      name: {
-        first: values.firstName,
-        last: values.lastName,
-      },
-      email: values.email,
+      name: values.name,
+      headquarter: values.headquarter,
+      contact: values.contact,
     };
-    if (userObj.role.type === "SuperAdmin") {
-      credentials.creatorId = userObj.id;
-      credentials.role = { name: role, type: entity === "Organisation" ? "Admin" : "User"};
-    } else if (userObj.role.type === "Admin") {
-      credentials.creatorId = userObj.id;
-      credentials.role = { name: role, type: "User" };
-    } else if (userObj.id.toString() === id.toString()) {
-      credentials.creatorId = userObj.creatorId;
-      credentials.role = { name: role, type: userObj.role.type };
-    } else  {
-      showToast("Unauthorized!", undefined);
-      router.push("/dashboard/admin");
-    }
 
     if (page === "Add") {
       try {
-        const response = await register(credentials);
+        const response = await createOrganisation({ credentials, token });
+        console.log(response)
         if (response.data) {
-          showToast("Successful!", undefined);
-          router.push("/dashboard/admin");
-        } else 
-          showToast("Error", response.error.data.message);
+          showToast(
+            `Successfully Added ${response.data.result.name}!`,
+            undefined
+          );
+          // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
+          // window.location.href = "https://benchmarking-fe.vercel.app/dashboard/admin";
+          window.location.href = "http://localhost:3000/dashboard/admin";
+        } else showToast("Error", response.error.data.message);
       } catch (err) {
         showToast("Error!", "Please try again later.");
       }
     } else if (page === "Edit") {
       try {
-        const response = await update({ token, id, credentials });
+        const response = await updateOrganisation({ id, token, credentials });
         if (response.data) {
           showToast(
-            `Successfully Updated ${user.name.first + " " + user.name.last} !`,
+            `Successfully Updated Organisation ${response.data.result.name} !`,
             undefined
           );
-          router.push("/dashboard/admin");
-        } else 
-          showToast("Error", response.error.data.message);
+          // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
+          // window.location.href = "https://benchmarking-fe.vercel.app/dashboard/admin";
+          window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
+        } else showToast("Error", response.error.data.message);
       } catch (err) {
         showToast("Error!", "Please try again later.");
       }
     }
   };
 
-  const getUserData = async () => {
+  const getOrganisationData = async () => {
     try {
-      const response = await getUser({ token, id });
+      const response = await getOrganisation({ id, token });
       if (response.data) {
-        const userData = response.data.result.user;
-        setUser(userData);
-        setRole(userData.role.name || "");
-        setPublicId(userData.picture);
+        const organisationData = response.data.result.organisation;
+        setPublicId(organisationData?.picture);
         setDefaultValues({
-          firstName: userData.name.first,
-          lastName: userData.name.last,
-          email: userData.email,
+          name: organisationData?.name,
+          headquarter: organisationData?.headquarter,
+          contact: organisationData?.contact,
         });
       }
     } catch (err) {
-      console.log(err)
+      console.log(err);
       showToast("Error!", "Please try again later.");
     }
   };
 
   const deleteUserData = async () => {
     try {
-      const response = await deleteUser({ token, id });
+      const response = await deleteOrganisation({ token, id });
       if (response.data) {
         showToast(`Successfully Deleted!`, undefined);
         router.push("/dashboard/admin");
@@ -195,7 +154,7 @@ const UserPage = () => {
 
   useEffect(() => {
     if (page === "Edit") {
-      getUserData();
+      getOrganisationData();
     }
   }, [id]);
 
@@ -212,19 +171,19 @@ const UserPage = () => {
           />
           <RxAvatar size={32} />
           <h1 className="pl-1 text-lg sm:text-2xl text-foreground dark:text-foreground">
-            {page || ""} {entity || ""}
+            {page} {"Bank"}
           </h1>
         </div>
       </div>
-      <div className="flex flex-col justify-center items-center w-full h-full mt-14 p-5">
+      <div className="flex flex-col justify-end items-center w-full h-full mt-14 p-5">
         <Card className="flex flex-col justify-center items-center shadow-lg bg-card rounded-2xl border-0 h-auto w-full sm:w-1/2 md:w-[600px] p-8 sm:p-10 md:p-12 gap-10">
           <div className="flex flex-col justify-center items-center h-auto w-full gap-5">
             <div className="w-full font-bold text-center text-xl md:text-2xl">
-              {page || ""} {entity || ""}
+              {page} {"Organisation"}
             </div>
             {publicId ? (
               <AdvancedImage
-                className="w-20 h-20 object-cover rounded-full bg-white"
+                className="w-20 h-20 rounded-full bg-white"
                 cldImg={myImage}
                 plugins={[responsive(), placeholder()]}
               />
@@ -237,28 +196,28 @@ const UserPage = () => {
             <UploadButton
               uwConfig={uwConfig}
               setPublicId={setPublicId}
-              title="Upload Profile Photo"
+              title="Upload Organisation Logo"
             />
           </div>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(handleEntity)}
+              onSubmit={form.handleSubmit(handleOrganisation)}
               className="w-full flex flex-col gap-5"
             >
               <FormField
                 control={form.control}
-                name="firstName"
+                name="name"
                 render={({ field }) => {
                   return (
                     <FormItem>
                       <div className="flex flex-col md:flex-row justify-between gap-4">
                         <FormLabel className="mt-3 text-xs md:text-sm">
-                          Enter First name* :
+                          Enter name* :
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Enter your first name"
-                            type="firstName"
+                            placeholder="organisation name"
+                            type="name"
                             {...field}
                             className="md:max-w-[300px]"
                           />
@@ -271,18 +230,18 @@ const UserPage = () => {
               />
               <FormField
                 control={form.control}
-                name="lastName"
+                name="headquarter"
                 render={({ field }) => {
                   return (
                     <FormItem>
                       <div className="flex flex-col md:flex-row justify-between gap-4">
                         <FormLabel className="mt-3 text-xs md:text-sm">
-                          Enter Last name* :
+                          Enter Headquarter* :
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Enter your last name"
-                            type="lastName"
+                            placeholder="headquarter"
+                            type="headquarter"
                             {...field}
                             className="md:max-w-[300px]"
                           />
@@ -295,18 +254,18 @@ const UserPage = () => {
               />
               <FormField
                 control={form.control}
-                name="email"
+                name="contact"
                 render={({ field }) => {
                   return (
                     <FormItem>
                       <div className="flex flex-col md:flex-row justify-between gap-4">
                         <FormLabel className="mt-3 text-xs md:text-sm">
-                          Enter Email* :
+                          Enter Contact* :
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Enter your email"
-                            type="email"
+                            placeholder="organisation Contact"
+                            type="contact"
                             {...field}
                             className="md:max-w-[300px]"
                           />
@@ -317,43 +276,6 @@ const UserPage = () => {
                   );
                 }}
               />
-              <div className="flex flex-col sm:flex-row justify-between gap-2">
-                <div className="mt-3 text-xs md:text-sm">
-                  Role Management* :
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="input"
-                      className="flex justify-between w-full md:max-w-[300px] gap-2 rounded-md"
-                    >
-                      <div>{role || "NA"}</div>
-                      <FaAngleDown />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-60">
-                    <DropdownMenuRadioGroup
-                      value={role}
-                      onValueChange={(v) => {
-                        setRole(v);
-                      }}
-                    >
-                      {roles.map((role, index) => {
-                        return (
-                          <DropdownMenuRadioItem
-                            key={index}
-                            value={role}
-                            className="flex flex-row justify-start w-full px-5"
-                          >
-                            {role}
-                          </DropdownMenuRadioItem>
-                        );
-                      })}
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
               <div className="flex flex-row w-full justify-center md:justify-end mt-2 md:mt-5">
                 <Button
                   size="sm"
@@ -376,7 +298,7 @@ const UserPage = () => {
                 }}
               >
                 <MdDelete size={24} />
-                Delete User
+                Delete Organisation
               </Button>
             </div>
           ) : (
@@ -388,4 +310,4 @@ const UserPage = () => {
   );
 };
 
-export default UserPage;
+export default OrganisationPage;
