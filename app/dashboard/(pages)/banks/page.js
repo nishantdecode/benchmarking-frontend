@@ -29,6 +29,8 @@ import { generateColumns } from "@/app/components/visualise/columns";
 import OptionButtons from "@/app/components/visualise/optionButtons";
 import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DataDialog } from "@/app/components/banks/dataDialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 
 const Bank = () => {
   const [getTablesData] = useGetTablesDataMutation();
@@ -46,6 +48,10 @@ const Bank = () => {
     },
   });
   const myImage = cld.image(bank?.iconUrl || "bank_hmejcf");
+
+  const handleAction = () => {
+    console.log("Action");
+  };
 
   const replaceCategoryNames = (data, categories) => {
     return data.map((dataObj) => {
@@ -254,20 +260,32 @@ const Bank = () => {
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        <OptionButtons
-          type="table"
-          downloadSheet={() =>
-            downloadSheet(
-              banks,
-              null,
-              category,
-              Object.keys(data),
-              Object.keys(data).map((item) => {
-                return data[item];
-              })
-            )
-          }
-        />
+        <div className="flex flex-col lg:flex-row gap-2">
+          <OptionButtons
+            type="table"
+            downloadSheet={() =>
+              downloadSheet(
+                banks,
+                null,
+                category,
+                Object.keys(data),
+                Object.keys(data).map((item) => {
+                  return data[item];
+                })
+              )
+            }
+          />
+          {banks && banks?.length !== 0 && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="default" className="w-full text-xs">
+                  Add Data
+                </Button>
+              </DialogTrigger>
+              <DataDialog banks={banks} handleAction={handleAction} />
+            </Dialog>
+          )}
+        </div>
       </div>
       <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
         <div className="lg:sticky lg:top-14 flex justify-center w-full lg:w-1/6">

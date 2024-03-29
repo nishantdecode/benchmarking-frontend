@@ -33,16 +33,19 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-import showToast from "@/util/showToast";
-import UploadButton from "@/app/components/upload";
 import {
   useDeleteUserMutation,
   useGetUserMutation,
   useRegisterMutation,
   useUpdateUserMutation,
 } from "@/lib/features/services/authApi";
+import showToast from "@/util/showToast";
+import UploadButton from "@/app/components/upload";
+import { useGetAllOrganisationNamesMutation } from "@/lib/features/services/organisationApi";
 
-const roles = [
+const roles = ["User", "Admin"];
+
+const profiles = [
   "Bank Manager",
   "Branch Manager",
   "Accountant",
@@ -65,12 +68,13 @@ const UserPage = () => {
   let token = null;
   const router = useRouter();
   const searchParams = useSearchParams();
-  
-  const [role, setRole] = useState("");
+
+  const [role, setRole] = useState("User");
+  const [profile, setProfile] = useState("Accountant");
   const [user, setUser] = useState(null);
   const [id] = useState(searchParams.get("userId") || null);
-  let entity = searchParams.get("entity");
-  if (entity) entity = entity[0].toUpperCase() + entity.slice(1);
+  const [names, setNames] = useState([]);
+  const [organisation, setOrganisation] = useState(null);
   let page = searchParams.get("action");
   if (page) page = page[0].toUpperCase() + page.slice(1);
 
@@ -81,13 +85,14 @@ const UserPage = () => {
   });
   const form = useForm({
     resolver: zodResolver(formSchema),
-    values: defaultValues
+    values: defaultValues,
   });
 
   const [getUser] = useGetUserMutation();
   const [register] = useRegisterMutation();
   const [update] = useUpdateUserMutation();
   const [deleteUser] = useDeleteUserMutation();
+  const [getOrganisationNames] = useGetAllOrganisationNamesMutation();
 
   const userObj = useSelector((state) => state.auth.user);
   if (typeof window !== "undefined" && window.localStorage)
@@ -110,7 +115,9 @@ const UserPage = () => {
   const myImage = cld.image(publicId);
   /*end*/
 
-  const handleEntity = async (values) => {
+  console.log(userObj)
+
+  const handleUser = async (values) => {
     let credentials = {
       picture: publicId,
       name: {
@@ -118,19 +125,21 @@ const UserPage = () => {
         last: values.lastName,
       },
       email: values.email,
+      creatorId: user ? user.creatorId : userObj.id,
+      role: { name: profile, type: role },
     };
-    if (userObj.role.type === "SuperAdmin") {
-      credentials.creatorId = userObj.id;
-      credentials.role = { name: role, type: entity === "Organisation" ? "Admin" : "User"};
-    } else if (userObj.role.type === "Admin") {
-      credentials.creatorId = userObj.id;
-      credentials.role = { name: role, type: "User" };
-    } else if (userObj.id.toString() === id.toString()) {
+
+    if (userObj?.role?.type === "SuperAdmin") {
+      credentials.organisationId = names?.find(
+        (item) => item.name === organisation
+      )?.id;
+    } else if (userObj?.role?.type === "Admin") {
+      credentials.organisationId = userObj.organisationId;
+    }
+
+    if (userObj?.id?.toString() === id?.toString()) {
       credentials.creatorId = userObj.creatorId;
-      credentials.role = { name: role, type: userObj.role.type };
-    } else  {
-      showToast("Unauthorized!", undefined);
-      router.push("/dashboard/admin");
+      credentials.role = { name: profile, type: userObj.role.type };
     }
 
     if (page === "Add") {
@@ -138,9 +147,10 @@ const UserPage = () => {
         const response = await register(credentials);
         if (response.data) {
           showToast("Successful!", undefined);
-          router.push("/dashboard/admin");
-        } else 
-          showToast("Error", response.error.data.message);
+          // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
+          window.location.href = "https://benchmarking-fe.vercel.app/dashboard/admin";
+          // window.location.href = "http://localhost:3000/dashboard/admin";
+        } else showToast("Error", response.error.data.message);
       } catch (err) {
         showToast("Error!", "Please try again later.");
       }
@@ -152,9 +162,10 @@ const UserPage = () => {
             `Successfully Updated ${user.name.first + " " + user.name.last} !`,
             undefined
           );
-          router.push("/dashboard/admin");
-        } else 
-          showToast("Error", response.error.data.message);
+          // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
+          window.location.href = "https://benchmarking-fe.vercel.app/dashboard/admin";
+          // window.location.href = "http://localhost:3000/dashboard/admin";
+        } else showToast("Error", response.error.data.message);
       } catch (err) {
         showToast("Error!", "Please try again later.");
       }
@@ -167,7 +178,8 @@ const UserPage = () => {
       if (response.data) {
         const userData = response.data.result.user;
         setUser(userData);
-        setRole(userData.role.name || "");
+        setRole(userData.role.type || "");
+        setProfile(userData.role.name || "");
         setPublicId(userData.picture);
         setDefaultValues({
           firstName: userData.name.first,
@@ -176,7 +188,7 @@ const UserPage = () => {
         });
       }
     } catch (err) {
-      console.log(err)
+      console.log(err);
       showToast("Error!", "Please try again later.");
     }
   };
@@ -192,6 +204,32 @@ const UserPage = () => {
       showToast("Error!", "Please try again later.");
     }
   };
+
+  const getOrganisationNamesData = async () => {
+    try {
+      const response = await getOrganisationNames({ token });
+      if (response.data) {
+        setNames(response.data.result.organisationNames);
+      }
+    } catch (err) {
+      showToast("Error!", undefined);
+    }
+  };
+
+  useEffect(() => {
+    if (user && names.length !== 0) {
+      const org = names?.find((item) => {
+        item.id === user.organisationId;
+      })?.name;
+      setOrganisation(org || names[0].name);
+    }
+  }, [user, names]);
+
+  useEffect(() => {
+    if (userObj?.role?.type === "SuperAdmin") {
+      getOrganisationNamesData();
+    }
+  }, [userObj]);
 
   useEffect(() => {
     if (page === "Edit") {
@@ -212,7 +250,7 @@ const UserPage = () => {
           />
           <RxAvatar size={32} />
           <h1 className="pl-1 text-lg sm:text-2xl text-foreground dark:text-foreground">
-            {page || ""} {entity || ""}
+            {page || ""} User
           </h1>
         </div>
       </div>
@@ -220,7 +258,7 @@ const UserPage = () => {
         <Card className="flex flex-col justify-center items-center shadow-lg bg-card rounded-2xl border-0 h-auto w-full sm:w-1/2 md:w-[600px] p-8 sm:p-10 md:p-12 gap-10">
           <div className="flex flex-col justify-center items-center h-auto w-full gap-5">
             <div className="w-full font-bold text-center text-xl md:text-2xl">
-              {page || ""} {entity || ""}
+              {page || ""} User
             </div>
             {publicId ? (
               <AdvancedImage
@@ -242,7 +280,7 @@ const UserPage = () => {
           </div>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(handleEntity)}
+              onSubmit={form.handleSubmit(handleUser)}
               className="w-full flex flex-col gap-5"
             >
               <FormField
@@ -317,10 +355,86 @@ const UserPage = () => {
                   );
                 }}
               />
-              <div className="flex flex-col sm:flex-row justify-between gap-2">
-                <div className="mt-3 text-xs md:text-sm">
-                  Role Management* :
+              {userObj?.role?.type === "SuperAdmin" && (
+                <div className="flex flex-col sm:flex-row justify-between gap-2">
+                  <div className="mt-3 text-xs md:text-sm">
+                    Select Organisation* :
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="input"
+                        className="flex justify-between w-full md:max-w-[300px] gap-2 rounded-md"
+                      >
+                        <div>{organisation || names[0]?.name}</div>
+                        <FaAngleDown />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-60">
+                      <DropdownMenuRadioGroup
+                        value={organisation || names[0]?.name}
+                        onValueChange={(v) => {
+                          setOrganisation(v);
+                        }}
+                      >
+                        {names.map((item, index) => {
+                          return (
+                            <DropdownMenuRadioItem
+                              key={index}
+                              value={item.name}
+                              className="flex flex-row justify-start w-full px-5"
+                            >
+                              {item.name}
+                            </DropdownMenuRadioItem>
+                          );
+                        })}
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
+              )}
+              {userObj?.role?.type === "SuperAdmin" && (
+                <div className="flex flex-col sm:flex-row justify-between gap-2">
+                  <div className="mt-3 text-xs md:text-sm">
+                    Role Management* :
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="input"
+                        className="flex justify-between w-full md:max-w-[300px] gap-2 rounded-md"
+                      >
+                        <div>{role}</div>
+                        <FaAngleDown />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-60">
+                      <DropdownMenuRadioGroup
+                        value={role}
+                        onValueChange={(v) => {
+                          setRole(v);
+                        }}
+                      >
+                        {roles.map((role, index) => {
+                          return (
+                            <DropdownMenuRadioItem
+                              key={index}
+                              value={role}
+                              className="flex flex-row justify-start w-full px-5"
+                            >
+                              {role}
+                            </DropdownMenuRadioItem>
+                          );
+                        })}
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
+              <div className="flex flex-col sm:flex-row justify-between gap-2">
+                <div className="mt-3 text-xs md:text-sm">User Profile* :</div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -328,25 +442,25 @@ const UserPage = () => {
                       variant="input"
                       className="flex justify-between w-full md:max-w-[300px] gap-2 rounded-md"
                     >
-                      <div>{role || "NA"}</div>
+                      <div>{profile}</div>
                       <FaAngleDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-60">
                     <DropdownMenuRadioGroup
-                      value={role}
+                      value={profile}
                       onValueChange={(v) => {
-                        setRole(v);
+                        setProfile(v);
                       }}
                     >
-                      {roles.map((role, index) => {
+                      {profiles.map((profile, index) => {
                         return (
                           <DropdownMenuRadioItem
                             key={index}
-                            value={role}
+                            value={profile}
                             className="flex flex-row justify-start w-full px-5"
                           >
-                            {role}
+                            {profile}
                           </DropdownMenuRadioItem>
                         );
                       })}

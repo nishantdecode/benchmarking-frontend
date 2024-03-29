@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { useSelector, useDispatch } from "react-redux";
@@ -38,7 +38,7 @@ const Navbar = () => {
 
   const user = useSelector((state) => state.auth.user);
 
-  const [publicId] = useState(user?.picture);
+  const [publicId, setPublicId] = useState(user?.picture);
   const cld = new Cloudinary({
     cloud: {
       cloudName: "dohnlambm",
@@ -53,6 +53,12 @@ const Navbar = () => {
     localStorage.removeItem("accessToken");
     showToast("Logged Out!", "Please Login.");
   };
+
+  useEffect(() => {
+    if (user) {
+      setPublicId(user.picture);
+    }
+  }, [user]);
 
   return (
     <div>

@@ -39,9 +39,9 @@ import { useGetItemByCategoryMutation } from "@/lib/features/services/analysisAp
 const AnalysisPage = () => {
   let ref = useRef();
 
-  const break1 = useMediaQuery("(max-width: 1300px)");
-  const break2 = useMediaQuery("(max-width: 1450px)");
-  const break3 = useMediaQuery("(max-width: 1600px)");
+  const break1 = useMediaQuery("(max-width: 1200px)");
+  const break2 = useMediaQuery("(max-width: 1400px)");
+  const break3 = useMediaQuery("(max-width: 1750px)");
 
   const [getRatio] = useGetRatioMutation();
   const [getAllYears] = useGetAllYearsMutation();
@@ -321,7 +321,7 @@ const AnalysisPage = () => {
         </div>
         {analysis === "Balance Sheet/BN" ? (
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-            <div className="lg:sticky lg:top-14 h-auto w-full sm:w-auto lg:w-[23vw] lg:max-w-1/6">
+            <div className="lg:sticky lg:top-14 h-auto w-full sm:w-auto lg:w-[17vw] 2xl:w-[20vw] lg:max-w-1/6">
               <SelectCategory
                 height="h-[650px]"
                 search={true}
@@ -332,7 +332,7 @@ const AnalysisPage = () => {
             </div>
             <div
               className={`flex flex-col h-auto w-full ${
-                break1 ? "lg:w-[66vw]" : break2 ? "lg:w-[70vw]" : break3 ? "lg:w-[74vw]" : "lg:w-[76vw]"
+                break1 ? "lg:w-[72vw]" : break2 ? "lg:w-[74vw]" : break3 ? "lg:w-[75vw]" : "lg:w-[78vw]"
               } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}
             >
               {balanceSheet.length !== 0 && (
@@ -351,7 +351,7 @@ const AnalysisPage = () => {
           </div>
         ) : analysis === "Income Statement/BN" ? (
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[23vw] lg:max-w-1/6">
+            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[17vw] 2xl:w-[20vw] lg:max-w-1/6">
               <SelectCategory
                 height="h-[650px]"
                 search={true}
@@ -362,7 +362,7 @@ const AnalysisPage = () => {
             </div>
             <div
               className={`flex flex-col h-auto w-full ${
-                break1 ? "lg:w-[66vw]" : break2 ? "lg:w-[70vw]" : break3 ? "lg:w-[74vw]" : "lg:w-[76vw]"
+                break1 ? "lg:w-[72vw]" : break2 ? "lg:w-[74vw]" : break3 ? "lg:w-[75vw]" : "lg:w-[78vw]"
               } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}
             >
               {incomeStatement.length !== 0 && (
@@ -381,7 +381,7 @@ const AnalysisPage = () => {
           </div>
         ) : (
           <div className="flex flex-col lg:flex-row justify-center lg:justify-between items-center min-w-full gap-3">
-            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[23vw] lg:max-w-1/6">
+            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[17vw] 2xl:w-[20vw] lg:max-w-1/6">
               <SelectCategory
                 height="h-[650px]"
                 search={true}
@@ -392,7 +392,7 @@ const AnalysisPage = () => {
             </div>
             <div
               className={`flex flex-col w-full ${
-                break1 ? "lg:w-[66vw]" : break2 ? "lg:w-[70vw]" : break3 ? "lg:w-[74vw]" : "lg:w-[76vw]"
+                break1 ? "lg:w-[72vw]" : break2 ? "lg:w-[74vw]" : break3 ? "lg:w-[75vw]" : "lg:w-[78vw]"
               } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-5`}
             >
               <div className="flex flex-col lg:flex-row w-full justify-center lg:justify-between items-center gap-5">
@@ -450,7 +450,7 @@ const AnalysisPage = () => {
       {analysis === "Balance Sheet/BN" ? (
         <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-            <div className="lg:sticky lg:top-14 flex h-full w-full sm:w-auto lg:w-[23vw] lg:max-w-1/6">
+            <div className="lg:sticky lg:top-14 flex h-full w-full sm:w-auto lg:w-[17vw] 2xl:w-[20vw] lg:max-w-1/6">
               <SelectCategory
                 height="h-[650px]"
                 search={true}
@@ -461,7 +461,7 @@ const AnalysisPage = () => {
             </div>
             <div
               className={`flex flex-col h-auto w-full ${
-                break1 ? "lg:w-[66vw]" : break2 ? "lg:w-[70vw]" : break3 ? "lg:w-[74vw]" : "lg:w-[76vw]"
+                break1 ? "lg:w-[72vw]" : break2 ? "lg:w-[74vw]" : break3 ? "lg:w-[75vw]" : "lg:w-[78vw]"
               } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}
             >
               {msBalanceSheet.length !== 0 && (
@@ -482,7 +482,7 @@ const AnalysisPage = () => {
       ) : analysis === "Income Statement/BN" ? (
         <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[23vw] lg:max-w-1/6">
+            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[17vw] 2xl:w-[20vw] lg:max-w-1/6">
               <SelectCategory
                 height="h-[650px]"
                 search={true}
@@ -493,7 +493,7 @@ const AnalysisPage = () => {
             </div>
             <div
               className={`flex flex-col h-auto w-full ${
-                break1 ? "lg:w-[66vw]" : break2 ? "lg:w-[70vw]" : break3 ? "lg:w-[74vw]" : "lg:w-[76vw]"
+                break1 ? "lg:w-[72vw]" : break2 ? "lg:w-[74vw]" : break3 ? "lg:w-[75vw]" : "lg:w-[78vw]"
               } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}
             >
               {msIncomeStatement.length !== 0 && (
@@ -514,7 +514,7 @@ const AnalysisPage = () => {
       ) : (
         <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
           <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[23vw] lg:max-w-1/6">
+            <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[17vw] 2xl:w-[20vw] lg:max-w-1/6">
               <SelectCategory
                 height="h-[650px]"
                 search={true}
@@ -525,7 +525,7 @@ const AnalysisPage = () => {
             </div>
             <div
               className={`flex flex-col h-auto w-full ${
-                break1 ? "lg:w-[66vw]" : break2 ? "lg:w-[70vw]" : break3 ? "lg:w-[74vw]" : "lg:w-[76vw]"
+                break1 ? "lg:w-[72vw]" : break2 ? "lg:w-[74vw]" : break3 ? "lg:w-[75vw]" : "lg:w-[78vw]"
               } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}
             >
               {figuresCategory.length !== 0 && (
