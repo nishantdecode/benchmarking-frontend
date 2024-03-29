@@ -35,413 +35,418 @@ import { PiBankBold } from "react-icons/pi";
 import { useRequestExtractionMutation } from "@/lib/features/services/bankApi";
 import showToast from "@/util/showToast";
 
-const bankColumns = [
-  {
-    accessorKey: "name",
-    header: () => {
-      return <div className="w-auto text-center font-bold">Bank Name</div>;
-    },
-    cell: ({ row }) => {
-      const cld = new Cloudinary({
-        cloud: {
-          cloudName: "dohnlambm",
-        },
-      });
-      const myImage = cld.image(row.original.iconUrl);
-      return (
-        <div className="flex flex-row w-auto gap-4 text-left font-medium">
-          <div
-            className="max-h-5 min-h-5 max-w-5 min-w-5 mt-1.5"
-            style={{ backgroundColor: row.original.color }}
-          ></div>
-          <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
-            {myImage ? (
-              <AdvancedImage
-                className="w-8 h-8 object-cover rounded-full bg-white"
-                cldImg={myImage}
-                plugins={[responsive(), placeholder()]}
-              />
-            ) : (
-              <div className="flex justify-center items-center h-10 w-10 bg-foreground rounded-full">
-                <PiBankBold size={10} className="text-secondary" />
-              </div>
-            )}
-          </div>
-          <span className="mt-2 text-xs truncate text-ellipsis">
-            {row.getValue("name")}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "headquarters",
-    header: () => {
-      return (
-        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
-          Headquarters
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      return (
-        <div className="text-center font-medium">
-          {row.getValue("headquarters")}
-        </div>
-      );
-    },
-  },
-  {
-    id: "extract",
-    header: () => {
-      return (
-        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
-          Status
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      const bank = row.original;
-      const userObj = useSelector((state) => state.auth.user) || null;
-      const [requestExtraction, { isLoading, isSuccess }] =
-        useRequestExtractionMutation();
-      const requestExtract = async ({ bank, user }) => {
-        try {
-          const response = await requestExtraction({ bank, user });
-          if (response.data) {
-            // showToast("Data Extraction mail sent!", undefined);
-            // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
-            window.location.href =
-              "https://benchmarking-fe.vercel.app/dashboard/admin";
-            // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
-          }
-        } catch (err) {
-          console.log(err);
-          showToast("Error!", "Please try again later.");
-        }
-      };
-      return (
-        <div className="flex flex-row justify-center items-center w-auto text-center font-medium">
-          {bank?.extraction?.disabled ? (
-            <Button
-              size="sm"
-              variant="toggleActive"
-              className="flex flex-row w-auto gap-2 px-10 text-xs rounded-xl"
-            >
-              <MdFindInPage size={15} />
-              Data Extracted
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              variant="outline"
-              className="flex flex-row w-auto gap-2 px-10 text-xs rounded-xl"
-              onClick={() =>
-                requestExtract({ bank: bank.name, user: userObj.email })
-              }
-            >
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <MdFindInPage size={15} />
-              )}
-              Request Extraction
-            </Button>
-          )}
-        </div>
-      );
-    },
-  },
-  {
-    id: "edit",
-    header: () => {
-      return (
-        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold"></div>
-      );
-    },
-    cell: ({ row }) => {
-      const bank = row.original;
-      return (
-        <div className="w-auto text-center font-medium">
-          <Button
-            size="sm"
-            variant="link"
-            className="flex flex-row w-auto text-xs rounded-sm"
-          >
-            <Link href={`/dashboard/admin/bank?action=edit&bankId=${bank.id}`}>
-              <BiEdit size={15} />
-            </Link>
-          </Button>
-        </div>
-      );
-    },
-  },
-];
-
-const bankViewColumns = [
-  {
-    accessorKey: "name",
-    header: () => {
-      return <div className="w-auto text-center font-bold">Bank Name</div>;
-    },
-    cell: ({ row }) => {
-      const cld = new Cloudinary({
-        cloud: {
-          cloudName: "dohnlambm",
-        },
-      });
-      const myImage = cld.image(row.original.iconUrl);
-      return (
-        <div className="flex flex-row w-auto gap-4 text-left font-medium">
-          <div
-            className="max-h-5 min-h-5 max-w-5 min-w-5 mt-1.5"
-            style={{ backgroundColor: row.original.color }}
-          ></div>
-          <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
-            {myImage ? (
-              <AdvancedImage
-                className="w-8 h-8 object-cover rounded-full bg-white"
-                cldImg={myImage}
-                plugins={[responsive(), placeholder()]}
-              />
-            ) : (
-              <div className="flex justify-center items-center h-10 w-10 bg-foreground rounded-full">
-                <PiBankBold size={10} className="text-secondary" />
-              </div>
-            )}
-          </div>
-          <span className="mt-2 text-xs truncate text-ellipsis">
-            {row.getValue("name")}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "headquarters",
-    header: () => {
-      return (
-        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
-          Headquarters
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      return (
-        <div className="text-center font-medium">
-          {row.getValue("headquarters")}
-        </div>
-      );
-    },
-  },
-];
-
-const userColumns = [
-  {
-    accessorKey: "name",
-    header: () => {
-      return <div className="w-auto text-center font-bold">User Name</div>;
-    },
-    cell: ({ row }) => {
-      const cld = new Cloudinary({
-        cloud: {
-          cloudName: "dohnlambm",
-        },
-      });
-      const myImage = cld.image(row.original.picture);
-      return (
-        <div className="flex flex-row w-auto gap-4 text-left font-medium">
-          <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
-            {myImage ? (
-              <AdvancedImage
-                className="w-8 h-8 object-cover rounded-full bg-white"
-                cldImg={myImage}
-                plugins={[responsive(), placeholder()]}
-              />
-            ) : (
-              <div className="flex justify-center items-center h-10 w-10 bg-foreground rounded-full">
-                <RxAvatar size={10} className="text-secondary" />
-              </div>
-            )}
-          </div>
-          <span className="mt-2 text-xs truncate text-ellipsis">
-            {row.getValue("name").first} {row.getValue("name").last}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "email",
-    header: () => {
-      return (
-        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
-          Email ID
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      return (
-        <div className="text-center font-medium">{row.getValue("email")}</div>
-      );
-    },
-  },
-  {
-    accessorKey: "organisation",
-    header: () => {
-      return (
-        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
-          Organisation
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      return (
-        <div className="text-center font-medium">
-          {row.getValue("organisation")}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "role",
-    header: () => {
-      return (
-        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
-          Profile
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      return (
-        <div className="text-center font-medium">
-          {row.getValue("role")?.name}
-        </div>
-      );
-    },
-  },
-  {
-    id: "edit",
-    header: () => {
-      return (
-        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold"></div>
-      );
-    },
-    cell: ({ row }) => {
-      const user = row.original;
-      return (
-        <div className="text-center font-medium">
-          <Button
-            size="sm"
-            variant="link"
-            className="flex flex-row text-xs rounded-sm"
-          >
-            <Link href={`/dashboard/admin/user?action=edit&userId=${user.id}`}>
-              <BiEdit size={15} />
-            </Link>
-          </Button>
-        </div>
-      );
-    },
-  },
-];
-
-const organisationColumns = [
-  {
-    accessorKey: "name",
-    header: () => {
-      return <div className="w-auto text-center font-bold">Name</div>;
-    },
-    cell: ({ row }) => {
-      const cld = new Cloudinary({
-        cloud: {
-          cloudName: "dohnlambm",
-        },
-      });
-      const myImage = cld.image(row.original.picture);
-      return (
-        <div className="flex flex-row w-auto gap-4 text-left font-medium">
-          <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
-            {myImage ? (
-              <AdvancedImage
-                className="w-8 h-8 object-cover rounded-full bg-white"
-                cldImg={myImage}
-                plugins={[responsive(), placeholder()]}
-              />
-            ) : (
-              <div className="flex justify-center items-center h-10 w-10 bg-foreground rounded-full">
-                <RxAvatar size={10} className="text-secondary" />
-              </div>
-            )}
-          </div>
-          <span className="mt-2 text-xs truncate text-ellipsis">
-            {row.getValue("name")}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "headquarter",
-    header: () => {
-      return (
-        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
-          Headquarter
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      return (
-        <div className="text-center font-medium">
-          {row.getValue("headquarter")}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "contact",
-    header: () => {
-      return (
-        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
-          Contact
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      return (
-        <div className="text-center font-medium">{row.getValue("contact")}</div>
-      );
-    },
-  },
-  {
-    id: "edit",
-    header: () => {
-      return (
-        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold"></div>
-      );
-    },
-    cell: ({ row }) => {
-      const organisation = row.original;
-      return (
-        <div className="text-center font-medium">
-          <Button
-            size="sm"
-            variant="link"
-            className="flex flex-row text-xs rounded-sm"
-          >
-            <Link
-              href={`/dashboard/admin/organisation?action=edit&organisationId=${organisation.id}`}
-            >
-              <BiEdit size={15} />
-            </Link>
-          </Button>
-        </div>
-      );
-    },
-  },
-];
-
 export function VisualiseTable({ data, columnName, role, search, title }) {
+  const userObj = useSelector((state) => state.auth.user) || null;
+  const [requestExtraction, { isLoading, isSuccess }] =
+    useRequestExtractionMutation();
+  const requestExtract = async ({ bank, user }) => {
+    try {
+      const response = await requestExtraction({ bank, user });
+      if (response.data) {
+        // showToast("Data Extraction mail sent!", undefined);
+        // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
+        window.location.href =
+          "https://benchmarking-fe.vercel.app/dashboard/admin";
+        // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
+      }
+    } catch (err) {
+      console.log(err);
+      showToast("Error!", "Please try again later.");
+    }
+  };
+  const bankColumns = [
+    {
+      accessorKey: "name",
+      header: () => {
+        return <div className="w-auto text-center font-bold">Bank Name</div>;
+      },
+      cell: ({ row }) => {
+        const cld = new Cloudinary({
+          cloud: {
+            cloudName: "dohnlambm",
+          },
+        });
+        const myImage = cld.image(row.original.iconUrl);
+        return (
+          <div className="flex flex-row w-auto gap-4 text-left font-medium">
+            <div
+              className="max-h-5 min-h-5 max-w-5 min-w-5 mt-1.5"
+              style={{ backgroundColor: row.original.color }}
+            ></div>
+            <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
+              {myImage ? (
+                <AdvancedImage
+                  className="w-8 h-8 object-cover rounded-full bg-white"
+                  cldImg={myImage}
+                  plugins={[responsive(), placeholder()]}
+                />
+              ) : (
+                <div className="flex justify-center items-center h-10 w-10 bg-foreground rounded-full">
+                  <PiBankBold size={10} className="text-secondary" />
+                </div>
+              )}
+            </div>
+            <span className="mt-2 text-xs truncate text-ellipsis">
+              {row.getValue("name")}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "headquarters",
+      header: () => {
+        return (
+          <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
+            Headquarters
+          </div>
+        );
+      },
+      cell: ({ row }) => {
+        return (
+          <div className="text-center font-medium">
+            {row.getValue("headquarters")}
+          </div>
+        );
+      },
+    },
+    {
+      id: "extract",
+      header: () => {
+        return (
+          <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
+            Status
+          </div>
+        );
+      },
+      cell: ({ row }) => {
+        const bank = row.original;
+        return (
+          <div className="flex flex-row justify-center items-center w-auto text-center font-medium">
+            {bank?.extraction?.disabled ? (
+              <Button
+                size="sm"
+                variant="toggleActive"
+                className="flex flex-row w-auto gap-2 px-10 text-xs rounded-xl"
+              >
+                <MdFindInPage size={15} />
+                Data Extracted
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex flex-row w-auto gap-2 px-10 text-xs rounded-xl"
+                onClick={() =>
+                  requestExtract({ bank: bank.name, user: userObj.email })
+                }
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <MdFindInPage size={15} />
+                )}
+                Request Extraction
+              </Button>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      id: "edit",
+      header: () => {
+        return (
+          <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold"></div>
+        );
+      },
+      cell: ({ row }) => {
+        const bank = row.original;
+        return (
+          <div className="w-auto text-center font-medium">
+            <Button
+              size="sm"
+              variant="link"
+              className="flex flex-row w-auto text-xs rounded-sm"
+            >
+              <Link
+                href={`/dashboard/admin/bank?action=edit&bankId=${bank.id}`}
+              >
+                <BiEdit size={15} />
+              </Link>
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  const bankViewColumns = [
+    {
+      accessorKey: "name",
+      header: () => {
+        return <div className="w-auto text-center font-bold">Bank Name</div>;
+      },
+      cell: ({ row }) => {
+        const cld = new Cloudinary({
+          cloud: {
+            cloudName: "dohnlambm",
+          },
+        });
+        const myImage = cld.image(row.original.iconUrl);
+        return (
+          <div className="flex flex-row w-auto gap-4 text-left font-medium">
+            <div
+              className="max-h-5 min-h-5 max-w-5 min-w-5 mt-1.5"
+              style={{ backgroundColor: row.original.color }}
+            ></div>
+            <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
+              {myImage ? (
+                <AdvancedImage
+                  className="w-8 h-8 object-cover rounded-full bg-white"
+                  cldImg={myImage}
+                  plugins={[responsive(), placeholder()]}
+                />
+              ) : (
+                <div className="flex justify-center items-center h-10 w-10 bg-foreground rounded-full">
+                  <PiBankBold size={10} className="text-secondary" />
+                </div>
+              )}
+            </div>
+            <span className="mt-2 text-xs truncate text-ellipsis">
+              {row.getValue("name")}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "headquarters",
+      header: () => {
+        return (
+          <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
+            Headquarters
+          </div>
+        );
+      },
+      cell: ({ row }) => {
+        return (
+          <div className="text-center font-medium">
+            {row.getValue("headquarters")}
+          </div>
+        );
+      },
+    },
+  ];
+
+  const userColumns = [
+    {
+      accessorKey: "name",
+      header: () => {
+        return <div className="w-auto text-center font-bold">User Name</div>;
+      },
+      cell: ({ row }) => {
+        const cld = new Cloudinary({
+          cloud: {
+            cloudName: "dohnlambm",
+          },
+        });
+        const myImage = cld.image(row.original.picture);
+        return (
+          <div className="flex flex-row w-auto gap-4 text-left font-medium">
+            <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
+              {myImage ? (
+                <AdvancedImage
+                  className="w-8 h-8 object-cover rounded-full bg-white"
+                  cldImg={myImage}
+                  plugins={[responsive(), placeholder()]}
+                />
+              ) : (
+                <div className="flex justify-center items-center h-10 w-10 bg-foreground rounded-full">
+                  <RxAvatar size={10} className="text-secondary" />
+                </div>
+              )}
+            </div>
+            <span className="mt-2 text-xs truncate text-ellipsis">
+              {row.getValue("name").first} {row.getValue("name").last}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "email",
+      header: () => {
+        return (
+          <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
+            Email ID
+          </div>
+        );
+      },
+      cell: ({ row }) => {
+        return (
+          <div className="text-center font-medium">{row.getValue("email")}</div>
+        );
+      },
+    },
+    {
+      accessorKey: "organisation",
+      header: () => {
+        return (
+          <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
+            Organisation
+          </div>
+        );
+      },
+      cell: ({ row }) => {
+        return (
+          <div className="text-center font-medium">
+            {row.getValue("organisation")}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "role",
+      header: () => {
+        return (
+          <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
+            Profile
+          </div>
+        );
+      },
+      cell: ({ row }) => {
+        return (
+          <div className="text-center font-medium">
+            {row.getValue("role")?.name}
+          </div>
+        );
+      },
+    },
+    {
+      id: "edit",
+      header: () => {
+        return (
+          <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold"></div>
+        );
+      },
+      cell: ({ row }) => {
+        const user = row.original;
+        return (
+          <div className="text-center font-medium">
+            <Button
+              size="sm"
+              variant="link"
+              className="flex flex-row text-xs rounded-sm"
+            >
+              <Link
+                href={`/dashboard/admin/user?action=edit&userId=${user.id}`}
+              >
+                <BiEdit size={15} />
+              </Link>
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  const organisationColumns = [
+    {
+      accessorKey: "name",
+      header: () => {
+        return <div className="w-auto text-center font-bold">Name</div>;
+      },
+      cell: ({ row }) => {
+        const cld = new Cloudinary({
+          cloud: {
+            cloudName: "dohnlambm",
+          },
+        });
+        const myImage = cld.image(row.original.picture);
+        return (
+          <div className="flex flex-row w-auto gap-4 text-left font-medium">
+            <div className="flex flex-row justify-center items-center min-h-6 min-w-6 rounded-full bg-secondary dark:bg-white">
+              {myImage ? (
+                <AdvancedImage
+                  className="w-8 h-8 object-cover rounded-full bg-white"
+                  cldImg={myImage}
+                  plugins={[responsive(), placeholder()]}
+                />
+              ) : (
+                <div className="flex justify-center items-center h-10 w-10 bg-foreground rounded-full">
+                  <RxAvatar size={10} className="text-secondary" />
+                </div>
+              )}
+            </div>
+            <span className="mt-2 text-xs truncate text-ellipsis">
+              {row.getValue("name")}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "headquarter",
+      header: () => {
+        return (
+          <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
+            Headquarter
+          </div>
+        );
+      },
+      cell: ({ row }) => {
+        return (
+          <div className="text-center font-medium">
+            {row.getValue("headquarter")}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "contact",
+      header: () => {
+        return (
+          <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
+            Contact
+          </div>
+        );
+      },
+      cell: ({ row }) => {
+        return (
+          <div className="text-center font-medium">
+            {row.getValue("contact")}
+          </div>
+        );
+      },
+    },
+    {
+      id: "edit",
+      header: () => {
+        return (
+          <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold"></div>
+        );
+      },
+      cell: ({ row }) => {
+        const organisation = row.original;
+        return (
+          <div className="text-center font-medium">
+            <Button
+              size="sm"
+              variant="link"
+              className="flex flex-row text-xs rounded-sm"
+            >
+              <Link
+                href={`/dashboard/admin/organisation?action=edit&organisationId=${organisation.id}`}
+              >
+                <BiEdit size={15} />
+              </Link>
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
   const router = useRouter();
   const category = title;
   const [sorting, setSorting] = React.useState([]);
