@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { Loader2 } from "lucide-react";
+import { useSelector } from "react-redux";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { useRouter } from "next/navigation";
 import { AdvancedImage, responsive, placeholder } from "@cloudinary/react";
@@ -30,6 +32,8 @@ import { BiEdit } from "react-icons/bi";
 import { MdFindInPage } from "react-icons/md";
 import { RxAvatar } from "react-icons/rx";
 import { PiBankBold } from "react-icons/pi";
+import { useRequestExtractionMutation } from "@/lib/features/services/bankApi";
+import showToast from "@/util/showToast";
 
 const bankColumns = [
   {
@@ -98,17 +102,52 @@ const bankColumns = [
     },
     cell: ({ row }) => {
       const bank = row.original;
+      const userObj = useSelector((state) => state.auth.user) || null;
+      const [requestExtraction, { isLoading, isSuccess }] =
+        useRequestExtractionMutation();
+      const requestExtract = async ({ bank, user }) => {
+        try {
+          const response = await requestExtraction({ bank, user });
+          if (response.data) {
+            // showToast("Data Extraction mail sent!", undefined);
+            // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
+            window.location.href =
+              "https://benchmarking-fe.vercel.app/dashboard/admin";
+            // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
+          }
+        } catch (err) {
+          console.log(err);
+          showToast("Error!", "Please try again later.");
+        }
+      };
       return (
         <div className="flex flex-row justify-center items-center w-auto text-center font-medium">
-          <Button
-            size="sm"
-            variant="outline"
-            className="flex flex-row w-auto gap-2 px-10 text-xs rounded-xl"
-            onClick={() => console.log(bank.id)}
-          >
-            <MdFindInPage size={15} />
-            Request Extraction
-          </Button>
+          {bank?.extraction?.disabled ? (
+            <Button
+              size="sm"
+              variant="toggleActive"
+              className="flex flex-row w-auto gap-2 px-10 text-xs rounded-xl"
+            >
+              <MdFindInPage size={15} />
+              Data Extracted
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex flex-row w-auto gap-2 px-10 text-xs rounded-xl"
+              onClick={() =>
+                requestExtract({ bank: bank.name, user: userObj.email })
+              }
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <MdFindInPage size={15} />
+              )}
+              Request Extraction
+            </Button>
+          )}
         </div>
       );
     },
@@ -248,11 +287,28 @@ const userColumns = [
     },
   },
   {
+    accessorKey: "organisation",
+    header: () => {
+      return (
+        <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
+          Organisation
+        </div>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div className="text-center font-medium">
+          {row.getValue("organisation")}
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "role",
     header: () => {
       return (
         <div className="flex flex-row justify-center w-auto gap-2 truncate text-ellipsis font-semibold">
-          Role
+          Profile
         </div>
       );
     },
@@ -280,9 +336,7 @@ const userColumns = [
             variant="link"
             className="flex flex-row text-xs rounded-sm"
           >
-            <Link
-              href={`/dashboard/admin/user?action=edit&userId=${user.id}&entity=User`}
-            >
+            <Link href={`/dashboard/admin/user?action=edit&userId=${user.id}`}>
               <BiEdit size={15} />
             </Link>
           </Button>
@@ -428,10 +482,23 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
           </div>
         )}
         <div className="flex flex-col lg:flex-row w-full justify-between items-center lg:justify-end gap-4">
-          {data? search : false && (
+          {title === "Users" ? (
+            data &&
+            search && (
+              <div className="flex flex-col sm:flex-row items-center justify-end w-full sm:w-auto gap-2">
+                <Input
+                  placeholder="Filter data by email..."
+                  value={table?.getColumn("email")?.getFilterValue() ?? ""}
+                  onChange={(event) =>
+                    table.getColumn("email")?.setFilterValue(event.target.value)
+                  }
+                />
+              </div>
+            )
+          ) : (
             <div className="flex flex-col sm:flex-row items-center justify-end w-full sm:w-auto gap-2">
               <Input
-                placeholder="Filter data..."
+                placeholder="Filter data by name..."
                 value={table?.getColumn("name")?.getFilterValue() ?? ""}
                 onChange={(event) =>
                   table.getColumn("name")?.setFilterValue(event.target.value)
@@ -449,9 +516,7 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
                     ? router.push("/dashboard/admin/bank?action=add")
                     : category === "Organisations"
                     ? router.push("/dashboard/admin/organisation?action=add")
-                    : router.push(
-                        "/dashboard/admin/user?action=add&entity=User"
-                      )
+                    : router.push("/dashboard/admin/user?action=add")
                 }
               >
                 {category === "Banks"
@@ -466,9 +531,7 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
               <Button
                 variant="default"
                 className="flex py-0 text-xs justify-center w-auto"
-                onClick={() =>
-                  router.push("/dashboard/admin/user?action=add&entity=User")
-                }
+                onClick={() => router.push("/dashboard/admin/user?action=add")}
               >
                 {"Add User"}
               </Button>
@@ -531,7 +594,7 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
                   colSpan={columns?.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No Data!
                 </TableCell>
               </TableRow>
             )}
