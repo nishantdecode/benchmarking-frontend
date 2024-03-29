@@ -219,7 +219,7 @@ export function DataDialog({ banks, handleAction }) {
                 {isDragActive ? (
                   <p>Drop the sheet here ...</p>
                 ) : (
-                  <p>Drag 'n' drop or click to upload sheet</p>
+                  <p>Drag n drop or click to upload sheet</p>
                 )}
               </div>
             </div>
