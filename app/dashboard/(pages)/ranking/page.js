@@ -7,13 +7,18 @@ import { itemAnalysisCategories } from "@/app/data/categoryData";
 
 import { Card } from "@/components/ui/card";
 
+import showToast from "@/util/showToast";
+import useMediaQuery from "@/app/hooks/useMediaQuery";
 import { SelectCategory } from "@/app/components/selectCategory";
 import { generateColumns } from "@/app/components/visualise/columns";
 import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
 import { useGetRankByCategoryMutation } from "@/lib/features/services/analysisApi";
-import showToast from "@/util/showToast";
 
 const Ranking = () => {
+  const break1 = useMediaQuery("(max-width: 1200px)");
+  const break2 = useMediaQuery("(max-width: 1400px)");
+  const break3 = useMediaQuery("(max-width: 1750px)");
+
   const [getRank] = useGetRankByCategoryMutation();
 
   const [balanceSheet, setBalanceSheet] = useState([]);
@@ -97,7 +102,7 @@ const Ranking = () => {
           </div>
         </div>
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-          <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+          <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[17vw] 2xl:w-[20vw] lg:max-w-1/6">
             <SelectCategory
               search={true}
               height="h-[700px]"
@@ -106,7 +111,11 @@ const Ranking = () => {
               categories={itemAnalysisCategories.balanceSheet}
             />
           </div>
-          <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+          <div
+            className={`flex flex-col h-auto w-full ${
+              break1 ? "lg:w-[72vw]" : break2 ? "lg:w-[74vw]" : break3 ? "lg:w-[75vw]" : "lg:w-[78vw]"
+            } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}
+          >
             {balanceSheet.length !== 0 && (
               <VisualiseTable
                 exportXls="true"
@@ -128,7 +137,7 @@ const Ranking = () => {
           </div>
         </div>
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-          <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-1/6">
+          <div className="lg:sticky lg:top-14 h-full w-full sm:w-auto lg:w-[17vw] 2xl:w-[20vw] lg:max-w-1/6">
             <SelectCategory
               search={true}
               height="h-[700px]"
@@ -137,7 +146,11 @@ const Ranking = () => {
               categories={itemAnalysisCategories.incomeStatement}
             />
           </div>
-          <div className="flex flex-col h-[500px] sm:h-[700px] w-full lg:max-w-5/6 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+          <div
+            className={`flex flex-col h-auto w-full ${
+              break1 ? "lg:w-[72vw]" : break2 ? "lg:w-[74vw]" : break3 ? "lg:w-[75vw]" : "lg:w-[78vw]"
+            } lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}
+          >
             {incomeStatement.length !== 0 && (
               <VisualiseTable
                 exportXls="true"
