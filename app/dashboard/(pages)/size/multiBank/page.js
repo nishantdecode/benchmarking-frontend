@@ -127,7 +127,7 @@ const MultiBankPage = () => {
         setData: setAssets,
       });
     } else {
-      setAssets([])
+      setAssets([]);
     }
   }, [assetCategory, checkedBanks]);
 
@@ -142,7 +142,7 @@ const MultiBankPage = () => {
         setData: setLiabilities,
       });
     } else {
-      setLiabilities([])
+      setLiabilities([]);
     }
   }, [liabilityCategory, checkedBanks]);
 
@@ -157,7 +157,7 @@ const MultiBankPage = () => {
         setData: setShareholdersEquity,
       });
     } else {
-      setShareholdersEquity([])
+      setShareholdersEquity([]);
     }
   }, [equityCategory, checkedBanks]);
 
@@ -172,7 +172,7 @@ const MultiBankPage = () => {
         setData: setOperatingIncome,
       });
     } else {
-      setOperatingIncome([])
+      setOperatingIncome([]);
     }
   }, [incomeCategory, checkedBanks]);
 
@@ -187,7 +187,7 @@ const MultiBankPage = () => {
         setData: setOperatingExpenses,
       });
     } else {
-      setOperatingExpenses([])
+      setOperatingExpenses([]);
     }
   }, [expenseCategory, checkedBanks]);
 
@@ -265,7 +265,7 @@ const MultiBankPage = () => {
                     categories={commonSizeCategories.assets}
                   />
                 </div>
-                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
                   {assets.length !== 0 && (
                     <VisualiseTable data={assets} columns={assetsColumns} />
                   )}
@@ -282,7 +282,7 @@ const MultiBankPage = () => {
                     categories={commonSizeCategories.liabilities}
                   />
                 </div>
-                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
                   {liabilities.length !== 0 && (
                     <VisualiseTable
                       data={liabilities}
@@ -302,7 +302,7 @@ const MultiBankPage = () => {
                     categories={commonSizeCategories.shareholders_equity}
                   />
                 </div>
-                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
                   {shareholdersEquity.length !== 0 && (
                     <VisualiseTable
                       data={shareholdersEquity}
@@ -325,7 +325,7 @@ const MultiBankPage = () => {
                     categories={commonSizeCategories.operating_income}
                   />
                 </div>
-                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
                   {operatingIncome.length !== 0 && (
                     <VisualiseTable
                       data={operatingIncome}
@@ -345,7 +345,7 @@ const MultiBankPage = () => {
                     categories={commonSizeCategories.operating_expenses}
                   />
                 </div>
-                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 overflow-scroll sm:gap-3 md:gap-8 lg:gap-10">
+                <div className="flex flex-col h-auto w-full lg:w-4/5 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
                   {operatingExpenses.length !== 0 && (
                     <VisualiseTable
                       data={operatingExpenses}

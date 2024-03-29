@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Cloudinary } from "@cloudinary/url-gen";
@@ -36,24 +36,6 @@ import { useRequestExtractionMutation } from "@/lib/features/services/bankApi";
 import showToast from "@/util/showToast";
 
 export function VisualiseTable({ data, columnName, role, search, title }) {
-  const userObj = useSelector((state) => state.auth.user) || null;
-  const [requestExtraction, { isLoading, isSuccess }] =
-    useRequestExtractionMutation();
-  const requestExtract = async ({ bank, user }) => {
-    try {
-      const response = await requestExtraction({ bank, user });
-      if (response.data) {
-        // showToast("Data Extraction mail sent!", undefined);
-        // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
-        window.location.href =
-          "https://benchmarking-fe.vercel.app/dashboard/admin";
-        // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
-      }
-    } catch (err) {
-      console.log(err);
-      showToast("Error!", "Please try again later.");
-    }
-  };
   const bankColumns = [
     {
       accessorKey: "name",
@@ -121,6 +103,19 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
       },
       cell: ({ row }) => {
         const bank = row.original;
+        const requestExtract = async ({ bank, user }) => {
+          try {
+            const response = await requestExtraction({ bank, user });
+            if (response.data) {
+              // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
+              window.location.href = "https://benchmarking-fe.vercel.app/dashboard/admin";
+              // window.location.href = "http://localhost:3000/dashboard/admin";
+            }
+          } catch (err) {
+            console.log(err);
+            showToast("Error!", "Please try again later.");
+          }
+        };
         return (
           <div className="flex flex-row justify-center items-center w-auto text-center font-medium">
             {bank?.extraction?.disabled ? (
@@ -137,11 +132,13 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
                 size="sm"
                 variant="outline"
                 className="flex flex-row w-auto gap-2 px-10 text-xs rounded-xl"
-                onClick={() =>
-                  requestExtract({ bank: bank.name, user: userObj.email })
-                }
+                onClick={() => {
+                  setLoading({ bank: bank.name, isLoading: true });
+                  requestExtract({ bank: bank.name, user: userObj.email });
+                }}
               >
-                {isLoading ? (
+                {loading?.bank?.toString() === bank?.name?.toString() &&
+                loading?.isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <MdFindInPage size={15} />
@@ -451,6 +448,13 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
   const category = title;
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
+
+  const [loading, setLoading] = useState({
+    bank: null,
+    isLoading: false,
+  });
+  const [requestExtraction] = useRequestExtractionMutation();
+  const userObj = useSelector((state) => state.auth.user) || null;
 
   let columns = null;
   if (columnName === "bankColumns" && role === "SuperAdmin")

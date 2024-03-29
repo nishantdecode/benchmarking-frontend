@@ -17,7 +17,12 @@ import {
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FaAngleDown } from "react-icons/fa";
-import { useExportDataMutation } from "@/lib/features/services/individualBankApi";
+import {
+  useExportDataMutation,
+  useImportDataMutation,
+} from "@/lib/features/services/individualBankApi";
+import showToast from "@/util/showToast";
+import { MdClose } from "react-icons/md";
 
 const intervals = ["Annual", "Quarter 1", "Quarter 2", "Quarter 3"];
 
@@ -29,28 +34,34 @@ for (let year = startYear; year <= currentYear; year++) {
   years.push(year);
 }
 
-export function DataDialog({ banks, handleAction }) {
+export function DataDialog({ banks }) {
   const [getSheet] = useExportDataMutation();
+  const [uplaodSheet] = useImportDataMutation();
 
   const [bank, setBank] = useState(banks[0].name);
   const [interval, setInterval] = useState(intervals[0]);
   const [year, setYear] = useState(years[0]);
 
-  const [preview, setPreview] = useState(null);
+  const [file, setFile] = useState(null);
 
   const onDrop = useCallback((acceptedFiles) => {
-    const file = new FileReader();
-
-    file.onload = function () {
-      setPreview(file.result);
-    };
-
-    file.readAsDataURL(acceptedFiles[0]);
+    if (acceptedFiles) {
+      setFile({
+        doc: acceptedFiles[0],
+        preview: URL.createObjectURL(acceptedFiles[0]),
+      });
+    }
   }, []);
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } =
     useDropzone({
       onDrop,
+      accept: {
+        "application/vnd.ms-excel": [".xls"],
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
+          ".xlsx",
+        ],
+      },
     });
 
   async function handleUpload(e) {
@@ -60,13 +71,8 @@ export function DataDialog({ banks, handleAction }) {
 
     const formData = new FormData();
 
-    formData.append("file", acceptedFiles[0]);
+    formData.append("file", acceptedFiles[0], acceptedFiles[0].name);
 
-    console.log(formData);
-  }
-
-  async function handleDownload() {
-    // console.log("Hello");
     try {
       const bankId = banks.find((item) => item.name === bank).id;
       let quarter = null;
@@ -83,9 +89,48 @@ export function DataDialog({ banks, handleAction }) {
         default:
           break;
       }
-      // const response = await getSheet({ bankId, year, quarter });
-      window.open(`http://154.49.243.15:8003/api/individualBank/export?bankId=${bankId}&year=${year}&quarter=${quarter}`)
-      // console.log(response)
+
+      const response = await uplaodSheet({ bankId, year, quarter, formData });
+      if (response.data) {
+        showToast("Upload Successful!", undefined);
+      }
+    } catch (err) {
+      showToast("Error!", "Upload Failed!");
+    }
+  }
+
+  async function handleDownload() {
+    try {
+      const bankId = banks.find((item) => item.name === bank).id;
+      let quarter = null;
+      switch (interval) {
+        case "Quarter 1":
+          quarter = 1;
+          break;
+        case "Quarter 2":
+          quarter = 2;
+          break;
+        case "Quarter 3":
+          quarter = 3;
+          break;
+        default:
+          break;
+      }
+      const response = await getSheet({ bankId, year, quarter });
+
+      const csv = response.data.result.csv;
+      const blob = new Blob([csv], { type: "text/csv" });
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.setAttribute("download", "sampleData.csv");
+      document.body.appendChild(link);
+
+      link.click();
+      link.parentNode.removeChild(link);
     } catch (err) {
       showToast("Error!", "Download Failed!");
     }
@@ -211,37 +256,53 @@ export function DataDialog({ banks, handleAction }) {
               </DropdownMenu>
             </div>
             <div className="flex flex-col justify-center items-center w-full mt-5 gap-2 text-foreground">
-              <div
-                {...getRootProps()}
-                className="flex justify-center w-full p-5 rounded-md border border-toggle"
-              >
-                <input {...getInputProps()} />
-                {isDragActive ? (
-                  <p>Drop the sheet here ...</p>
-                ) : (
-                  <p>Drag n drop or click to upload sheet</p>
-                )}
-              </div>
+              {file ? (
+                <div className="flex flex-row justify-center items-center w-full p-5 gap-3 rounded-md border border-toggle text-foreground">
+                  <div>{file?.doc?.name}</div>
+                  <MdClose
+                    className="mt-1 hover:text-primary"
+                    onClick={() => setFile(null)}
+                  />
+                </div>
+              ) : (
+                <div
+                  {...getRootProps({
+                    className:
+                      "flex justify-center w-full p-5 rounded-md border border-toggle",
+                  })}
+                >
+                  <input {...getInputProps()} />
+                  {isDragActive ? (
+                    <p>Drop the sheet here ...</p>
+                  ) : (
+                    <p>Drag n drop or click to upload sheet</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </DialogDescription>
       </DialogHeader>
       <DialogFooter className="flex flex-row justify-between sm:justify-between w-full">
-        <Button
-          className="text-xs"
-          onClick={() => {
-            handleDownload();
-          }}
-        >
-          Get Sample Sheet
-        </Button>
-        <Button
-          variant="secondary"
-          className="text-primary text-xs"
-          onClick={() => handleUpload()}
-        >
-          Upload Sample Sheet
-        </Button>
+        <DialogClose asChild>
+          <Button
+            className="text-xs"
+            onClick={() => {
+              handleDownload();
+            }}
+          >
+            Get Sample Sheet
+          </Button>
+        </DialogClose>
+        <DialogClose asChild>
+          <Button
+            variant="secondary"
+            className="text-xs"
+            onClick={(e) => handleUpload(e)}
+          >
+            Upload Sample Sheet
+          </Button>
+        </DialogClose>
       </DialogFooter>
     </DialogContent>
   );

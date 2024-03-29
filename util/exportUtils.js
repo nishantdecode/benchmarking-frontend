@@ -220,7 +220,7 @@ export function downloadSheet(banks, value, fileName, sheetNames, exportData) {
           if(key === "label" || key === "id" || key === "category"){
             return [key, dataObj[key]];
           }
-          return [key, dataObj[key].toFixed(4)];
+          return [key, dataObj[key]];
         })
       );
     });
