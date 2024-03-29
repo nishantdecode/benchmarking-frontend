@@ -108,9 +108,8 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
             const response = await requestExtraction({ bank, user });
             if (response.data) {
               // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
-              // window.location.href =
-              // "https://benchmarking-fe.vercel.app/dashboard/admin";
-              window.location.href = "http://localhost:3000/dashboard/admin";
+              window.location.href = "https://benchmarking-fe.vercel.app/dashboard/admin";
+              // window.location.href = "http://localhost:3000/dashboard/admin";
             }
           } catch (err) {
             console.log(err);
