@@ -60,19 +60,23 @@ const ResetPassword = () => {
 
   const handleSubmit = async (values) => {
     const credentials = {
-      email: searchParams.get('email'),
+      email: searchParams.get("email"),
       newPassword: values.newPassword,
     };
     try {
-      const response = await resetPassword(credentials);
-      if (!response.error) {
-        showToast("Successfully password Reset!","Please Login.")
-        router.push(`/dashboard/login`);
+      if (values.newPassword === values.confirmNewPassword) {
+        const response = await resetPassword(credentials);
+        if (!response.error) {
+          showToast("Successfully password Reset!", "Please Login.");
+          router.push(`/dashboard/login`);
+        } else {
+          showToast("Error!", response.error.data.message);
+        }
       } else {
-        showToast("Error!",response.error.data.message)
+        showToast("Passwords do not match!", undefined);
       }
     } catch (err) {
-      showToast("Error!",undefined);
+      showToast("Error!", undefined);
     }
   };
   return (

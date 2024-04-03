@@ -19,24 +19,17 @@ export const downloadImage = (
   img.onload = function () {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
+    ctx.font = "18px Arial";
 
     let length = checkedBanks?.length;
+    let paddingFrame = 20;
+    let totalTextWidth = 0;
+    let totalTextWidth1 = 0;
+    let totalTextWidth2 = 0;
 
-    canvas.width = img.width;
-    canvas.height = banks
-      ? length < 5
-        ? img.height + 180
-        : img.height + 240
-      : img.height + 90;
-
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    banks
-      ? length < 5
-        ? ctx.drawImage(img, 0, 90)
-        : ctx.drawImage(img, 0, 150)
-      : ctx.drawImage(img, 0, 0);
+    const rectangleWidth = 60;
+    const rectangleHeight = 10;
+    const padding = 20;
 
     let bankNames = data
       ? checkedBanks?.map((bank, index) => {
@@ -46,39 +39,70 @@ export const downloadImage = (
     let bankColors = checkedBanks?.map((bank) => {
       return banks.find((item) => item.name === bank).color;
     });
+    bankNames?.forEach((item, index) => {
+      if (index < 5) {
+        totalTextWidth1 += ctx.measureText(item).width;
+      } else {
+        totalTextWidth2 += ctx.measureText(item).width;
+      }
+    });
+    totalTextWidth1 += length > 5 ? 4 * paddingFrame : (length - 1) * paddingFrame;
+    totalTextWidth2 += length - 5 > 5 ? 4 * paddingFrame : (length - 6) * paddingFrame;
+    totalTextWidth =
+      totalTextWidth1 > totalTextWidth2 ? totalTextWidth1 : totalTextWidth2;
 
-    const rectangleWidth = 60;
-    const rectangleHeight = 10;
-    const padding = 200;
+    canvas.width =
+      totalTextWidth > img.width
+        ? totalTextWidth + 2 * paddingFrame
+        : img.width + 2 * paddingFrame;
+    canvas.height = banks
+      ? length < 5
+        ? img.height + 180 + 2 * paddingFrame
+        : img.height + 240 + 2 * paddingFrame
+      : img.height + 90 + 2 * paddingFrame;
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    banks
+      ? length < 5
+        ? ctx.drawImage(
+            img,
+            (canvas.width - img.width) / 2 + paddingFrame,
+            90 + paddingFrame
+          )
+        : ctx.drawImage(
+            img,
+            (canvas.width - img.width) / 2 + paddingFrame,
+            150 + paddingFrame
+          )
+      : ctx.drawImage(img, 0 + paddingFrame, 0 + paddingFrame);
 
-    const totalRectangleWidth =
-      length < 5
-        ? length * (rectangleWidth + padding)
-        : 5 * (rectangleWidth + padding);
-    const startX = 70 + (canvas.width - totalRectangleWidth) / 2;
-    const startY = 20;
+    const startX = (canvas.width - totalTextWidth1) / 2;
+    const startY = paddingFrame;
 
+    let currentX = startX;
     if (banks) {
       bankColors.forEach((color, index) => {
-        const rectangleX =
-          index < 5
-            ? startX + index * (rectangleWidth + padding)
-            : startX + (index - 5) * (rectangleWidth + padding);
-        const rectangleY = index < 5 ? startY : startY + 60;
-        ctx.fillStyle = color;
-        ctx.fillRect(rectangleX, rectangleY, rectangleWidth, rectangleHeight);
-
         const textWidth = ctx.measureText(bankNames[index]).width;
-        const textX =
-          index === 0
-            ? rectangleX + (rectangleWidth - textWidth) / 2 - 30
-            : rectangleX + (rectangleWidth - textWidth) / 2;
-        const textY = rectangleY + 30;
+        if (index === 1) {
+          currentX += fileName === "Market Share" ? 80 : 50;
+        }
+        let textX = currentX;
+        const textY = index < 5 ? startY + 0 + 30 : startY + 60 + 30;
 
         ctx.font = "18px Arial";
         ctx.fillStyle = "white";
         ctx.textAlign = "left";
         ctx.fillText(bankNames[index], textX, textY);
+
+        const rectangleX = index === 0 ? currentX + (textWidth - rectangleWidth) / 2 + (fileName === "Market Share" ? 50 : 30) : currentX + (textWidth - rectangleWidth) / 2;
+        const rectangleY = index < 5 ? startY : startY + 60;
+        ctx.fillStyle = color;
+        ctx.fillRect(rectangleX, rectangleY, rectangleWidth, rectangleHeight);
+
+        currentX += textWidth + padding;
+        if (index === 4) {
+          currentX = (canvas.width - totalTextWidth2) / 2;
+        }
       });
     }
 
@@ -217,8 +241,11 @@ export function downloadSheet(banks, value, fileName, sheetNames, exportData) {
               ).name,
             ];
           }
-          if(key === "label" || key === "id" || key === "category"){
+          if (key === "label" || key === "id" || key === "category") {
             return [key, dataObj[key]];
+          }
+          if (fileName === "Common Size Individual Bank") {
+            return [key, dataObj[key].toFixed(4)];
           }
           return [key, dataObj[key]];
         })

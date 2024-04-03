@@ -62,6 +62,7 @@ const formSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   email: z.string().email(),
+  profile: z.string().min(1),
 });
 
 const UserPage = () => {
@@ -70,7 +71,6 @@ const UserPage = () => {
   const searchParams = useSearchParams();
 
   const [role, setRole] = useState("User");
-  const [profile, setProfile] = useState("Accountant");
   const [user, setUser] = useState(null);
   const [id] = useState(searchParams.get("userId") || null);
   const [names, setNames] = useState([]);
@@ -82,6 +82,7 @@ const UserPage = () => {
     firstName: "",
     lastName: "",
     email: "",
+    profile: "",
   });
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -115,8 +116,6 @@ const UserPage = () => {
   const myImage = cld.image(publicId);
   /*end*/
 
-  console.log(userObj)
-
   const handleUser = async (values) => {
     let credentials = {
       picture: publicId,
@@ -126,20 +125,22 @@ const UserPage = () => {
       },
       email: values.email,
       creatorId: user ? user.creatorId : userObj.id,
-      role: { name: profile, type: role },
+      role: { name: values.profile, type: role },
     };
 
     if (userObj?.role?.type === "SuperAdmin") {
-      credentials.organisationId = names?.find(
-        (item) => item.name === organisation
-      )?.id;
+      if (userObj?.id.toString() !== id?.toString()) {
+        credentials.organisationId = names?.find(
+          (item) => item.name === organisation
+        )?.id;
+      }
     } else if (userObj?.role?.type === "Admin") {
       credentials.organisationId = userObj.organisationId;
     }
 
     if (userObj?.id?.toString() === id?.toString()) {
       credentials.creatorId = userObj.creatorId;
-      credentials.role = { name: profile, type: userObj.role.type };
+      credentials.role = { name: values.profile, type: userObj.role.type };
     }
 
     if (page === "Add") {
@@ -179,12 +180,12 @@ const UserPage = () => {
         const userData = response.data.result.user;
         setUser(userData);
         setRole(userData.role.type || "");
-        setProfile(userData.role.name || "");
         setPublicId(userData.picture);
         setDefaultValues({
           firstName: userData.name.first,
           lastName: userData.name.last,
           email: userData.email,
+          profile: userData.role.name || "",
         });
       }
     } catch (err) {
@@ -336,7 +337,11 @@ const UserPage = () => {
                 name="email"
                 render={({ field }) => {
                   return (
-                    <FormItem>
+                    <FormItem
+                      className={`${
+                        userObj?.id.toString() === id?.toString() ? "hidden" : ""
+                      }`}
+                    >
                       <div className="flex flex-col md:flex-row justify-between gap-4">
                         <FormLabel className="mt-3 text-xs md:text-sm">
                           Enter Email* :
@@ -355,119 +360,110 @@ const UserPage = () => {
                   );
                 }}
               />
-              {userObj?.role?.type === "SuperAdmin" && (
-                <div className="flex flex-col sm:flex-row justify-between gap-2">
-                  <div className="mt-3 text-xs md:text-sm">
-                    Select Organisation* :
+              {userObj?.role?.type === "SuperAdmin" &&
+                userObj?.id.toString() !== id?.toString() && (
+                  <div className="flex flex-col sm:flex-row justify-between gap-2">
+                    <div className="mt-3 text-xs md:text-sm font-medium">
+                      Select Organisation* :
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="input"
+                          className="flex justify-between w-full md:max-w-[300px] gap-2 rounded-md"
+                        >
+                          <div>{organisation || names[0]?.name}</div>
+                          <FaAngleDown />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-60">
+                        <DropdownMenuRadioGroup
+                          value={organisation || names[0]?.name}
+                          onValueChange={(v) => {
+                            setOrganisation(v);
+                          }}
+                        >
+                          {names.map((item, index) => {
+                            return (
+                              <DropdownMenuRadioItem
+                                key={index}
+                                value={item.name}
+                                className="flex flex-row justify-start w-full px-5"
+                              >
+                                {item.name}
+                              </DropdownMenuRadioItem>
+                            );
+                          })}
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="input"
-                        className="flex justify-between w-full md:max-w-[300px] gap-2 rounded-md"
-                      >
-                        <div>{organisation || names[0]?.name}</div>
-                        <FaAngleDown />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-60">
-                      <DropdownMenuRadioGroup
-                        value={organisation || names[0]?.name}
-                        onValueChange={(v) => {
-                          setOrganisation(v);
-                        }}
-                      >
-                        {names.map((item, index) => {
-                          return (
-                            <DropdownMenuRadioItem
-                              key={index}
-                              value={item.name}
-                              className="flex flex-row justify-start w-full px-5"
-                            >
-                              {item.name}
-                            </DropdownMenuRadioItem>
-                          );
-                        })}
-                      </DropdownMenuRadioGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              )}
-              {userObj?.role?.type === "SuperAdmin" && (
-                <div className="flex flex-col sm:flex-row justify-between gap-2">
-                  <div className="mt-3 text-xs md:text-sm">
-                    Role Management* :
+                )}
+              {userObj?.role?.type === "SuperAdmin" &&
+                userObj?.id.toString() !== id?.toString() && (
+                  <div className="flex flex-col sm:flex-row justify-between gap-2">
+                    <div className="mt-3 text-xs md:text-sm font-medium">
+                      Role Management* :
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="input"
+                          className="flex justify-between w-full md:max-w-[300px] gap-2 rounded-md"
+                        >
+                          <div>{role}</div>
+                          <FaAngleDown />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-60">
+                        <DropdownMenuRadioGroup
+                          value={role}
+                          onValueChange={(v) => {
+                            setRole(v);
+                          }}
+                        >
+                          {roles.map((role, index) => {
+                            return (
+                              <DropdownMenuRadioItem
+                                key={index}
+                                value={role}
+                                className="flex flex-row justify-start w-full px-5"
+                              >
+                                {role}
+                              </DropdownMenuRadioItem>
+                            );
+                          })}
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="input"
-                        className="flex justify-between w-full md:max-w-[300px] gap-2 rounded-md"
-                      >
-                        <div>{role}</div>
-                        <FaAngleDown />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-60">
-                      <DropdownMenuRadioGroup
-                        value={role}
-                        onValueChange={(v) => {
-                          setRole(v);
-                        }}
-                      >
-                        {roles.map((role, index) => {
-                          return (
-                            <DropdownMenuRadioItem
-                              key={index}
-                              value={role}
-                              className="flex flex-row justify-start w-full px-5"
-                            >
-                              {role}
-                            </DropdownMenuRadioItem>
-                          );
-                        })}
-                      </DropdownMenuRadioGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              )}
-              <div className="flex flex-col sm:flex-row justify-between gap-2">
-                <div className="mt-3 text-xs md:text-sm">User Profile* :</div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="input"
-                      className="flex justify-between w-full md:max-w-[300px] gap-2 rounded-md"
-                    >
-                      <div>{profile}</div>
-                      <FaAngleDown />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-60">
-                    <DropdownMenuRadioGroup
-                      value={profile}
-                      onValueChange={(v) => {
-                        setProfile(v);
-                      }}
-                    >
-                      {profiles.map((profile, index) => {
-                        return (
-                          <DropdownMenuRadioItem
-                            key={index}
-                            value={profile}
-                            className="flex flex-row justify-start w-full px-5"
-                          >
-                            {profile}
-                          </DropdownMenuRadioItem>
-                        );
-                      })}
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+                )}
+              <FormField
+                control={form.control}
+                name="profile"
+                render={({ field }) => {
+                  return (
+                    <FormItem>
+                      <div className="flex flex-col md:flex-row justify-between gap-4">
+                        <FormLabel className="mt-3 text-xs md:text-sm font-medium">
+                          User Profile* :
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter User Profile"
+                            type="profile"
+                            {...field}
+                            className="md:max-w-[300px]"
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
               <div className="flex flex-row w-full justify-center md:justify-end mt-2 md:mt-5">
                 <Button
                   size="sm"
@@ -480,7 +476,7 @@ const UserPage = () => {
               </div>
             </form>
           </Form>
-          {searchParams.get("action") === "edit" ? (
+          {searchParams.get("action") === "edit" && role !== "SuperAdmin" ? (
             <div className="flex flex-row w-full justify-center md:justify-start">
               <Button
                 variant="destructive"

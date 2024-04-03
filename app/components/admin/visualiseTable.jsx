@@ -499,7 +499,7 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
                   placeholder="Filter data by email..."
                   value={table?.getColumn("email")?.getFilterValue() ?? ""}
                   onChange={(event) =>
-                    table.getColumn("email")?.setFilterValue(event.target.value)
+                    table?.getColumn("email")?.setFilterValue(event.target.value)
                   }
                 />
               </div>

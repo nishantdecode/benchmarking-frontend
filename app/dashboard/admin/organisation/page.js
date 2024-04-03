@@ -170,7 +170,7 @@ const OrganisationPage = () => {
           />
           <RxAvatar size={32} />
           <h1 className="pl-1 text-lg sm:text-2xl text-foreground dark:text-foreground">
-            {page} {"Bank"}
+            {page} {"Organisation"}
           </h1>
         </div>
       </div>
