@@ -124,11 +124,11 @@ const Admin = () => {
     <>
       <div className="flex flex-col w-full h-full mt-14 p-5 pl-7 sm:pl-10 gap-10">
         <div className="flex flex-col sm:flex-row justify-center items-center gap-5">
-          <div className="h-[220px] sm:h-[300px] w-full sm:w-4/6">
+          <div className="h-[240px] sm:h-[300px] w-full sm:w-4/6">
             {userObj ? (
               <Card className="h-full w-full p-5 sm:p-14">
                 <div className="flex flex-row justify-between">
-                  <div className="flex flex-col items-start">
+                  <div className="flex flex-col items-start w-1/2 truncate">
                     <div className="rounded-full bg-foreground mb-5">
                       {publicId ? (
                         <AdvancedImage
@@ -142,19 +142,19 @@ const Admin = () => {
                         </div>
                       )}
                     </div>
-                    <div className="flex flex-row text-semibold">
+                    <div className="flex flex-row text-sm text-semibold">
                       <span>{`${userObj?.name?.first} ${userObj?.name?.last}`}</span>
                     </div>
                     <div className="text-medium text-sm mb-5">
                       {userObj?.email}
                     </div>
-                    <div className="text-xs">Role:</div>
-                    <div>{role}</div>
+                    <div className="text-sm">Role:</div>
+                    <div className="text-sm">{role}</div>
                   </div>
-                  <div className="flex flex-col items-end gap-16">
+                  <div className="flex flex-col items-end w-1/2 truncate gap-16">
                     <div className="flex flex-row gap-2">
-                      <div className="text-xs mt-1">Joined:</div>{" "}
-                      {formattedDate}
+                      <div className="text-xs mt-0.5 sm:mt-2">Joined:</div>{" "}
+                      <div className="text-sm sm:text-lg">{formattedDate}</div>
                     </div>
                     <Button
                       variant="outline"

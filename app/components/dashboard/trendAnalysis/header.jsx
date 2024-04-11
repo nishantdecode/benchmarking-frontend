@@ -39,9 +39,15 @@ const Header = ({
   const bank1 = checkedBanks[0];
   const bank2 = checkedBanks[1];
   const bank3 = checkedBanks[2];
-  const myImage1 = cld.image(banks.find((item) => item.name === bank1)?.iconUrl);
-  const myImage2 = cld.image(banks.find((item) => item.name === bank2)?.iconUrl);
-  const myImage3 = cld.image(banks.find((item) => item.name === bank3)?.iconUrl);
+  const myImage1 = cld.image(
+    banks.find((item) => item.name === bank1)?.iconUrl
+  );
+  const myImage2 = cld.image(
+    banks.find((item) => item.name === bank2)?.iconUrl
+  );
+  const myImage3 = cld.image(
+    banks.find((item) => item.name === bank3)?.iconUrl
+  );
   return (
     <div
       className={`flex ${
@@ -65,7 +71,11 @@ const Header = ({
                       plugins={[responsive(), placeholder()]}
                     />
                   </div>
-                  <div className="mt-1.5 text-xs truncate text-ellipsis">
+                  <div
+                    className={`${
+                      checkedBanks[0] ? "mt-1.5" : "mt-0"
+                    } text-xs truncate text-ellipsis`}
+                  >
                     {!bank1 || bank1 === "null" ? "Select Bank:" : bank1}
                   </div>
                 </div>
@@ -201,10 +211,7 @@ const Header = ({
       </div>
       <div className="hidden lg:flex flex-row justify-end gap-1">
         {["totalDeposits", "totalGrossLoans"].includes(category) ? (
-          <OptionButtons
-            type="table"
-            downloadSheet={downloadSheet}
-          />
+          <OptionButtons type="table" downloadSheet={downloadSheet} />
         ) : (
           <OptionButtons
             type="chart"

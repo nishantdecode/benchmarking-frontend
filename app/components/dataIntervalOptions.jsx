@@ -13,12 +13,11 @@ import { IoIosArrowDown } from "react-icons/io";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const DataIntervalOptions = ({ years, category, date, setDate }) => {
-
   if (!years || years.length === 0) {
     return (
       <Skeleton className="hidden lg:flex h-[50px] w-full bg-secondary"></Skeleton>
     );
-  } 
+  }
 
   return (
     <div className="flex flex-row justify-center items-center w-full gap-3">
@@ -48,8 +47,12 @@ const DataIntervalOptions = ({ years, category, date, setDate }) => {
                 setDate((prev) => {
                   return {
                     interval: v,
-                    startDate: prev.startDate,
-                    endDate: prev.endDate,
+                    startDate: new Date(
+                      Date.UTC(prev.startDate.getFullYear(), 0, 1, 0, 0, 0, 0)
+                    ),
+                    endDate: new Date(
+                      Date.UTC(prev.endDate.getFullYear(), 0, 1, 0, 0, 0, 0)
+                    ),
                   };
                 });
               }}
@@ -80,17 +83,23 @@ const DataIntervalOptions = ({ years, category, date, setDate }) => {
                     variant="dropdown"
                     className="gap-2 dark:border-2 rounded-lg"
                   >
-                    {`Q${Math.ceil((date.startDate.getMonth() + 1) / 3)}` || "Q1"}
+                    {`Q${Math.ceil((date.startDate.getMonth() + 1) / 3)}` ||
+                      "Q1"}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-40">
                   <DropdownMenuRadioGroup
-                    value={`${date.startDate.getMonth()+1}`}
+                    value={`${date.startDate.getMonth() + 1}`}
                     onValueChange={(v) => {
                       setDate((prev) => {
                         return {
                           interval: prev.interval,
-                          startDate: new Date(`${v}/01/${prev.startDate.getFullYear()}`),
+                          startDate: new Date(
+                            Date.UTC(
+                              prev.startDate.getFullYear(),
+                              v, 1, 0, 0, 0, 0
+                            )
+                          ),
                           endDate: prev.endDate,
                         };
                       });
@@ -98,28 +107,22 @@ const DataIntervalOptions = ({ years, category, date, setDate }) => {
                     className="flex flex-col gap-2"
                   >
                     <DropdownMenuRadioItem
-                      value="01"
+                      value={0}
                       className="flex flex-row justify-center w-full"
                     >
                       <div>Q1</div>
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem
-                      value="04"
+                      value={3}
                       className="flex flex-row justify-center w-full"
                     >
                       <div>Q2</div>
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem
-                      value="07"
+                      value={6}
                       className="flex flex-row justify-center w-full"
                     >
                       <div>Q3</div>
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem
-                      value="10"
-                      className="flex flex-row justify-center w-full"
-                    >
-                      <div>Q4</div>
                     </DropdownMenuRadioItem>
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
@@ -146,14 +149,23 @@ const DataIntervalOptions = ({ years, category, date, setDate }) => {
                     setDate((prev) => {
                       return {
                         interval: prev.interval,
-                        startDate: new Date(`${date.startDate.getMonth()+1}/01/${year}`),
+                        startDate: new Date(
+                          Date.UTC(
+                            year,
+                            date.startDate.getMonth(),
+                            1, 0, 0, 0, 0
+                          )
+                        ),
                         endDate: prev.endDate,
                       };
                     });
                   }}
                 >
                   {years
-                    .filter((year) => Number(year) < Number(date.endDate.getFullYear()))
+                    .filter(
+                      (year) =>
+                        Number(year) < Number(date.endDate.getFullYear())
+                    )
                     .map((year, index) => {
                       return (
                         <DropdownMenuRadioItem
@@ -192,35 +204,34 @@ const DataIntervalOptions = ({ years, category, date, setDate }) => {
                         return {
                           interval: prev.interval,
                           startDate: prev.startDate,
-                          endDate: new Date(`${v}/01/${prev.endDate.getFullYear()}`),
+                          endDate: new Date(
+                            Date.UTC(
+                              prev.endDate.getFullYear(),
+                              v, 1, 0, 0, 0, 0
+                            )
+                          ),
                         };
                       });
                     }}
                     className="flex flex-col gap-2"
                   >
                     <DropdownMenuRadioItem
-                      value="01"
+                      value={0}
                       className="flex flex-row justify-center w-full"
                     >
                       <div>Q1</div>
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem
-                      value="04"
+                      value={3}
                       className="flex flex-row justify-center w-full"
                     >
                       <div>Q2</div>
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem
-                      value="07"
+                      value={6}
                       className="flex flex-row justify-center w-full"
                     >
                       <div>Q3</div>
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem
-                      value="10"
-                      className="flex flex-row justify-center w-full"
-                    >
-                      <div>Q4</div>
                     </DropdownMenuRadioItem>
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
@@ -248,13 +259,22 @@ const DataIntervalOptions = ({ years, category, date, setDate }) => {
                       return {
                         interval: prev.interval,
                         startDate: prev.startDate,
-                        endDate: new Date(`${date.endDate.getMonth()+1}/01/${year}`),
+                        endDate: new Date(
+                          Date.UTC(
+                            year,
+                            date.endDate.getMonth(),
+                            1, 0, 0, 0, 0
+                          )
+                        ),
                       };
                     });
                   }}
                 >
                   {years
-                    .filter((year) => Number(year) > Number(date.startDate.getFullYear()))
+                    .filter(
+                      (year) =>
+                        Number(year) > Number(date.startDate.getFullYear())
+                    )
                     .map((year, index) => {
                       return (
                         <DropdownMenuRadioItem
