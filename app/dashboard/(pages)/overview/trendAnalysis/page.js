@@ -76,8 +76,8 @@ const TrendAndCompetitionAnalysis = () => {
   const getRatioBankData = async ({ category, setData }) => {
     try {
       const bankIds = checkedBanks.map(
-        (bank) => banks.find((item) => item.name === bank).id
-      );
+        (bank) => banks.find((item) => item.name === bank)?.id
+      ).filter(id => id !== undefined);;
       const response = await getRatioBank({ bankIds, category });
       if (response.data) {
         setData(response.data.result);
@@ -94,8 +94,8 @@ const TrendAndCompetitionAnalysis = () => {
   const getItemBankData = async ({ table, category, setData }) => {
     try {
       const bankIds = checkedBanks.map(
-        (bank) => banks.find((item) => item.name === bank).id
-      );
+        (bank) => banks.find((item) => item.name === bank)?.id
+      ).filter(id => id !== undefined);;
       const response = await getItemBank({
         bankIds,
         table,

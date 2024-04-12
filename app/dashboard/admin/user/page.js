@@ -150,7 +150,6 @@ const UserPage = () => {
           showToast("Successful!", undefined);
           // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
           window.location.href = "https://benchmarking-fe.vercel.app/dashboard/admin";
-          // window.location.href = "http://localhost:3000/dashboard/admin";
         } else showToast("Error", response.error.data.message);
       } catch (err) {
         showToast("Error!", "Please try again later.");
@@ -165,7 +164,6 @@ const UserPage = () => {
           );
           // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
           window.location.href = "https://benchmarking-fe.vercel.app/dashboard/admin";
-          // window.location.href = "http://localhost:3000/dashboard/admin";
         } else showToast("Error", response.error.data.message);
       } catch (err) {
         showToast("Error!", "Please try again later.");

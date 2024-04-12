@@ -109,7 +109,6 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
             if (response.data) {
               // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
               window.location.href = "https://benchmarking-fe.vercel.app/dashboard/admin";
-              // window.location.href = "http://localhost:3000/dashboard/admin";
             }
           } catch (err) {
             console.log(err);
@@ -134,7 +133,7 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
                 className="flex flex-row w-auto gap-2 px-10 text-xs rounded-xl"
                 onClick={() => {
                   setLoading({ bank: bank.name, isLoading: true });
-                  requestExtract({ bank: bank.name, user: userObj.email });
+                  requestExtract({ bank: bank.name, user: userObj });
                 }}
               >
                 {loading?.bank?.toString() === bank?.name?.toString() &&
