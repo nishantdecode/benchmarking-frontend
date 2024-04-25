@@ -295,7 +295,7 @@ const Bank = () => {
             categories={individualBankCategories}
           />
         </div>
-        {data.length !== 0 ? (
+        {(data && data[Object.keys(data)[0]]?.length !== 0) ? (
           <Card className="flex flex-col w-full lg:w-5/6 p-3 lg:p-5 gap-2 sm:gap-3 md:gap-8 lg:gap-10">
             {Object.keys(data).map((key, index) => {
               const columns = generateColumns({ data: data[key] });
