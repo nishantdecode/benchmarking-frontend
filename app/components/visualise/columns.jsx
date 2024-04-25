@@ -162,7 +162,7 @@ const itemRankCol = ({ key, banks }) => {
       return (
         <div className="flex flex-row justify-between px-8">
           <div className="text-center font-medium">
-            {row.getValue(key).value}
+            {row.getValue(key)?.value}
           </div>
           <div
             className="flex flex-row justify-center items-center h-6 w-6 rounded-full font-bold text-white"
@@ -174,7 +174,7 @@ const itemRankCol = ({ key, banks }) => {
               )?.color,
             }}
           >
-            {row.getValue(key).rank}
+            {row.getValue(key)?.rank}
           </div>
         </div>
       );
@@ -239,10 +239,10 @@ const msCol = ({ key, banks }) => {
       return (
         <div className="flex flex-row justify-between px-2">
           <div className="text-center font-medium">
-            {row.getValue(key).value}
+            {row.getValue(key)?.value}
           </div>
           <Progress
-            value={row.getValue(key).share}
+            value={row.getValue(key)?.share}
             className="w-[120px]"
             bg={
               banks?.find(
@@ -252,7 +252,7 @@ const msCol = ({ key, banks }) => {
               )?.color
             }
           >
-            {row.getValue(key).share + "%"}
+            {isNaN((row.getValue(key)?.share)) ? "0.0000%"  : (((row.getValue(key)?.share)  || "0.0000") + "%")}
           </Progress>
         </div>
       );
@@ -262,6 +262,7 @@ const msCol = ({ key, banks }) => {
 
 export const generateColumns = ({ data, initialType, type, color, banks }) => {
   let array = Object.keys(data[0]);
+  
 
   if (array[0] !== "id") {
     array = array.reverse();
