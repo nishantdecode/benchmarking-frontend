@@ -28,7 +28,7 @@ const CompetitionCards = ({ data }) => {
             return null;
           }
           return (
-            <Card key={item.category} className="w-[280px] p-3">
+            <Card key={item.category} className="w-[310px] p-3">
               <div className="p-1 pl-2 overflow-hidden rounded-md text-xs font-bold bg-black text-white">
                 {item.category}
               </div>

@@ -263,6 +263,10 @@ export const downloadPDF = async (
   };
 };
 
+function isDecimal(number) {
+  return number % 1 !== 0 ? 1 : 0;
+}
+
 export function downloadSheet(banks, value, fileName, sheetNames, exportData) {
   let data = exportData.map((item) => {
     return item.map((dataObj) => {
@@ -285,7 +289,7 @@ export function downloadSheet(banks, value, fileName, sheetNames, exportData) {
           if (fileName === "Common Size Individual Bank" || fileName === "Market Share") {
             return [key, dataObj[key].toFixed(4)];
           }
-          return [key, dataObj[key]];
+          return (isDecimal(dataObj[key]) ? [key, dataObj[key].toFixed(4)] : [key, dataObj[key]]);
         })
       );
     });
