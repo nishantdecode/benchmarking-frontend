@@ -7,6 +7,10 @@ import { PiBankBold } from "react-icons/pi";
 
 import { Progress } from "@/components/ui/progress";
 
+function isDecimal(number) {
+  return number % 1 !== 0 ? 1 : 0;
+}
+
 const initialCol = ({ key }) => {
   return {
     accessorKey: key,
@@ -96,7 +100,7 @@ const remainingCol = ({ key }) => {
       );
     },
     cell: ({ row }) => {
-      return <div className="text-center font-medium">{row.getValue(key)}</div>;
+      return <div className="text-center font-medium">{isDecimal(row.getValue(key)) ? row.getValue(key).toFixed(4) : row.getValue(key)}</div>;
     },
   };
 };
