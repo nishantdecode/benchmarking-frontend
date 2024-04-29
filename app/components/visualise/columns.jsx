@@ -100,7 +100,7 @@ const remainingCol = ({ key }) => {
       );
     },
     cell: ({ row }) => {
-      return <div className="text-center font-medium">{isDecimal(row.getValue(key)) ? row.getValue(key).toFixed(4) : row.getValue(key)}</div>;
+      return <div className="text-center font-medium">{isDecimal(Number(row.getValue(key))) ? Number(row.getValue(key))?.toFixed(4) : row.getValue(key)}</div>;
     },
   };
 };
