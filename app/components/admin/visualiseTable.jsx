@@ -124,7 +124,7 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
                 className="flex flex-row w-auto gap-2 px-10 text-xs rounded-xl"
               >
                 <MdFindInPage size={15} />
-                Data Extracted
+                {bank?.extraction?.status}
               </Button>
             ) : (
               <Button
