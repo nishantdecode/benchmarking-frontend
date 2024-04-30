@@ -264,7 +264,7 @@ const Dashboard = () => {
             {provision.length !== 0 && (
               <VisualiseLineChart
                 legend={true}
-                xAxis={false}
+                xAxis={true}
                 data={provision}
                 colors={bankLabel.bankColorsLabel}
                 dataFormatter={bankLabel.dataFormatterCurrency}
@@ -292,7 +292,7 @@ const Dashboard = () => {
             {nim.length !== 0 && (
               <VisualiseLineChart
                 legend={true}
-                xAxis={false}
+                xAxis={true}
                 data={nim}
                 colors={bankLabel.bankColorsLabel}
                 dataFormatter={bankLabel.dataFormatterPercentage}
@@ -320,7 +320,7 @@ const Dashboard = () => {
             {cor.length !== 0 && (
               <VisualiseLineChart
                 legend={true}
-                xAxis={false}
+                xAxis={true}
                 data={cor}
                 colors={bankLabel.bankColorsLabel}
                 dataFormatter={bankLabel.dataFormatterPercentage}
@@ -349,7 +349,7 @@ const Dashboard = () => {
           <div className="h-[250px] xs:h-[300px] md:h-[350px]">
             {incomeExpense.length !== 0 && (
               <VisualiseBarChart
-                xAxis={false}
+                xAxis={true}
                 data={incomeExpense}
                 colors={bankLabel?.bankColorsLabel?.flatMap((value) => [
                   value,
@@ -382,7 +382,7 @@ const Dashboard = () => {
             {income.length !== 0 && (
               <VisualiseLineChart
                 legend={true}
-                xAxis={false}
+                xAxis={true}
                 data={income}
                 colors={bankLabel.bankColorsLabel}
                 dataFormatter={bankLabel.dataFormatterPercentage}
@@ -410,7 +410,7 @@ const Dashboard = () => {
             {investments.length !== 0 && (
               <VisualiseLineChart
                 legend={true}
-                xAxis={false}
+                xAxis={true}
                 data={investments}
                 colors={bankLabel.bankColorsLabel}
                 dataFormatter={bankLabel.dataFormatterCurrency}
@@ -438,7 +438,7 @@ const Dashboard = () => {
             {totalDeposits.length !== 0 && (
               <VisualiseLineChart
                 legend={true}
-                xAxis={false}
+                xAxis={true}
                 data={totalDeposits}
                 colors={bankLabel.bankColorsLabel}
                 dataFormatter={bankLabel.dataFormatterCurrency}
@@ -466,7 +466,7 @@ const Dashboard = () => {
             {totalGrossLoans.length !== 0 && (
               <VisualiseLineChart
                 legend={true}
-                xAxis={false}
+                xAxis={true}
                 data={totalGrossLoans}
                 colors={bankLabel.bankColorsLabel}
                 dataFormatter={bankLabel.dataFormatterCurrency}
