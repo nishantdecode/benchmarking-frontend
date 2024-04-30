@@ -102,7 +102,6 @@ export function DataDialog({ banks }) {
 
   async function handleDownload() {
     try {
-      setDownloading(true);
       const bankId = banks.find((item) => item.name === bank).id;
       let quarter = null;
       switch (interval) {
@@ -138,9 +137,7 @@ export function DataDialog({ banks }) {
 
       link.click();
       link.parentNode.removeChild(link);
-      setDownloading(false);
     } catch (err) {
-      setDownloading(false);
       showToast("Error!", "Download Failed!");
     }
   }
@@ -310,7 +307,7 @@ export function DataDialog({ banks }) {
             onClick={(e) => handleUpload(e)}
           >
             <svg
-              class={`${isLoading ? "animate-spin" : "hidden"} text-gray-300 `}
+              className={`${isLoading ? "animate-spin" : "hidden"} text-gray-300 `}
               viewBox="0 0 64 64"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -330,7 +327,7 @@ export function DataDialog({ banks }) {
                 stroke-width="5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="text-gray-900"
+                className="text-gray-900"
               ></path>
             </svg>
             Upload Sample Sheet
