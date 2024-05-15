@@ -158,6 +158,7 @@ const AnalysisPage = () => {
   const getItemCategoryData = async ({
     table,
     setData,
+    date,
     category,
     categories,
   }) => {
@@ -168,6 +169,8 @@ const AnalysisPage = () => {
       const response = await getItemCategory({
         table,
         category: categoryValue,
+        startDate:date.startDate,
+        endDate:date.endDate
       });
       if (response.data) {
         setData(response.data.result);
@@ -214,8 +217,9 @@ const AnalysisPage = () => {
       (item) => item.name === ratioCategory
     ).value;
     try {
-      const response = await getFiguresCategory({ category });
+      const response = await getFiguresCategory({ category,startDate:figureCategoryDate.startDate,endDate:figureCategoryDate.endDate });
       if (response.data) {
+        
         setFiguresCategory(response.data.result);
       } else {
         setFiguresCategory([]);
@@ -275,6 +279,7 @@ const AnalysisPage = () => {
     getItemCategoryData({
       table: "balanceSheet",
       setData: setBalanceSheet,
+      date:figureDateBalanceSheet,
       category: balanceSheetCategory,
       categories: itemAnalysisCategories.balanceSheet,
     });
@@ -284,6 +289,7 @@ const AnalysisPage = () => {
     getItemCategoryData({
       table: "balanceSheet",
       setData: setMsBalanceSheet,
+      date:figureDateMSBalanceSheet,
       category: msBalanceSheetCategory,
       categories: itemAnalysisCategories.msBalanceSheet,
     });
@@ -293,6 +299,7 @@ const AnalysisPage = () => {
     getItemCategoryData({
       table: "incomeStatement",
       setData: setIncomeStatement,
+      date:figureDateIncomeState,
       category: incomeStatementCategory,
       categories: itemAnalysisCategories.incomeStatement,
     });
@@ -302,6 +309,7 @@ const AnalysisPage = () => {
     getItemCategoryData({
       table: "incomeStatement",
       setData: setMsIncomeStatement,
+      date:figureDateMSIncomeState,
       category: msIncomeStatementCategory,
       categories: itemAnalysisCategories.msIncomeStatement,
     });
