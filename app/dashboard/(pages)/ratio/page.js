@@ -43,7 +43,13 @@ const Ratio = () => {
   const banks = useSelector((state) => state.bank.banks);
 
   const [bank, setBank] = useState(null);
-
+  const endDate = new Date();
+  const startDate = new Date(endDate);
+  startDate.setFullYear(startDate.getFullYear() - 11)
+  const [figureDate, setFigureDate] = useState({
+    startDate,
+    endDate
+  });
   const [date, setDate] = useState({});
   const [checkedBanks, setCheckedBanks] = useState([]);
   const [category, setCategory] = useState(keyRatioCategories[0].name);
@@ -79,7 +85,7 @@ const Ratio = () => {
   const getFiguresData = async () => {
     const bankId = banks?.find((item) => item.name === bank)?.id;
     try {
-      const response = await getFigures({ bankId });
+      const response = await getFigures({ bankId,startDate:figureDate.startDate,endDate:figureDate.endDate });
       if (response.data) {
         const transformedData = replaceCategoryNames(response.data.result);
         setFigures(transformedData);
@@ -147,7 +153,7 @@ const Ratio = () => {
     if (bank) {
       getFiguresData();
     }
-  }, [bank, banks]);
+  }, [bank, banks,figureDate]);
 
   useEffect(() => {
     if (banks && banks.length > 0) {
@@ -254,6 +260,9 @@ const Ratio = () => {
                 exportXls="true"
                 title={bank}
                 data={figures}
+                years={years}
+                figureDate={figureDate}
+                setFigureDate={setFigureDate}
                 columns={columns}
                 exportData={[figures]}
                 sheetNames={["figures"]}
