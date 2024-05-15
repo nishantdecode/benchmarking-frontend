@@ -57,11 +57,12 @@ const Bank = () => {
     return data.map((dataObj) => {
       const newEntry = {};
       for (const key in dataObj) {
+        console.log({[key]:dataObj[key]})
         const category = categories.find((item) => item.value === dataObj[key]);
         if (category) {
           newEntry["category"] = category.name;
         } else {
-          newEntry[key] = dataObj[key];
+          newEntry[key] = dataObj[key].toLocaleString();
         }
       }
       return newEntry;

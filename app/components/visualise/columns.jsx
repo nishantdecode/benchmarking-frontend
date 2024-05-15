@@ -94,13 +94,14 @@ const remainingCol = ({ key }) => {
     accessorKey: key,
     header: ({ column }) => {
       return (
-        <div className="flex flex-row justify-center w-[150px] gap-2 truncate text-ellipsis font-semibold">
+        <div className="flex flex-row justify-center w-[90px] gap-2 truncate text-ellipsis !font-bold">
           {key}
         </div>
       );
     },
     cell: ({ row }) => {
-      return <div className="text-center font-medium">{isDecimal(Number(row.getValue(key))) ? Number(row.getValue(key))?.toFixed(4) : row.getValue(key)}</div>;
+      // console.log()
+      return <div className="text-center font-medium">{isNaN(Number(row.getValue(key))) ? row.getValue(key) : isDecimal(Number(row.getValue(key))) ? Number(row.getValue(key))?.toFixed(2) : row.getValue(key)}</div>;
     },
   };
 };
@@ -110,7 +111,7 @@ const progressCol = ({ key, color }) => {
     accessorKey: key,
     header: ({ column }) => {
       return (
-        <div className="flex flex-row justify-start w-[150px] gap-2 truncate text-ellipsis font-semibold">
+        <div className="flex flex-row justify-start w-[90px] gap-2 truncate text-ellipsis !font-bold">
           {key}
         </div>
       );
@@ -119,7 +120,7 @@ const progressCol = ({ key, color }) => {
       return (
         <div className="flex flex-row w-full">
           <Progress value={row.getValue(key)} bg={color}>
-            {row.getValue(key)?.toFixed(4) + "%"}
+            {row.getValue(key)?.toFixed(2) + "%"}
           </Progress>
         </div>
       );
@@ -132,7 +133,7 @@ const progressBankCol = ({ key, banks }) => {
     accessorKey: key,
     header: ({ column }) => {
       return (
-        <div className="flex flex-row justify-start w-[150px] gap-2 truncate text-ellipsis font-semibold">
+        <div className="flex flex-row justify-start w-[90px] gap-2 truncate text-ellipsis !font-bold">
           {key}
         </div>
       );
@@ -191,7 +192,7 @@ const rankCol = ({ key, banks }) => {
     accessorKey: key,
     header: () => {
       return (
-        <div className="flex flex-row justify-center font-bold min-w-[150px] gap-2">
+        <div className="flex flex-row justify-center font-bold min-w-[90px] gap-2">
           {key}
         </div>
       );

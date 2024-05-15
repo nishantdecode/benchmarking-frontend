@@ -268,6 +268,7 @@ function isDecimal(number) {
 }
 
 export function downloadSheet(banks, value, fileName, sheetNames, exportData) {
+  console.log({banks,value,fileName,sheetNames,exportData})
   let data = exportData.map((item) => {
     return item.map((dataObj) => {
       return Object.fromEntries(
@@ -287,9 +288,9 @@ export function downloadSheet(banks, value, fileName, sheetNames, exportData) {
             return [key, dataObj[key]];
           }
           if (fileName === "Common Size Individual Bank" || fileName === "Market Share") {
-            return [key, dataObj[key].toFixed(4)];
+            return [key, dataObj[key].toFixed(2)];
           }
-          return (isDecimal(dataObj[key]) ? [key, dataObj[key].toFixed(4)] : [key, dataObj[key]]);
+          return (isDecimal(dataObj[key]) ? [key, parseFloat(dataObj[key]).toFixed(2)] : [key, dataObj[key]]);
         })
       );
     });

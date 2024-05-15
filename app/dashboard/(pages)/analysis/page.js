@@ -47,6 +47,7 @@ const AnalysisPage = () => {
   const [getAllYears] = useGetAllYearsMutation();
   const [getItemCategory] = useGetItemByCategoryMutation();
   const [getFiguresCategory] = useGetFiguresByCategoryMutation();
+  const [years, setYears] = useState([]);
 
   const [ratio, setRatio] = useState([]);
   const [balanceSheet, setBalanceSheet] = useState([]);
@@ -56,6 +57,29 @@ const AnalysisPage = () => {
   const [figuresCategory, setFiguresCategory] = useState([]);
 
   const banks = useSelector((state) => state.bank.banks);
+  const endDate = new Date();
+  const startDate = new Date(endDate);
+  startDate.setFullYear(startDate.getFullYear() - 11)
+  const [figureDateBalanceSheet, setFigureDateBalanceSheet] = useState({
+    startDate,
+    endDate
+  });
+  const [figureDateMSBalanceSheet, setFigureDateMSBalanceSheet] = useState({
+    startDate,
+    endDate
+  });
+  const [figureDateIncomeState, setFigureDateIncomeState] = useState({
+    startDate,
+    endDate
+  });
+  const [figureDateMSIncomeState, setFigureDateMSIncomeState] = useState({
+    startDate,
+    endDate
+  });
+  const [figureCategoryDate, setFigureCategoryDate] = useState({
+    startDate,
+    endDate
+  });
 
   const [date, setDate] = useState({});
   const [checkedBanks, setCheckedBanks] = useState([]);
@@ -202,10 +226,17 @@ const AnalysisPage = () => {
     }
   };
 
+
+  useEffect(() => {
+    getYears();
+  }, []);
+
   const getYears = async () => {
     try {
       const response = await getAllYears();
       if (response.data) {
+        setYears(response.data.result);
+
         setDate({
           interval: "YEARLY",
           startDate: new Date(`01/01/${response.data.result[0]}`),
@@ -340,6 +371,9 @@ const AnalysisPage = () => {
                   value="value"
                   exportXls="true"
                   data={balanceSheet}
+                  figureDate={figureDateBalanceSheet}
+                  years={years}
+                  setFigureDate = {setFigureDateBalanceSheet}
                   title={balanceSheetCategory}
                   columns={balanceSheetColumns}
                   exportData={[balanceSheet]}
@@ -368,8 +402,12 @@ const AnalysisPage = () => {
               {incomeStatement.length !== 0 && (
                 <VisualiseTable
                   value="value"
+                  years={years}
+
                   exportXls="true"
                   data={incomeStatement}
+                  figureDate={figureDateIncomeState}
+                  setFigureDate = {setFigureDateIncomeState}
                   title={incomeStatementCategory}
                   columns={incomeStatementColumns}
                   exportData={[incomeStatement]}
@@ -467,8 +505,12 @@ const AnalysisPage = () => {
               {msBalanceSheet.length !== 0 && (
                 <VisualiseTable
                   value="share"
+                  years={years}
+
                   exportXls="true"
                   data={msBalanceSheet}
+                  figureDate={figureDateMSBalanceSheet}
+                  setFigureDate = {setFigureDateMSBalanceSheet}
                   title={msBalanceSheetCategory}
                   columns={msBalanceSheetColumns}
                   exportData={[msBalanceSheet]}
@@ -499,8 +541,12 @@ const AnalysisPage = () => {
               {msIncomeStatement.length !== 0 && (
                 <VisualiseTable
                   value="share"
+                  years={years}
+
                   exportXls="true"
                   data={msIncomeStatement}
+                  figureDate={figureDateIncomeState}
+                  setFigureDate = {setMsIncomeStatement}
                   title={msIncomeStatementCategory}
                   columns={msIncomeStatementColumns}
                   exportData={[msIncomeStatement]}
@@ -531,7 +577,11 @@ const AnalysisPage = () => {
               {figuresCategory.length !== 0 && (
                 <VisualiseTable
                   exportXls="true"
+                  years={years}
+
                   data={figuresCategory}
+                  figureDate={figureCategoryDate}
+                  setFigureDate = {setFigureCategoryDate}
                   title={ratioCategory}
                   columns={ratioColumns}
                   exportData={[figuresCategory]}

@@ -41,13 +41,13 @@ const CompetitionCards = ({ data }) => {
                     }
                   </div>
                   <div className="flex flex-row gap-2">
-                    {item.highest.valueType === "currency" ? (
-                      <TbCurrencyRiyal size={16} />
+                    {/* {item.highest.valueType === "currency" ? (
+                      
                     ) : (
                       ""
-                    )}
-                    {item.highest.value.toFixed(4)}
-                    {item.highest.valueType === "percentage" ? "%" : ""}
+                    )} */}
+                    {item.highest.value.toFixed(2)}
+                    {item.highest.valueType === "percentage" ? "%" : item.highest.value.toString().split(".")[0]?.length >=4 ? <TbCurrencyRiyal size={16} /> : " M"}
                   </div>
                 </div>
                 <div className="flex flex-row justify-between font-bold text-foreground">
@@ -58,13 +58,13 @@ const CompetitionCards = ({ data }) => {
                     }
                   </div>
                   <div className="flex flex-row gap-2">
-                    {item.lowest.valueType === "currency" ? (
+                    {/* {item.lowest.valueType === "currency" ? (
                       <TbCurrencyRiyal size={16} />
                     ) : (
                       ""
-                    )}
-                    {item.lowest.value.toFixed(4)}
-                    {item.lowest.valueType === "percentage" ? "%" : ""}
+                    )} */}
+                    {item.lowest.value.toFixed(2)}
+                    {item.lowest.valueType === "percentage" ? "%" :  item.lowest.value.toString().split(".")[0]?.length >=4 ? <TbCurrencyRiyal size={16} /> : " M"}
                   </div>
                 </div>
               </div>

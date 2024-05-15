@@ -8,9 +8,9 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BiCalendar } from "react-icons/bi";
 import { IoIosArrowDown } from "react-icons/io";
-import { Skeleton } from "@/components/ui/skeleton";
 
 const DataIntervalOptions = ({ years, category, date, setDate }) => {
   if (!years || years.length === 0) {

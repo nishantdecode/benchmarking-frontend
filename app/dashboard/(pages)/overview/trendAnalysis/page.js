@@ -63,7 +63,23 @@ const TrendAndCompetitionAnalysis = () => {
         categories,
       });
       if (response.data) {
-        setTables(response.data.result);
+        let arr = {...response.data.result};
+        let result = {}
+        Object.entries(arr).map(([key,value])=>{
+          for (let item of value){
+            let itemDemo = {}
+            Object.entries(item).map(([innerKey,innerValue])=>{
+              itemDemo[innerKey] = innerValue.toLocaleString()
+            })
+            if(result[key]){
+              result[key].push(itemDemo)
+            }else{
+              result[key] = [itemDemo]
+            }
+          }        
+        })
+        console.log("TABLE",response.data,{arr})
+        setTables(result);
       } else {
         setTables([]);
         showToast("No Data!", response.error.result);
@@ -102,6 +118,8 @@ const TrendAndCompetitionAnalysis = () => {
         category,
       });
       if (response.data) {
+        console.log("TABLE",response.data)
+
         setData(response.data.result);
         setBankLabel(visualisationLabelUtils(banks, response.data.result));
       } else {

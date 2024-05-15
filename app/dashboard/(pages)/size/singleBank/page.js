@@ -33,7 +33,7 @@ const SingleBankPage = () => {
 
   const banks = useSelector((state) => state.bank.banks);
 
-  const [size, setSize] = useState("BS-CS");
+  const [size, setSize] = useState("Balance Sheet");
   const [bank, setBank] = useState(null);
   const [color, setColor] = useState("");
   const [iconUrl, setIconUrl] = useState("");
@@ -162,18 +162,18 @@ const SingleBankPage = () => {
                 value={size}
                 onValueChange={(v) => setSize(v)}
               >
-                <DropdownMenuRadioItem value="BS-CS" className="px-3">
-                  BS - Common Size
+                <DropdownMenuRadioItem value="Balance Sheet" className="px-3">
+                Balance Sheet
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="IS-CS" className="px-3">
-                  IS - Common Size
+                <DropdownMenuRadioItem value="Income Statement" className="px-3">
+                Income Statement
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
           <ToggleBank data={banks} bank={bank} setBank={setBank} />
         </div>
-        {size === "BS-CS" ? (
+        {size === "Balance Sheet" ? (
           <div className={`flex flex-col h-auto w-full ${break1 ? "lg:w-[67vw]" : "lg:w-[75vw]"} lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}>
             <div className="h-auto w-full">
               {individualBankSize && (

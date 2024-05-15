@@ -120,7 +120,7 @@ const Header = ({ pathname }) => {
         <ClientOnly>
           <div className="flex flex-row justify-start gap-2">
             {icon}
-            <h1 className="text-2xl mt-0.5 font-semibold">{title}</h1>
+            <h1 className="text-2xl mt-0.5 font-bold">{title}</h1>
           </div>
           <Button
             variant="link"

@@ -52,6 +52,14 @@ const Summary = () => {
   const [itemCheckedBanks, setItemCheckedBanks] = useState([]);
   const [itemCategory, setItemCategory] = useState(summaryCategories[0].name);
 
+  const endDate = new Date();
+  const startDate = new Date(endDate);
+  startDate.setFullYear(startDate.getFullYear() - 11)
+  const [figureDate, setFigureDate] = useState({
+    startDate,
+    endDate
+  });
+
   const [ratioDate, setRatioDate] = useState({});
   const [ratioCheckedBanks, setRatioCheckedBanks] = useState([]);
   const [ratioCategory, setRatioCategory] = useState(
@@ -94,7 +102,7 @@ const Summary = () => {
   const getFiguresData = async () => {
     const bankId = banks?.find((item) => item.name === bank)?.id;
     try {
-      const response = await getFigures({ bankId });
+      const response = await getFigures({ bankId,startDate:figureDate.startDate,endDate:figureDate.endDate });
       if (response.data) {
         const transformedData = replaceCategoryNames(response.data.result);
         setFigures(transformedData);
@@ -193,7 +201,7 @@ const Summary = () => {
     if (bank) {
       getFiguresData();
     }
-  }, [bank, banks]);
+  }, [bank, banks,figureDate]);
 
   useEffect(() => {
     if (banks && banks.length > 0) {
@@ -360,7 +368,11 @@ const Summary = () => {
                 search="true"
                 exportXls="true"
                 title={bank}
+                width={10}
                 data={figures}
+                figureDate={figureDate}
+                setFigureDate = {setFigureDate}
+                years = {years}
                 columns={columns}
                 exportData={[figures]}
                 sheetNames={["figures"]}

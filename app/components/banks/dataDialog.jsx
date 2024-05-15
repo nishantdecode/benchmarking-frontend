@@ -130,7 +130,7 @@ export function DataDialog({ banks }) {
       link.setAttribute(
         "download",
         `${
-          bank + "_" + (year ? year + "_" : "") + (quarter ? quarter + "_" : "")
+          bank + "_"  + (quarter ? "QUARTER_"+ quarter : "ANNUAL")
         }.csv`
       );
       document.body.appendChild(link);

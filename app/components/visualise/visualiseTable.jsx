@@ -33,7 +33,21 @@ import { Input } from "@/components/ui/input";
 import { BsFiletypeXls } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
 import { downloadSheet } from "@/util/exportUtils";
+import DateRangeSelector from "../dateRangeSelector";
 
+
+const numberToLocalDigitsConvertor= (data) => {
+  let result = []
+  for (let obj of data){
+    let demoObj = {}
+    Object.entries(obj).map(([key,value])=>{
+        demoObj[key] = value.toLocaleString()
+      
+    })
+    result.push(demoObj)
+  }
+  return result
+}
 export function VisualiseTable({
   data,
   title,
@@ -42,6 +56,9 @@ export function VisualiseTable({
   columns,
   navigate,
   fileName,
+  years,
+  figureDate,
+  setFigureDate,
   exportXls,
   sheetNames,
   value = null,
@@ -53,9 +70,12 @@ export function VisualiseTable({
   const banks = useSelector((state) => state.bank.banks);
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
-
+  // console.log({data})
+  // const realData = numberToLocalDigitsConvertor(data) || [];
+  const realData = data
+  console.log({realData})
   const table = useReactTable({
-    data,
+    data:realData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
@@ -90,6 +110,9 @@ export function VisualiseTable({
               />
             </div>
           )}
+          {years && <div>
+            <DateRangeSelector years={years} date={figureDate} setDate={setFigureDate} />
+          </div>}
           {exportXls && (
             <div className="flex flex-row w-auto gap-1">
               <DropdownMenu>
@@ -154,14 +177,14 @@ export function VisualiseTable({
       </div>
       <div className="relative max-h-[500px] lg:max-h-[650px] rounded-md border overflow-scroll">
         <Table>
-          <TableHeader>
+          <TableHeader className=" ">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="sticky top-0 bg-secondary z-20 ">
                 {headerGroup.headers.map((header, index) => {
                   return (
                     <TableHead
                       key={header.id}
-                      className={`${index === 0 ? "border-r-[1px]" : ""}`}
+                      className={`${index === 0 ? "border-r-[1px] sticky left-0" : ""}`}
                     >
                       {header.isPlaceholder
                         ? null
@@ -186,9 +209,10 @@ export function VisualiseTable({
                     <TableCell
                       key={cell.id}
                       className={`${
-                        index === 0 ? "bg-secondary border-r-[1px]" : ""
+                        index === 0 ? "bg-secondary border-r-[1px] sticky left-0 z-10" : ""
                       }`}
                     >
+                      
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

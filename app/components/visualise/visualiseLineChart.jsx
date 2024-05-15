@@ -45,7 +45,7 @@ const VisualiseLineChart = forwardRef(function VisualiseLineChart(
     xAxis,
     legend = false,
     dataFormatter = function (value, index, ticks) {
-      return value.toFixed(4);
+      return value.toFixed(2);
     },
   },
   ref

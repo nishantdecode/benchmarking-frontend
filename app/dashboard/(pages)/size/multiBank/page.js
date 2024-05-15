@@ -34,7 +34,7 @@ const MultiBankPage = () => {
   const [operatingIncome, setOperatingIncome] = useState([]);
   const [operatingExpenses, setOperatingExpenses] = useState([]);
 
-  const [size, setSize] = useState("BS-CS");
+  const [size, setSize] = useState("Balance Sheet");
   const [assetCategory, setAssetCategory] = useState(
     commonSizeCategories.assets[0].name
   );
@@ -217,11 +217,11 @@ const MultiBankPage = () => {
                   setSize(v);
                 }}
               >
-                <DropdownMenuRadioItem value="BS-CS" className="px-3">
-                  BS - Common Size
+                <DropdownMenuRadioItem value="Balance Sheet" className="px-3">
+                Balance Sheet
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="IS-CS" className="px-3">
-                  IS - Common Size
+                <DropdownMenuRadioItem value="Income Statement" className="px-3">
+                Income Statement
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
@@ -252,7 +252,7 @@ const MultiBankPage = () => {
           />
         </div>
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-3">
-          {size === "BS-CS" ? (
+          {size === "Balance Sheet" ? (
             <div className="flex flex-col w-full lg:w-5/6 h-auto gap-10">
               <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-3 lg:gap-3">
                 <div className="flex flex-col items-center w-full lg:w-1/5 h-auto gap-3">
