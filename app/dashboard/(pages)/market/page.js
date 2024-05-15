@@ -37,7 +37,13 @@ const Market = () => {
   const [years, setYears] = useState([]);
   const [multipleMSData, setMultipleMSData] = useState([]);
   const [individualMSData, setIndividualMSData] = useState([]);
-
+  const endDate = new Date();
+  const startDate = new Date(endDate);
+  startDate.setFullYear(startDate.getFullYear() - 11)
+  const [figureDate, setFigureDate] = useState({
+    startDate,
+    endDate
+  });
   const banks = useSelector((state) => state.bank.banks);
 
   const [color, setColor] = useState("");
@@ -92,6 +98,8 @@ const Market = () => {
   const getIndividualBankMSData = async () => {
     const credentials = {
       bankId: banks?.find((item) => item.name === bank).id,
+      startDate:figureDate.startDate,
+      endDate:figureDate.endDate
     };
     try {
       const response = await getIndividualBankData(credentials);
@@ -135,7 +143,7 @@ const Market = () => {
       getIndividualBankMSData();
       setColor(banks.find((item) => item.name === bank).color);
     }
-  }, [bank, banks]);
+  }, [bank, banks,figureDate]);
 
   useEffect(() => {
     if (checkedBanks && year) {
@@ -165,6 +173,9 @@ const Market = () => {
               <VisualiseTable
                 exportXls="true"
                 title={bank}
+                figureDate={figureDate}
+                setFigureDate={setFigureDate}
+                years={years}
                 data={individualMSData}
                 columns={columns}
                 exportData={[individualMSData]}

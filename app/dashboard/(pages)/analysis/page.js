@@ -273,7 +273,7 @@ const AnalysisPage = () => {
 
   useEffect(() => {
     getFiguresCategoryData();
-  }, [ratioCategory]);
+  }, [ratioCategory,figureCategoryDate]);
 
   useEffect(() => {
     getItemCategoryData({
@@ -283,7 +283,7 @@ const AnalysisPage = () => {
       category: balanceSheetCategory,
       categories: itemAnalysisCategories.balanceSheet,
     });
-  }, [balanceSheetCategory]);
+  }, [balanceSheetCategory,figureDateBalanceSheet]);
 
   useEffect(() => {
     getItemCategoryData({
@@ -293,7 +293,7 @@ const AnalysisPage = () => {
       category: msBalanceSheetCategory,
       categories: itemAnalysisCategories.msBalanceSheet,
     });
-  }, [msBalanceSheetCategory]);
+  }, [msBalanceSheetCategory,figureDateMSBalanceSheet]);
 
   useEffect(() => {
     getItemCategoryData({
@@ -303,7 +303,7 @@ const AnalysisPage = () => {
       category: incomeStatementCategory,
       categories: itemAnalysisCategories.incomeStatement,
     });
-  }, [incomeStatementCategory]);
+  }, [incomeStatementCategory,figureDateIncomeState]);
 
   useEffect(() => {
     getItemCategoryData({
@@ -313,7 +313,7 @@ const AnalysisPage = () => {
       category: msIncomeStatementCategory,
       categories: itemAnalysisCategories.msIncomeStatement,
     });
-  }, [msIncomeStatementCategory]);
+  }, [msIncomeStatementCategory,figureDateMSIncomeState]);
 
   return (
     <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10 gap-10">
