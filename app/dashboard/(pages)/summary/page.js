@@ -3,6 +3,7 @@
 import { useSelector } from "react-redux";
 import React, { useRef, useEffect, useState } from "react";
 
+
 import {
   keyRatioCategories,
   executiveSummaryCategories as summaryCategories,
@@ -14,6 +15,7 @@ import {
   useGetAllYearsMutation,
   useGetFiguresMutation,
   useGetItemMutation,
+  useGetMetricQuery,
 } from "@/lib/features/services/summaryApi";
 import showToast from "@/util/showToast";
 import useMediaQuery from "@/app/hooks/useMediaQuery";
@@ -28,6 +30,8 @@ import { visualisationLabelUtils } from "@/util/visualizationLabelUtils";
 import { useGetRatioMutation } from "@/lib/features/services/keyRatioApi";
 import { VisualiseTable } from "@/app/components/visualise/visualiseTable";
 import VisualiseLineChart from "@/app/components/visualise/visualiseLineChart";
+import SarTable from "@/app/components/sarTable";
+import SarFilter from "@/app/components/sarFilter";
 
 const Summary = () => {
   let ref = useRef();
@@ -43,7 +47,11 @@ const Summary = () => {
   const [ratio, setRatio] = useState([]);
   const [figures, setFigures] = useState([]);
   const [years, setYears] = useState([]);
-
+  const [metric, setMetric] = useState([]);
+  const [interval, setInterval] = useState('YEARLY');
+  const [startPeriod, setStartPeriod] = useState('2020');
+  const [endPeriod, setEndPeriod] = useState('2021');
+  const [data, setData] = useState(null);
   const banks = useSelector((state) => state.bank.banks);
 
   const [bank, setBank] = useState(null);
@@ -60,7 +68,11 @@ const Summary = () => {
     endDate
   });
 
-  const [ratioDate, setRatioDate] = useState({});
+  const [ratioDate, setRatioDate] = useState({
+    interval: 'YEARLY',
+    startDate: new Date(Date.UTC(new Date().getFullYear(), 0, 1, 0, 0, 0, 0)),
+    endDate: new Date(Date.UTC(new Date().getFullYear(), 0, 1, 0, 0, 0, 0)),
+  });
   const [ratioCheckedBanks, setRatioCheckedBanks] = useState([]);
   const [ratioCategory, setRatioCategory] = useState(
     keyRatioCategories[0].name
@@ -83,6 +95,7 @@ const Summary = () => {
     });
   }
 
+
   const replaceCategoryNames = (data) => {
     return data.map((item) => {
       const categoryInfo = summaryCategories.find(
@@ -102,7 +115,7 @@ const Summary = () => {
   const getFiguresData = async () => {
     const bankId = banks?.find((item) => item.name === bank)?.id;
     try {
-      const response = await getFigures({ bankId,startDate:figureDate.startDate,endDate:figureDate.endDate });
+      const response = await getFigures({ bankId, startDate: figureDate.startDate, endDate: figureDate.endDate });
       if (response.data) {
         const transformedData = replaceCategoryNames(response.data.result);
         setFigures(transformedData);
@@ -193,6 +206,23 @@ const Summary = () => {
     }
   };
 
+  const fetchData = async () => {
+    const url = `http://localhost:8003/api/executiveSummary/metric?interval=${interval}&startPeriod=${interval === 'QUARTERLY' ? `Q1 ${startPeriod}` : startPeriod
+      }&endPeriod=${interval === 'QUARTERLY' ? `Q1 ${endPeriod}` : endPeriod}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      setData(data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [interval, startPeriod, endPeriod]);
+
   useEffect(() => {
     getYears();
   }, []);
@@ -201,7 +231,7 @@ const Summary = () => {
     if (bank) {
       getFiguresData();
     }
-  }, [bank, banks,figureDate]);
+  }, [bank, banks, figureDate]);
 
   useEffect(() => {
     if (banks && banks.length > 0) {
@@ -371,8 +401,8 @@ const Summary = () => {
                 width={10}
                 data={figures}
                 figureDate={figureDate}
-                setFigureDate = {setFigureDate}
-                years = {years}
+                setFigureDate={setFigureDate}
+                years={years}
                 columns={columns}
                 exportData={[figures]}
                 sheetNames={["figures"]}
@@ -382,7 +412,31 @@ const Summary = () => {
           </div>
         </div>
       </Card>
-    </div>
+
+      <Card className="flex flex-col h-auto w-full p-3 gap-5">
+        <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
+          <div className={`flex flex-col h-auto w-full  `}>
+            <div className="w-full lg:w-4/6 text-xs sm:text-sm font-medium">
+              <div className="flex justify-end items-end">
+                <SarFilter interval={interval}
+                  setInterval={setInterval}
+                  startPeriod={startPeriod}
+                  setStartPeriod={setStartPeriod}
+                  endPeriod={endPeriod}
+                  setEndPeriod={setEndPeriod} />
+              </div>
+
+            </div>
+            <div className="App">
+              <h1>Bank Performance Comparison</h1>
+              <div className="relative max-h-[500px] lg:max-h-[650px] rounded-md border overflow-scroll">
+                <SarTable data={data} interval={interval} startPeriod={startPeriod} endPeriod={endPeriod} />
+              </div>
+            </div>
+          </div>
+        </div >
+      </Card >
+    </div >
   );
 };
 
