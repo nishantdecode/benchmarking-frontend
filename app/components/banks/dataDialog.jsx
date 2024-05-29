@@ -143,6 +143,7 @@ export function DataDialog({ banks }) {
       link.click();
       link.parentNode.removeChild(link);
     } catch (err) {
+      console.log({err})
       showToast("Error!", "Download Failed!");
     }
   }
