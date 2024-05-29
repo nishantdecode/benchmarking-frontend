@@ -23,8 +23,6 @@ import {
 } from "@/lib/features/services/individualBankApi";
 import showToast from "@/util/showToast";
 import { MdClose } from "react-icons/md";
-import AsyncXLSXLoader from "./xlsx";
-// import * as XLSX from 'xlsx';
 
 const intervals = ["Annual", "Quarter 1", "Quarter 2", "Quarter 3"];
 
@@ -58,12 +56,7 @@ export function DataDialog({ banks }) {
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } =
     useDropzone({
       onDrop,
-      accept: {
-        "application/vnd.ms-excel": [".xls"],
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
-          ".xlsx",
-        ],
-      },
+      accept: "text/csv",
     });
 
   async function handleUpload(e) {
@@ -122,41 +115,30 @@ export function DataDialog({ banks }) {
       const response = await getSheet({ bankId, year, quarter });
 
       const csv = response.data.result.csv;
-
-      // Ensure XLSX is available globally
-      if (typeof XLSX === 'undefined') {
-        throw new Error('XLSX library is not loaded');
-    }
-      // Convert CSV to XLSX
-      const workbook = XLSX.utils.book_new();
-      const worksheet = XLSX.utils.csv_to_sheet(csv);
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-
-      const xlsxData = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([xlsxData], { type: "application/octet-stream" });
+      const blob = new Blob([csv], { type: "text/csv" });
 
       const url = window.URL.createObjectURL(blob);
 
       const link = document.createElement("a");
+
       link.href = url;
       link.setAttribute(
-          "download",
-          `${bank}_${quarter ? "QUARTER_" + quarter : "ANNUAL"}.xlsx`
+        "download",
+        `${
+          bank + "_"  + (quarter ? "QUARTER_"+ quarter : "ANNUAL")
+        }.csv`
       );
       document.body.appendChild(link);
 
       link.click();
       link.parentNode.removeChild(link);
     } catch (err) {
-      console.log({err})
       showToast("Error!", "Download Failed!");
     }
   }
 
   return (
     <DialogContent className="w-full px-5 py-8">
-            <AsyncXLSXLoader />
-
       <DialogHeader className="gap-5">
         <DialogTitle className="flex justify-center w-full text-lg lg:text-2xl">
           Add Data
