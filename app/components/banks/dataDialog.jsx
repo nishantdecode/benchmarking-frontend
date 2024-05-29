@@ -23,6 +23,7 @@ import {
 } from "@/lib/features/services/individualBankApi";
 import showToast from "@/util/showToast";
 import { MdClose } from "react-icons/md";
+import AsyncXLSXLoader from "./xlsx";
 // import * as XLSX from 'xlsx';
 
 const intervals = ["Annual", "Quarter 1", "Quarter 2", "Quarter 3"];
@@ -154,6 +155,8 @@ export function DataDialog({ banks }) {
 
   return (
     <DialogContent className="w-full px-5 py-8">
+            <AsyncXLSXLoader />
+
       <DialogHeader className="gap-5">
         <DialogTitle className="flex justify-center w-full text-lg lg:text-2xl">
           Add Data

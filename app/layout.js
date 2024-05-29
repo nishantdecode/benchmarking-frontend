@@ -23,10 +23,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       {/* <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script> */}
-      <Script
+      {/* <Script
     src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"
     strategy="beforeInteractive"
-  />
+  /> */}
       <body className={cn(
           "min-h-screen bg-background font-sans antialiased",
           fontSans.variable
