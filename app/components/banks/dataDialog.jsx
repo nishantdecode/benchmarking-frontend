@@ -23,7 +23,7 @@ import {
 } from "@/lib/features/services/individualBankApi";
 import showToast from "@/util/showToast";
 import { MdClose } from "react-icons/md";
-import XLSX from "xlsx"
+import * as XLSX from 'xlsx';
 
 const intervals = ["Annual", "Quarter 1", "Quarter 2", "Quarter 3"];
 
