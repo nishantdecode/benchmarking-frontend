@@ -23,7 +23,7 @@ import {
 } from "@/lib/features/services/individualBankApi";
 import showToast from "@/util/showToast";
 import { MdClose } from "react-icons/md";
-import * as XLSX from 'xlsx';
+// import * as XLSX from 'xlsx';
 
 const intervals = ["Annual", "Quarter 1", "Quarter 2", "Quarter 3"];
 
@@ -122,6 +122,10 @@ export function DataDialog({ banks }) {
 
       const csv = response.data.result.csv;
 
+      // Ensure XLSX is available globally
+      if (typeof XLSX === 'undefined') {
+        throw new Error('XLSX library is not loaded');
+    }
       // Convert CSV to XLSX
       const workbook = XLSX.utils.book_new();
       const worksheet = XLSX.utils.csv_to_sheet(csv);
