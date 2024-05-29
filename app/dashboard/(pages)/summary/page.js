@@ -207,7 +207,7 @@ const Summary = () => {
   };
 
   const fetchData = async () => {
-    const url = `http://localhost:8003/api/executiveSummary/metric?interval=${interval}&startPeriod=${interval === 'QUARTERLY' ? `Q1 ${startPeriod}` : startPeriod
+    const url = `https://benchmarking.brihatinfotech.com/api/executiveSummary/metric?interval=${interval}&startPeriod=${interval === 'QUARTERLY' ? `Q1 ${startPeriod}` : startPeriod
       }&endPeriod=${interval === 'QUARTERLY' ? `Q1 ${endPeriod}` : endPeriod}`;
 
     try {
