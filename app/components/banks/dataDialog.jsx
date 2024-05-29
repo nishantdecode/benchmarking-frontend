@@ -23,6 +23,7 @@ import {
 } from "@/lib/features/services/individualBankApi";
 import showToast from "@/util/showToast";
 import { MdClose } from "react-icons/md";
+import XLSX from "xlsx"
 
 const intervals = ["Annual", "Quarter 1", "Quarter 2", "Quarter 3"];
 
@@ -120,18 +121,22 @@ export function DataDialog({ banks }) {
       const response = await getSheet({ bankId, year, quarter });
 
       const csv = response.data.result.csv;
-      const blob = new Blob([csv], { type: "text/csv" });
+
+      // Convert CSV to XLSX
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.csv_to_sheet(csv);
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+      const xlsxData = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([xlsxData], { type: "application/octet-stream" });
 
       const url = window.URL.createObjectURL(blob);
 
       const link = document.createElement("a");
-
       link.href = url;
       link.setAttribute(
-        "download",
-        `${
-          bank + "_"  + (quarter ? "QUARTER_"+ quarter : "ANNUAL")
-        }.csv`
+          "download",
+          `${bank}_${quarter ? "QUARTER_" + quarter : "ANNUAL"}.xlsx`
       );
       document.body.appendChild(link);
 
