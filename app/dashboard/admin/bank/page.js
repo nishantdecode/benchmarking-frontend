@@ -38,6 +38,7 @@ const formSchema = z.object({
   headquarters: z.string().min(1),
   code: z.string().min(1),
   contact: z.string().min(1),
+  dataUrl: z.string().min(1),
 });
 
 const BankPage = () => {
@@ -54,6 +55,7 @@ const BankPage = () => {
     headquarters: "",
     code: "",
     contact: "",
+    dataUrl: "",
   });
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -84,6 +86,7 @@ const BankPage = () => {
       name: values.name,
       headquarters: values.headquarters,
       contact: values.contact,
+      dataUrl: values.dataUrl,
       code: values.code,
       color: color,
     };
@@ -103,6 +106,7 @@ const BankPage = () => {
         showToast("Error!", "Please try again later.");
       }
     } else if (page === "Edit") {
+
       try {
         const response = await updateBank({id, credentials});
         if (response.data) {
@@ -131,6 +135,7 @@ const BankPage = () => {
           headquarters: bankData?.headquarters,
           code: bankData?.code,
           contact: bankData?.contact,
+          dataUrl: bankData?.dataUrl,
         });
       }
     } catch (err) {
@@ -277,6 +282,30 @@ const BankPage = () => {
                           <Input
                             placeholder="Enter bank Contact"
                             type="contact"
+                            {...field}
+                            className="md:max-w-[300px]"
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
+              <FormField
+                control={form.control}
+                name="dataUrl"
+                render={({ field }) => {
+                  return (
+                    <FormItem>
+                      <div className="flex flex-col md:flex-row justify-between gap-4">
+                        <FormLabel className="mt-3 text-xs md:text-sm">
+                          Enter Bank Data Url* :
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter bank Data Url"
+                            type="dataUrl"
                             {...field}
                             className="md:max-w-[300px]"
                           />
