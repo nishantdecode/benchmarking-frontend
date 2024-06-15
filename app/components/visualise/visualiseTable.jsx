@@ -179,12 +179,12 @@ export function VisualiseTable({
         <Table>
           <TableHeader className=" ">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="sticky top-0 bg-secondary z-20 ">
+              <TableRow key={headerGroup.id} className="sticky  top-0 bg-secondary z-20 ">
                 {headerGroup.headers.map((header, index) => {
                   return (
                     <TableHead
                       key={header.id}
-                      className={`${index === 0 ? "border-r-[1px] sticky left-0" : ""}`}
+                      className={`${index === 0 ? "border-r-[1px] bg-secondary sticky left-0" : ""}`}
                     >
                       {header.isPlaceholder
                         ? null

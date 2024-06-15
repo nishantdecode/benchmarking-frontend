@@ -13,7 +13,7 @@ const SarTable = ({ data, interval, startPeriod, endPeriod }) => {
     <Table>
       <TableHeader>
         <TableRow className="sticky top-0 bg-secondary z-20">
-          <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider divide-x divide-[#1e293b]">
+          <TableHead className="px-6  bg-secondary z-30 sticky left-0 py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider divide-x divide-[#1e293b]">
             SAR
           </TableHead>
           {[
@@ -25,18 +25,18 @@ const SarTable = ({ data, interval, startPeriod, endPeriod }) => {
             "SABB",
             "SIB",
             "SNB",
-          ].map((bank) => (
+          ].map((bank,i) => (
             <TableHead
               key={bank}
               colSpan="2"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider"
+              className={`px-6 ${i === 0 ? " ":""} py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider`}
             >
               {bank}
             </TableHead>
           ))}
         </TableRow>
         <TableRow className="sticky top-0 bg-secondary z-20">
-          <TableHead className="px-6 py-3"></TableHead>
+          <TableHead className="px-6 py-3 bg-secondary sticky left-0  z-30"></TableHead>
           {new Array(8).fill(null).map((_, index) => (
             <React.Fragment key={index}>
               <TableHead className="px-6 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase tracking-wider">
