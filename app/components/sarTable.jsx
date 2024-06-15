@@ -334,8 +334,9 @@ const SarTable = ({
               >
                 {row?.metric
                   ? `${row.metric
-                      .replace(/_/g, " ")
-                      .replace(/([a-z])([A-Z])/g, "$1 $2")
+                      .split(' ') // Split the string into an array of words
+                      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
+                      .join(' ')
                       .slice(0, 20)}${row.metric.length > 20 ? "..." : ""}`
                   : ""}
               </TableCell>
