@@ -51,6 +51,8 @@ const Summary = () => {
   const [interval, setInterval] = useState('YEARLY');
   const [startPeriod, setStartPeriod] = useState('2020');
   const [endPeriod, setEndPeriod] = useState('2021');
+  const [quarter, setQuarter] = useState("Q1");
+  const [quarter2, setQuarter2] = useState("Q1");
   const [data, setData] = useState(null);
   const banks = useSelector((state) => state.bank.banks);
 
@@ -206,9 +208,22 @@ const Summary = () => {
     }
   };
 
+  // const fetchData = async () => {
+  //   const url = `http://localhost:8003/api/executiveSummary/metric?interval=${interval}&startPeriod=${interval === 'QUARTERLY' ? `Q1 ${startPeriod}` : startPeriod
+  //     }&endPeriod=${interval === 'QUARTERLY' ? `Q1 ${endPeriod}` : endPeriod}`;
+
+  //   try {
+  //     const response = await fetch(url);
+  //     const data = await response.json();
+  //     setData(data);
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   }
+  // };
+
   const fetchData = async () => {
-    const url = `http://localhost:8003/api/executiveSummary/metric?interval=${interval}&startPeriod=${interval === 'QUARTERLY' ? `Q1 ${startPeriod}` : startPeriod
-      }&endPeriod=${interval === 'QUARTERLY' ? `Q1 ${endPeriod}` : endPeriod}`;
+    const url = `https://analytic.benchmarking.brihatinfotech.com/api/executiveSummary/metric?interval=${interval}&startPeriod=${interval === 'QUARTERLY' ? `${quarter} ${startPeriod}` : startPeriod
+      }&endPeriod=${interval === 'QUARTERLY' ? `${quarter2} ${endPeriod}` : endPeriod}`;
 
     try {
       const response = await fetch(url);
@@ -221,7 +236,11 @@ const Summary = () => {
 
   useEffect(() => {
     fetchData();
-  }, [interval, startPeriod, endPeriod]);
+  }, [interval, startPeriod, endPeriod, quarter]);
+
+  // useEffect(() => {
+  //   fetchData();
+  // }, [interval, startPeriod, endPeriod]);
 
   useEffect(() => {
     getYears();
@@ -249,6 +268,9 @@ const Summary = () => {
     getRatioData();
   }, [ratioDate, ratioCategory, ratioCheckedBanks]);
 
+  console.log(data)
+  console.log(years)
+  console.log(quarter2)
   return (
     <div className="flex flex-col justify-center items-start w-full h-auto mt-14 p-5 pl-7 sm:pl-10 gap-10">
       <Card className="flex flex-col items-center w-full h-auto p-3 md:p-5 gap-3 md:gap-5">
@@ -384,38 +406,38 @@ const Summary = () => {
           </div>
         </div>
       </Card>
-     {
-    //    <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
-    //    <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
-    //      <div className="flex flex-col justify-center items-center lg:items-start h-full w-full sm:w-auto lg:w-[25vw] lg:max-w-1/6 gap-7">
-    //        <span className="text-lg lg:text-2xl font-bold truncate text-ellipsis">
-    //          Figures
-    //        </span>
-    //        <ToggleBank data={banks} bank={bank} setBank={setBank} />
-    //      </div>
-    //      <div className={`flex flex-col h-auto w-full ${break1 ? "lg:w-[69vw]" : "lg:w-[75vw]"} lg:max-w-5/6  gap-2 sm:gap-3 md:gap-8 lg:gap-10`}>
-    //        {figures.length !== 0 && (
-    //          <VisualiseTable
-    //            search="true"
-    //            exportXls="true"
-    //            title={bank}
-    //            width={10}
-    //            data={figures}
-    //            figureDate={figureDate}
-    //            setFigureDate={setFigureDate}
-    //            years={years}
-    //            columns={columns}
-    //            exportData={[figures]}
-    //            sheetNames={["figures"]}
-    //            fileName="Executive Summary Figures"
-    //          />
-    //        )}
-    //      </div>
-    //    </div>
-    //  </Card>
-     }
+      {
+        //    <Card className="flex flex-col h-auto w-full p-3 md:p-5 gap-5 lg:gap-10">
+        //    <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
+        //      <div className="flex flex-col justify-center items-center lg:items-start h-full w-full sm:w-auto lg:w-[25vw] lg:max-w-1/6 gap-7">
+        //        <span className="text-lg lg:text-2xl font-bold truncate text-ellipsis">
+        //          Figures
+        //        </span>
+        //        <ToggleBank data={banks} bank={bank} setBank={setBank} />
+        //      </div>
+        //      <div className={`flex flex-col h-auto w-full ${break1 ? "lg:w-[69vw]" : "lg:w-[75vw]"} lg:max-w-5/6  gap-2 sm:gap-3 md:gap-8 lg:gap-10`}>
+        //        {figures.length !== 0 && (
+        //          <VisualiseTable
+        //            search="true"
+        //            exportXls="true"
+        //            title={bank}
+        //            width={10}
+        //            data={figures}
+        //            figureDate={figureDate}
+        //            setFigureDate={setFigureDate}
+        //            years={years}
+        //            columns={columns}
+        //            exportData={[figures]}
+        //            sheetNames={["figures"]}
+        //            fileName="Executive Summary Figures"
+        //          />
+        //        )}
+        //      </div>
+        //    </div>
+        //  </Card>
+      }
 
-      <Card className="flex flex-col h-auto w-full p-3 gap-5">
+      {/* <Card className="flex flex-col h-auto w-full p-3 gap-5">
         <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
           <div className={`flex flex-col h-auto w-full  `}>
             <div className="w-full lg:w-4/6 text-xs sm:text-sm font-medium">
@@ -437,7 +459,46 @@ const Summary = () => {
             </div>
           </div>
         </div >
-      </Card >
+      </Card > */}
+
+      <Card className="flex flex-col h-auto w-full p-3 gap-5">
+        <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start w-full gap-5">
+          <div className={`flex flex-col h-auto w-full`}>
+            <div className="w-full lg:w-4/6 text-xs sm:text-sm font-medium">
+              <div className="flex justify-end items-end">
+                <SarFilter
+                  interval={interval}
+                  setInterval={setInterval}
+                  startPeriod={startPeriod}
+                  setStartPeriod={setStartPeriod}
+                  endPeriod={endPeriod}
+                  setEndPeriod={setEndPeriod}
+                  quarter={quarter}
+                  setQuarter={setQuarter}
+                  quarter2={quarter2}
+                  setQuarter2={setQuarter2}
+                  years={years}
+                />
+              </div>
+            </div>
+            <div className="App">
+              <div>
+                <span className="w-auto lg:w-1/6 text-2xl font-bold mt-2 truncate text-ellipsis">Bank Performance Comparison</span>
+              </div>
+              <div className="relative max-h-[500px] lg:max-h-[650px] rounded-md border overflow-scroll">
+                <SarTable
+                  data={data}
+                  interval={interval}
+                  startPeriod={startPeriod}
+                  endPeriod={endPeriod}
+                  quarter={quarter}
+                  quarter2={quarter2}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
     </div >
   );
 };

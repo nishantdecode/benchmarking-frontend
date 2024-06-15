@@ -105,10 +105,18 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
         const bank = row.original;
         const requestExtract = async ({ bank, user }) => {
           try {
-            const response = await requestExtraction({ bank, user });
+            const response = await requestExtraction({ id: bank.id, user });
+            console.log({ response });
+            if (response.error) {
+              setLoading({ bank: bank.name, isLoading: false });
+
+              showToast("Server Error", response.error.data.message);
+
+            }
             if (response.data) {
               // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
-              window.location.href = "https://benchmarking-fe.vercel.app/dashboard/admin";
+              window.location.href =
+                "https://benchmarking-fe.vercel.app/dashboard/admin";
             }
           } catch (err) {
             console.log(err);
@@ -133,7 +141,7 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
                 className="flex flex-row w-auto gap-2 px-10 text-xs rounded-xl"
                 onClick={() => {
                   setLoading({ bank: bank.name, isLoading: true });
-                  requestExtract({ bank: bank.name, user: userObj });
+                  requestExtract({ bank: bank, user: userObj });
                 }}
               >
                 {loading?.bank?.toString() === bank?.name?.toString() &&
@@ -498,7 +506,9 @@ export function VisualiseTable({ data, columnName, role, search, title }) {
                   placeholder="Filter data by email..."
                   value={table?.getColumn("email")?.getFilterValue() ?? ""}
                   onChange={(event) =>
-                    table?.getColumn("email")?.setFilterValue(event.target.value)
+                    table
+                      ?.getColumn("email")
+                      ?.setFilterValue(event.target.value)
                   }
                 />
               </div>
