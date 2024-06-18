@@ -293,7 +293,6 @@ const SarTable = ({
             "ANB",
             "SABB",
             "SIB",
-            "SNB",
           ].map((bank,i) => (
             <TableHead
               key={bank}
@@ -306,7 +305,7 @@ const SarTable = ({
         </TableRow>
         <TableRow className="sticky top-0 bg-secondary z-20">
           <TableHead className="px-6 py-3 bg-secondary sticky left-0  z-30"></TableHead>
-          {new Array(8).fill(null).map((_, index) => (
+          {new Array(10).fill(null).map((_, index) => (
             <React.Fragment key={index}>
               <TableHead className="px-6 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase tracking-wider">
                 {" "}

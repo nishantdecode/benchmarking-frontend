@@ -46,7 +46,7 @@ const CompetitionCards = ({ data }) => {
                     ) : (
                       ""
                     )} */}
-                    {item.highest.value.toFixed(2)}
+                    {item.highest.value?.toFixed(2)}
                     {item.highest.valueType === "percentage" ? "%" : item.highest.value.toString().split(".")[0]?.length >=4 ? <TbCurrencyRiyal size={16} /> : " M"}
                   </div>
                 </div>
@@ -63,7 +63,7 @@ const CompetitionCards = ({ data }) => {
                     ) : (
                       ""
                     )} */}
-                    {item.lowest.value.toFixed(2)}
+                    {item.lowest.value?.toFixed(2)}
                     {item.lowest.valueType === "percentage" ? "%" :  item.lowest.value.toString().split(".")[0]?.length >=4 ? <TbCurrencyRiyal size={16} /> : " M"}
                   </div>
                 </div>
