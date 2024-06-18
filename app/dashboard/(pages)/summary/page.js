@@ -209,7 +209,7 @@ const Summary = () => {
   };
 
   // const fetchData = async () => {
-  //   const url = `http://localhost:8003/api/executiveSummary/metric?interval=${interval}&startPeriod=${interval === 'QUARTERLY' ? `Q1 ${startPeriod}` : startPeriod
+  //   const url = `https://analytic.benchmarking.brihatinfotech.com/api/executiveSummary/metric?interval=${interval}&startPeriod=${interval === 'QUARTERLY' ? `Q1 ${startPeriod}` : startPeriod
   //     }&endPeriod=${interval === 'QUARTERLY' ? `Q1 ${endPeriod}` : endPeriod}`;
 
   //   try {
@@ -222,7 +222,7 @@ const Summary = () => {
   // };
 
   const fetchData = async () => {
-    const url = `http://localhost:8003/api/executiveSummary/metric?interval=${interval}&startPeriod=${interval === 'QUARTERLY' ? `${quarter} ${startPeriod}` : startPeriod
+    const url = `https://analytic.benchmarking.brihatinfotech.com/api/executiveSummary/metric?interval=${interval}&startPeriod=${interval === 'QUARTERLY' ? `${quarter} ${startPeriod}` : startPeriod
       }&endPeriod=${interval === 'QUARTERLY' ? `${quarter2} ${endPeriod}` : endPeriod}`;
 
     try {
