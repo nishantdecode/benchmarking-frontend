@@ -41,13 +41,15 @@ const CompetitionCards = ({ data }) => {
                     }
                   </div>
                   <div className="flex flex-row gap-2">
-                    {/* {item.highest.valueType === "currency" ? (
+                    {/* {item?.highest?.valueType === "currency" ? (
                       
                     ) : (
                       ""
                     )} */}
-                    {item.highest.value?.toFixed(2)}
-                    {item.highest.valueType === "percentage" ? "%" : item.highest.value.toString().split(".")[0]?.length >=4 ? <TbCurrencyRiyal size={16} /> : " M"}
+                    {/* {item?.highest?.value?.toFixed(2)} */}
+                    {item?.highest?.valueType === "percentage" ? item?.highest?.value?.toFixed(2) : item?.highest?.value?.toString()?.split(".")[0]?.length >=4 ? (item?.highest?.value/1000000 )?.toFixed(2) :item?.highest?.value?.toFixed(2)}
+
+                    {item?.highest?.valueType === "percentage" ? "%" : item?.highest?.value?.toString()?.split(".")[0]?.length >=4 ? " M" : " M"}
                   </div>
                 </div>
                 <div className="flex flex-row justify-between font-bold text-foreground">
@@ -58,13 +60,16 @@ const CompetitionCards = ({ data }) => {
                     }
                   </div>
                   <div className="flex flex-row gap-2">
-                    {/* {item.lowest.valueType === "currency" ? (
+                    {/* {item?.lowest?.valueType === "currency" ? (
                       <TbCurrencyRiyal size={16} />
                     ) : (
                       ""
                     )} */}
-                    {item.lowest.value?.toFixed(2)}
-                    {item.lowest.valueType === "percentage" ? "%" :  item.lowest.value.toString().split(".")[0]?.length >=4 ? <TbCurrencyRiyal size={16} /> : " M"}
+                    {/* {item?.lowest?.value?.toFixed(2)} */}
+                    {item?.lowest?.valueType === "percentage" ? item?.lowest?.value?.toFixed(2) : item?.lowest?.value?.toString()?.split(".")[0]?.length >=4 ? (item?.lowest?.value/1000000 )?.toFixed(2) :item?.lowest?.value?.toFixed(2)}
+
+                    {/* {console.log("TEST",item?.lowest?.valueType, item?.lowest?.value?.toString().split(".")[0])} */}
+                    {item?.lowest?.valueType === "percentage" ? "%" :  item?.lowest?.value?.toString()?.split(".")[0]?.length >=4 ? " M" : " M"}
                   </div>
                 </div>
               </div>

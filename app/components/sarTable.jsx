@@ -279,7 +279,7 @@ const SarTable = ({
     <Table>
       <TableHeader className="sticky top-0 bg-secondary z-20">
         <TableRow className="sticky top-0 bg-secondary z-20">
-          <TableHead className="px-6  bg-secondary z-30 sticky left-0 py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider divide-x divide-[#1e293b]">
+          <TableHead className="px-6  bg-secondary z-30 sticky left-0 py-3 text-left text-xs font-medium  uppercase tracking-wider divide-x divide-[#1e293b]">
             SAR
           </TableHead>
           {[
@@ -297,7 +297,7 @@ const SarTable = ({
             <TableHead
               key={bank}
               colSpan="2"
-              className={`px-6 ${i === 0 ? " ":""} py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider`}
+              className={`px-6 ${i === 0 ? " ":""} py-3 text-left text-xs font-medium  uppercase tracking-wider`}
             >
               {bank}
             </TableHead>
@@ -329,7 +329,7 @@ const SarTable = ({
             <TableRow className="text-center">
               <TableCell
                 rowSpan="2"
-                className="bg-secondary border-r-[1px] sticky left-0 z-10 px-6 py-4 whitespace-nowrap text-sm text-gray-100"
+                className="bg-secondary border-r-[1px] sticky left-0 z-10 px-6 py-4 whitespace-nowrap text-sm "
               >
                 {row?.metric
                   ? `${row.metric
