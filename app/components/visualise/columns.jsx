@@ -111,7 +111,7 @@ const progressCol = ({ key, color }) => {
     accessorKey: key,
     header: ({ column }) => {
       return (
-        <div className="flex flex-row justify-start w-[90px] gap-2 truncate text-ellipsis !font-bold">
+        <div className="flex flex-row justify-center items-start w-[180px] h-[80px] pt-3 gap-2 text-wrap text-center !font-bold">
           {key}
         </div>
       );

@@ -184,7 +184,7 @@ export function VisualiseTable({
                   return (
                     <TableHead
                       key={header.id}
-                      className={`${index === 0 ? "border-r-[1px]  bg-secondary sticky left-0" : ""}`}
+                      className={`${index === 0 ? "border-r-[1px] hover:opacity-100 bg-secondary sticky left-0" : ""}`}
                     >
                       {header.isPlaceholder
                         ? null

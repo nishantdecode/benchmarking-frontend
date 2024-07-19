@@ -255,7 +255,7 @@ const SingleBankPage = () => {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col justify-start items-center w-full lg:w-5/6 gap-10">
+          <div className={`flex flex-col h-auto w-full ${break1 ? "lg:w-[67vw]" : "lg:w-[75vw]"} lg:max-w-5/6 gap-2 sm:gap-3 md:gap-8 lg:gap-10`}>
             <div className="h-auto w-full">
               {individualBankSize && (
                 <VisualiseTable
