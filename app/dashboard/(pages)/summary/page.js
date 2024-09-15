@@ -222,7 +222,7 @@ const Summary = () => {
   // };
 
   const fetchData = async () => {
-    const url = `https://analytic.benchmarking.brihatinfotech.com/api/executiveSummary/metric?interval=${interval}&startPeriod=${interval === 'QUARTERLY' ? `${quarter} ${startPeriod}` : startPeriod
+    const url = `${process.env.NEXT_PUBLIC_ENV === "DEV" ? process.env.NEXT_PUBLIC_DEV_ANALYTICS_API : process.env.NEXT_PUBLIC_PROD_ANALYTICS_API}/executiveSummary/metric?interval=${interval}&startPeriod=${interval === 'QUARTERLY' ? `${quarter} ${startPeriod}` : startPeriod
       }&endPeriod=${interval === 'QUARTERLY' ? `${quarter2} ${endPeriod}` : endPeriod}`;
 
     try {

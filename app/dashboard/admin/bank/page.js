@@ -99,8 +99,8 @@ const BankPage = () => {
             `Successfully Added ${response.data.result.name}!`,
             undefined
           );
-          // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
-          window.location.href = "https://benchmarking-fe.vercel.app/dashboard/admin";
+          window.location.href = process.env.NEXT_PUBLIC_ENV === "DEV" ? "http://localhost:3000/dashboard/admin" :
+          "https://benchmarking-frontend.vercel.app/dashboard/admin";
         } else showToast("Error", response.error.data.message);
       } catch (err) {
         showToast("Error!", "Please try again later.");
@@ -114,8 +114,8 @@ const BankPage = () => {
             `Successfully Updated Bank ${response.data.result.name} !`,
             undefined
           );
-          // window.location.href = process.env.NEXT_PUBLIC_ADMIN_REDIRECT;
-          window.location.href = "https://benchmarking-fe.vercel.app/dashboard/admin";
+          window.location.href = process.env.NEXT_PUBLIC_ENV === "DEV" ? "http://localhost:3000/dashboard/admin" :
+          "https://benchmarking-frontend.vercel.app/dashboard/admin";
         } else showToast("Error", response.error.data.message);
       } catch (err) {
         showToast("Error!", "Please try again later.");
