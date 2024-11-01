@@ -8,7 +8,7 @@ A powerful data visualization tool designed for financial insights across 10+ ba
 
 ## Demo Video
 
-[![Demo Video](https://i.ibb.co/bQ9Tk71/Benchmarking.png)](https://drive.google.com/file/d/1FuU8JBrRVSCwgt1sA-1IpJ0WduCtKL9t/view?usp=sharing)
+[![Demo Video](https://i.ibb.co/bQ9Tk71/Benchmarking.png)](https://drive.google.com/file/d/11evRlxiQ7OI4-8sgEtPDMyIx1XqFS2jg/view?usp=sharing)
 
 ## Table of Contents
 
